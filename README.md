@@ -41,10 +41,12 @@ Read the [student guide](student-guide.md) for more detailed information on how 
 
 Add your team details here:
 
-- Team name:
+- Team name: Boys in Beige
 - Module: CMP-5012B – Software Engineering
-- Year:
+- Year: 2nd
 - Team members:
-  - Name 1 (GitHub: `@username`)
-  - Name 2 (GitHub: `@username`)
-  - ...
+  - Oliver Ward (GitHub: `@0liverward`)
+  - Luke Wootton (GitHub: `@username`)
+  - Aidan Wood (GitHub: `@username`)
+  - Emilio Knock (GitHub: `@username`)
+  - Harry Tyson (GitHub: `@username`)
