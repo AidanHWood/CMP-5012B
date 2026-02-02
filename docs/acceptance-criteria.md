@@ -10,7 +10,7 @@
 
 ---
 
-## Story 2: Leonard - Track Progress Over Time to Improve Physique
+## Story 4: Leonard - Track Progress Over Time to Improve Physique
 
 - Given Leonard has logged into the system, When he records workout or calorie data, Then the data is stored and added to his health history
 
@@ -20,7 +20,7 @@
 
 ---
 
-## Story 2: Olivia - Compete With Friends Using Rankings
+## Story 5: Olivia - Compete With Friends Using Rankings
 
 - Given Olivia is logged in and connected with friends, When she opens the ranking view, Then she can see a ranked list comparing her progress with her friends
 
