@@ -1,3 +1,3 @@
 # Wireframes
 
-![Wireframe](wireframe.png)
+![Wireframe](Wireframe.png)
