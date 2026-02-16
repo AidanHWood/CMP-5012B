@@ -2,10 +2,10 @@
 
 ## Diagram 1: [Name]
 
-![Sequence Diagram 1](sequence_diagram_1.png)
+![Sequence Diagram 1](design/Kieran Sequence Diagram.pdf)
 
-### Notes
+This Diagram is of Kieran, it goes over several sequences such as adding items to his food tracker, reading his past food tracker additions and setting up a daily reminder notification.
 
-(Which user story this sequence supports, and any important design decisions.)
+## Diagram 2: [Leonard]
 
-(Add more diagrams as needed.)
+![Sequence Diagram 2](design/Leonard Sequence Diagram.pdf)
