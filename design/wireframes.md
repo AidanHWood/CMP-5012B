@@ -1,3 +1,3 @@
 # Wireframes
 
-![Wireframe](./design/wireframe.png)
+![Wireframe](wireframe.png)
