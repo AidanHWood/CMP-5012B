@@ -1,6 +1,6 @@
 ------- Functional Requirements -------
 1. Food and Calorie Tracking<br>
-        The system will allow users to log meals and snacks with nutritional content.
+        &nbsp; &nbsp; &nbsp;The system will allow users to log meals and snacks with nutritional content.
 2. Workout Tracker<br>
         Users will be allowed to log workouts including type, duration, intensity and calories burned.
 3. Progress Visualisation<br>
