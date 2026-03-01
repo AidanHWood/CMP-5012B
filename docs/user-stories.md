@@ -7,7 +7,7 @@ Use the format:
 ## Story List
 |Story Number       | User Name            | Story | Key Story |
 |--------------------|-------------------------|-----------------------------------------------------|------------------------------------------|
-| 1  | Kieran | Easy navigation, quick data entryb, real-time updates, clear visualisations, data privacy, mobile accessibility| TRUE |
+| 1  | Kieran | Easy navigation, quick data entry, real-time updates, clear visualisations, data privacy, mobile accessibility| TRUE |
 | 2 | Kieran | As the user Kieran he wants to be able to build better habits around his diet, by tracking his daily food intake he wants to ensure that he can improve his health without being overwhelmed.| TRUE |
 | 3 | Leonard |As the user Leonard he wants to create fitness content as an influencer so that he can promote self-improvement onto others | FALSE |
 | 4 | Leonard |As the user Leonard, he wants to continue improving his physique by tracking progress over time so that he can improve his brand image and stay healthy |  TRUE |
