@@ -1,9 +1,0 @@
-
-
-| Application | Features | Strengths | Drawbacks |
-| :---- | :---- | :---- | :---- |
-| MyFitnessPal | Comprehensive food and nutrient logging, Barcode scanner for food items, calorie and macro goals, synced with other apps and wearables, progress charts and reports. | Excellent food database which reduces user effort in logging meals, strong calorie and nutritional insights, good progress tracking, synced with other apps. | Can feel overwhelming for casual users, heavy focus on numbers which could increase anxiety around food, social features are limited leading to less motivation. |
-| Strava | GPS tracking for running and cycling, performance analytics and leaderboards, segments and challenges, strong social sharing features. | Excellent for tracking runs/rides, community engagement and shared challenges, great visualisation of routes and performance. | Mostly activity/athlete-focused, can feel intimidating for beginners, social features can feel exclusive/competitive. |
-| Fitbit | Activity tracking (steps, heart rate, workouts), sleep tracking, food and water logging, goal setting, synced with other fitbit devices. | Large array of different tracking possibilities, great reminders and motivation, easy logging and visual feedback. | Full functionality often depends on owning a fitbit device, interface can feel cluttered with metrics, food database is not as extensive as MyFitnessPal |
-| Couch To 5K | Structured running programmes, audio coaching prompts, gradual progression from walk to run, goal-oriented schedule. | Amazing for beginners as goals are clear and achievable, motivational design and guidance, reduces intimidation of starting exercise. | Very narrow focus as it only does running, doesn't include any diet or broader health metrics, little to no social sharing features. |
-
