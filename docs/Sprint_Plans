@@ -1,0 +1,228 @@
+Software Development – Health Tracker System
+First Sprint (Week 6 – 8)
+
+First Sprint Objective
+To implement foundational system functionality including user authentication, basic caloric and exercise logging, simple goal management and responsive user interface support.
+
+First Sprint Features
+
+User Authentication and Security
+
+Registration: The system shall allow users to register with:
+•	Unique username
+•	Valid email address
+•	Secure password
+
+Validation and Security
+•	Username uniqueness check
+•	Email is validated via a regex
+•	Password strength value validation via a regex
+•	Passwords hashed before DB storage
+
+Login Validation
+•	Credential verification against stored values in database
+•	Incorrect credentials rejected
+•	Session initiated on successful verification
+
+Password Recovery
+•	Button to reset password
+•	Page to re-enter a new password
+•	System must update that user’s password in DB
+
+User Health Profile
+•	The system shall capture the following user health attributes:
+•	Height 
+•	Weight
+•	Age 
+•	Biological Sex
+
+These attributes shall support:
+•	BMI calculation
+•	Goal Validatio
+•	Caloric Expenditure Modelling
+
+Validation Contraints
+•	Height and weight must fall within realistic human ranges
+•	Age must fall within acceptable user limits
+•	Values mut be numeric
+
+Database Schema and ERDs
+A structured relation schema will be developed including 
+•	Users 
+•	calorieLogs
+•	ExerciseLogs
+•	Goals
+
+An Entity Relationship Diagram (ERD) will also define 
+•	Primary keys
+•	Foreign keys
+•	Data relationships
+•	Entity constraints
+
+Basic Caloric Logging
+Users shall manually input 
+•	Food names 
+•	Caloric value
+•	Timestamp
+
+Validation constraints
+•	Numeric only
+•	Realistic intake bounds enforced
+•	Negative values rejected 
+A publicly available caloric dataset will be identified for future integration
+
+Exercise logging 
+Users log:
+•	Activity type out of three subgroups: sport, gym and recreational
+•	Active minutes partaking in one of the subgroups
+Calories burned calculated initially as = Active minutes x Predefined caloric burn rate
+
+Validation Ensures
+•	Numeric values 
+•	Realistic daily limits
+
+
+Basic Goal Setting
+Users Shall:
+•	Set manual goals
+•	Define future target date
+•	Goal Logic:
+•	Compare user logs to target 
+•	Reject if goal has unrealistic value
+
+Basic Responsive UI
+•	Minimal dashboard interface
+•	Functional forms
+•	CSS @media queries for mobile responsiveness
+•	Clear validation messaging
+
+
+First Sprint Test Cases
+Authentication Test
+•	Duplicate username rejected
+•	Invalid email rejected 
+•	Weak password rejected 
+•	Password stored hashed 
+•	Successful login creates session
+
+Caloric Logging Tests
+•	Non-Numeric rejected
+•	Out-of-Range rejected
+•	Valid entry saved correctly
+
+Exercise Tests
+•	Invalid minutes rejected 
+•	Calculation correct
+•	Stored with timestamp
+
+Goal Tests
+•	Unrealistic values rejected
+•	Goal met logic functions correctly
+
+
+
+
+Second Sprint (Week 9 – 11)
+
+Second Sprint Objective
+To extend the system with automated data integration, advanced goal logic, group functionality, leaderboards, email notifications and data visualisation. 
+
+Second Sprint Features
+Calorie Dataset Integration
+•	Integration of structured calorie dataset
+•	Automatic food lookup functionality
+•	Macro-nutrient calculation based on food input weight 
+•	Ability to add common meals to internal dataset (E.g. Chicken & Rice)
+•	Persist saved user meals in a separate table
+
+Exercise Types database expansion
+•	Database driven exercise type categories 
+•	Subgroups based on predefined structure. For example: 
+  o	 Cardio
+  o	Strength Training
+  o	Bodyweight
+  o	HIIT & Circuits
+  o	Sports
+  o	Mobility & Recovery
+•	These will also have their own predefined caloric burn rate, improving accuracy
+•	Dynamic retrieval from database
+
+Automatic Food and Macro Calculation
+System shall:
+•	Retrieve caloric data automatically
+•	Adjust macros proportionally to portion weight 
+•	Store macro breakdown (protein, carbs, fats)
+
+Historic Data Visualisation
+•	Extrapolate historical caloric, exercise, and weight data
+•	Generate graphical trend outputs
+•	Display development over time
+•	Charts to be implemented via backend data processing and frontend visualisation libraries.
+
+
+
+Enhanced Goal Logic
+•	Complex goal creation (distance/time targets)
+•	Automatic goal expiration detection
+•	Timestamp goal creation and deadline
+•	Prompt user to set new goal if achieved 
+•	Prevent invalid goal times 
+•	Automatic expired goal notification
+
+Group Functionality
+Group creation 
+•	Create unique group name 
+•	Store group owner
+
+Group membership 
+•	Share join link via email 
+•	Allow users to join group
+•	Allow users to leave group
+
+Group goals and leaderboards
+•	Create group-level goals 
+•	Track progress of members
+•	Generate leaderboard ranking 
+•	Notify group via email when goals are met
+
+Email Integration
+•	Password recovery emails 
+•	Group join link emails
+•	Group goal achievement notifications
+•	Goal expiry reminders
+
+Security and Data Integrity Enhancements
+•	Ensure passwords remain hashed
+•	Validate input constraints across all new features
+
+
+
+
+
+Second Sprint Test Cases
+Dataset and Lookup Testing
+•	Test dataset retrieval accuracy
+•	Test macro calculation correctness
+•	Test saving and retrieving common meals
+•	Test user entering and retrieving saved/recent meals
+
+Exercise testing
+•	Test database-driven exercise types
+•	Validate calorie burn calculations
+
+Goal Testing
+•	Test timestamp functionality 
+•	Test expiry logic
+•	Test invalid time input rejection
+•	Test complex goal conditions
+
+Group testing
+•	Test group creation
+•	Test join link functionality
+•	Test leaving group
+•	Test group leaderboard accuracy
+•	Test group goal achievement triggers email
+
+Security testing
+•	Confirm password hashing 
+•	Test password recovery process
