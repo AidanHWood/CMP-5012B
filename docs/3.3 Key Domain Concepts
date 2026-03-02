@@ -1,0 +1,105 @@
+https://miro.com/app/board/uXjVGKyTLaM=/?moveToWidget=3458764661864981097&cot=14
+
+The above is a link to the domain concepts diagram on miro, please make sure that it is uploaded as its rlly important. xx
+
+
+Our health tracking system is centred around several recurring real-world concepts that shape both user interaction and architectural design. These concepts represent meaningful entities in the problem domain rather than technical implementation details. They inform the system’s structure and will guide later design and development decisions.
+
+User
+Real-World Concept
+•	A person engaging with the system to monitor and improve their health behaviours
+Representation within our System
+•	Unique user account
+•	Login credentials
+•	Profile information
+•	Role (standard user, admin, etc)
+Link to our User stories
+•	User Story 1: “As a user, I want to navigate the app easily and enter data quickly so that tracking my health feels simple and not overwhelming”.
+•	User Story 5: “As Olivia, I want to compare my progress with friends using a ranking system so that I stay motivated to train”.
+The User concept is central to the system. All other domain entities are associated with a user
+Profile
+Real-World Concept
+A structured personal identity containing relevant background information
+Representation in the system
+•	Age, weight, height 
+•	Preferences
+•	Health goals 
+•	Activity settings
+Links to user journeys
+When a user first registers, they create a profile that informs personalised tracking and feedback. The profile influences progress calculations 
+
+
+
+
+Health Metric 
+Real-World Concept
+A measurable indicator of health or behaviour
+Representation in the System 
+•	Metric type
+•	Value
+•	Timestamp
+•	Associated user
+Links to user stories
+•	User Story 4: “As Leonard, I want to track my fitness progress over time so that I can monitor improvement and stay motivated.”
+•	User Story 2: “As Kieran, I want to log my daily food intake so that I can build better eating habits and improve my health.”
+Health metrics form the primary data stored in the system and enable progress tracking
+Goal
+Real World Concept
+A target outcome a user aims to achieve
+Representation in the system
+•	Target value
+•	Timeframe
+•	Progress status
+Link to user journeys
+When users set goals, the system compares logged metrics against these targets and provides feedback or ranking updates
+Goals provide direction and motivation
+
+
+
+
+
+
+
+
+
+Progress
+Real-World concept
+Change over time toward a desired outcome
+Representation in the system 
+•	Trend analysis 
+•	Daily summaries 
+•	Historical comparisons
+Link to user stories
+User Story 4: “As Leonard, I want to track my fitness progress over time so that I can monitor improvement and stay motivated”
+Progress is derived from multiple health metrics and displayed through visualisations and summaries
+Friendship
+Real-World Concept
+A social connection between users enabling shared comparison and motivation
+Representation in the system
+•	Friend Request 
+•	Approved connection
+•	Shared ranking visibility
+Link to user stories
+User Story 5: “As Olivia, I want to compare my progress with friends using a ranking system so that I stay motivated to train”
+Friendship enables the ranking feature and increases engagement
+
+Ranking
+Real-World Concept
+A comparative ordering of users based on progress or performance
+Representation in the System
+•	Calculated score 
+•	Leaderboard position
+•	Comparison metrics
+Link to user journey
+After progress updates, the system recalculates rankings and updates the leaderboard, which then reinforces motivation
+
+Feedback & Notifications
+Real-World Concept
+Information and notification provided to users to encourage behavioural change
+Representation in the system
+•	Daily summaries 
+•	Notifications
+•	Visual progress indicators
+Link to user stories
+•	Users receive feedback after logging food or exercise
+•	Notifications reinforce habit formation
