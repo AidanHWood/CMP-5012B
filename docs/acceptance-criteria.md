@@ -33,10 +33,12 @@ non functional
 - Given Olivia logs a new activity, When she refreshes or reopens the ranking view, Then the leaderboard updates to reflect the new ranking position
 - Given two or more users have equal weekly workout counts, When the rankings are calculated, Then the system assigns equal ranking positions or applies a pre-defined tie-breaking rule
 - Given Olivia hasn't added any friends, When she attempts to view rankings, Then the system displays a message explaining that rankings require connected friends.
+- Given the ranking service is unavailable, When Olivia attempts to access the leaderboard, Then the system displays a temporary service unavailable message without crashing.
 
 - NON-FUNCTIONAL
 - The leaderboard must load within 5 seconds
 - Only authenticated and authorised users may access ranking data
+- Given two users log workouts simultaneously, When rankings are recalculated, Then the system ensures consistent and accurate leaderboard ordering.
 ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # Acceptance Criteria - ENTRY 1
