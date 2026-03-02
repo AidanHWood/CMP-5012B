@@ -7,12 +7,13 @@ Use the format:
 ## Story List
 |Story Number       | User Name            | Story | Key Story |
 |--------------------|-------------------------|-----------------------------------------------------|------------------------------------------|
-| 1  | Kieran | Easy navigation, quick data entry, real-time updates, clear visualisations, data privacy, mobile accessibility| TRUE |
-| 2 | Kieran | As the user Kieran he wants to be able to build better habits around his diet, by tracking his daily food intake he wants to ensure that he can improve his health without being overwhelmed.| TRUE |
-| 3 | Leonard |As the user Leonard he wants to create fitness content as an influencer so that he can promote self-improvement onto others | FALSE |
-| 4 | Leonard |As the user Leonard, he wants to continue improving his physique by tracking progress over time so that he can improve his brand image and stay healthy |  TRUE |
-| 5  | Olivia | As the user Olivia, she wants to be able to be able compete with her friends with a ranking so that she can stay motivated in the gym | TRUE |
-| 6 | Olivia | As the user Olivia, she wants to be able to find vetted friends so that she doesn’t feel uncomfortable or scared to train by herself  | FALSE |
+| 1  | Kieran | As a user, I want to navigate the app easily and enter data quickly so that tracking my health feels simple and not overwhelming| TRUE |
+| 2 | Kieran | As Kieran, I want to log my daily food intake so that I can build better eating habits and improve my health. | TRUE |
+| 3 | Leonard |As the user Leonard, I want to create fitness content as an influencer so that I can promote self-improvement onto others | FALSE |
+| 4 | Leonard |As Leonard, I want to track my fitness progress over time so that I can monitor improvement and stay motivated |  TRUE |
+| 5  | Olivia |As Olivia, I want to compare my progress with friends using a ranking system so that I stay motivated to train
+| TRUE |
+| 6 | Olivia | As the user Olivia, I want to be able to find vetted friends so that I don't feel uncomfortable or scared to train by myself  | FALSE |
 
 
 
