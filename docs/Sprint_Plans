@@ -38,13 +38,13 @@ User Health Profile
 
 These attributes shall support:
 •	BMI calculation
-•	Goal Validatio
+•	Goal Validation
 •	Caloric Expenditure Modelling
 
-Validation Contraints
+Validation Constraints
 •	Height and weight must fall within realistic human ranges
 •	Age must fall within acceptable user limits
-•	Values mut be numeric
+•	Values must be numeric
 
 Database Schema and ERDs
 A structured relation schema will be developed including 
@@ -136,7 +136,7 @@ Calorie Dataset Integration
 •	Persist saved user meals in a separate table
 
 Exercise Types database expansion
-•	Database driven exercise type categories 
+•	Database-driven exercise type categories 
 •	Subgroups based on predefined structure. For example: 
   o	 Cardio
   o	Strength Training
