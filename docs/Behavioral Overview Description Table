@@ -1,0 +1,10 @@
+## Behaviour and Interaction Overview
+
+The following table summarises the sequence diagrams used to illustrate key system interactions. Each interaction corresponds to a core user story and demonstrates how different system components collaborate to support the required functionality.
+
+| Diagram Number | Explanation |
+|---------------|-------------|
+| **1** | **Supports Story 2: Kieran – Track Daily Food Intake.** The authenticated user submits a food entry containing a meal type and calorie value. The UI sends this data to the backend where validation checks are performed before storage. The backend ensures required fields are present and calorie inputs are numeric and non-negative. If validation fails, submission is rejected and the UI prompts correction. If valid, the entry is stored in the database with a timestamp. Daily totals are calculated dynamically by retrieving all entries for that date and aggregating them. |
+| **2** | **Supports Story 4: Leonard – Track Progress Over Time.** When Leonard accesses the progress view, the backend retrieves timestamped entries for the selected date range. If insufficient data exists, the system returns a message indicating that more data is required. If sufficient data exists, the backend aggregates the records and returns a structured dataset to the UI where the visualisation module renders a time-based graph. |
+| **3** | **Supports Story 5: Olivia – Compare Progress with Friends.** When Olivia opens the ranking view, the backend verifies authentication and retrieves accepted friends. If no friends exist, a message is returned explaining that rankings require connections. If friends exist, activity data is retrieved and passed to the ranking module which calculates the leaderboard dynamically. |
+| **4** | **Supports Story 5: Activity Logging and Ranking Updates.** This interaction demonstrates how activity logging integrates with the ranking system. When a new workout is recorded, the entry is validated and stored. When the ranking view is refreshed, the leaderboard is recalculated dynamically using updated activity data. |
