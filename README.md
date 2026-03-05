@@ -45,8 +45,8 @@ Add your team details here:
 - Module: CMP-5012B – Software Engineering
 - Year: 2nd
 - Team members:
-  - Aidan Wood (GitHub: `@username`)
+  - Aidan Wood (GitHub: `@AidanHWood`)
   - Oliver Ward (GitHub: `@0liverward`)
   - Luke Wootton (GitHub: `@LUKEWOTUEA`)
-  - Emilio Knock (GitHub: `@username`)
-  - Harry Tyson (GitHub: `@username`)
+  - Emilio Knock (GitHub: `@Em140`)
+  - Harry Tyson (GitHub: `@HarryTys`)
