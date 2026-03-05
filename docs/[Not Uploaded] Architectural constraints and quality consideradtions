@@ -1,0 +1,9 @@
+Architectural constraints and quality considerations
+
+Performance expectations: There should be no large performance concerns for modern day devices connected to the internet and is therefore widely accessible and with optimisation shouldn’t have issues on less powerful devices. Good performance on modern devices means easy access and solid performance for users without having to invest in additional physical equipment giving us a low access requirement that should easily be able to meet our acceptance criteria involving our loading or processing speeds server side.
+
+Reliability and availability needs: The aim is for the system to be highly reliable with little to no performance drops on even lower spec devices and to remain available at all times but depending on time and budget a permanent hosting rig may be difficult.
+
+Security and data protection concerns: There will be many protected parts of our system especially the databases, with all sensitive data being stored as hashed values and no data stored beyond what is being explicitly asked for (Name, age, ect…) These implementations will hopefully reduce any security concerns and vulnerabilities within our system. 
+
+Usability and accessibility concerns: The website is designed to be user friendly and easily navigable by users regardless of age demographics and technological backgrounds so with even the most basic level of technology literacy the site is accessible and very usable.
