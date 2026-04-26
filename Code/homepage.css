@@ -10,7 +10,6 @@ body {
     background-size: 40px 40px;
 }
 
-/* Navbar */
 .navbar {
     position: fixed;
     top: 0;
@@ -32,7 +31,6 @@ body {
     z-index: 1000;
 }
 
-/* Title */
 .site-title {
     position: fixed;
     top: 80px;
@@ -58,7 +56,6 @@ body {
     opacity: 0.7;
 }
 
-/* Navigation */
 .nav-links {
     list-style: none;
     display: flex;
@@ -89,7 +86,6 @@ body {
     opacity: 0.6;
 }
 
-/* Mobile menu */
 #menu-toggle {
     display: none;
 }
@@ -129,7 +125,6 @@ body {
     }
 }
 
-/* Content layout */
 .content {
     padding-top: 160px;
 
@@ -140,7 +135,6 @@ body {
     min-height: 100vh;
 }
 
-/* Card */
 .home-box {
     text-align: center;
 
@@ -153,7 +147,6 @@ body {
     box-shadow: 0 20px 40px rgba(0,0,0,0.08);
 }
 
-/* Register link */
 .register-link {
     display: inline-block;
     margin-top: 10px;

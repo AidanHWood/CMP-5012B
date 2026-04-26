@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title>Register - Health Tracking System</title>
     <link rel="stylesheet" href="homepage.css">
+    <link rel="stylesheet" href="register.css">
 </head>
 
 <body>
@@ -25,8 +26,37 @@
 </header>
 
 <a class="site-title">
-    Register
+    Health Tracking System
 </a>
+
+<div class="content form-page">
+
+    <form class="form-card">
+
+        <h2>Create Account</h2>
+
+        <label for="username">Username</label>
+        <input id="username" name="username" type="text" placeholder="Enter username" required>
+
+        <label for="email">Email</label>
+        <input id="email" name="email" type="email" placeholder="Enter email" required>
+
+        <label for="password">Password</label>
+        <input id="password" name="password" type="password" placeholder="Enter password" required>
+
+        <label for="confirmPassword">Confirm Password</label>
+        <input id="confirmPassword" name="confirmPassword" type="password" placeholder="Confirm password" required>
+
+        <button type="submit">Register</button>
+
+        <p class="form-link">
+            Already have an account?
+            <a href="login.html">Login</a>
+        </p>
+
+    </form>
+
+</div>
 
 </body>
 </html>

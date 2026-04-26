@@ -1,0 +1,68 @@
+.form-page {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+.form-card {
+    width: 100%;
+    max-width: 420px;
+    padding: 35px;
+
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid rgba(0,0,0,0.08);
+    border-radius: 16px;
+
+    box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.form-card h2 {
+    margin: 0 0 10px;
+    font-size: 28px;
+    text-align: center;
+}
+
+.form-card label {
+    font-weight: 700;
+    font-size: 14px;
+}
+
+.form-card input {
+    padding: 12px 14px;
+    border: 1px solid rgba(0,0,0,0.12);
+    border-radius: 10px;
+
+    font-size: 15px;
+    font-family: inherit;
+}
+
+.form-card button {
+    margin-top: 10px;
+    padding: 13px;
+
+    border: none;
+    border-radius: 10px;
+
+    background: #0a0a0a;
+    color: white;
+
+    font-size: 16px;
+    font-weight: 800;
+
+    cursor: pointer;
+    transition: opacity 0.2s ease;
+}
+
+.form-card button:hover {
+    opacity: 0.85;
+}
+
+.form-link {
+    text-align: center;
+    font-size: 14px;
+}
