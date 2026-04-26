@@ -7,7 +7,7 @@ const path = require('path');
 const router = express.Router();
 const SALT_ROUNDS = 12;
 
-//THIS SHIT IS TEMPORARY UNTIL I ADD THE POSTGRES TABLES
+//THIS SHIT IS TEMPORARY UNTIL I ADD THE POSTGRESQL TABLES
 const users = [];
 let nextId = 1;
 

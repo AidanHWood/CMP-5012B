@@ -57,3 +57,6 @@ async function handleRegister() {
         btn.textContent = 'Create Account';
     }
 }
+
+
+//The user will have to fill this out every time the server is restarted at the moment, will be fixed later xx

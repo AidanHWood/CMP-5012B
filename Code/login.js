@@ -1,3 +1,5 @@
+
+//Generating the likkle CSRF token
 async function getCsrfToken() {
     const res = await fetch('/api/csrf-token', {
         credentials: 'same-origin'
@@ -7,7 +9,7 @@ async function getCsrfToken() {
     return data.csrfToken;
 }
 
-
+//func that handles the login tingy
 async function handleLogin() {
     const btn = document.getElementById('loginBtn');
     const errorBox = document.getElementById('errorBox');

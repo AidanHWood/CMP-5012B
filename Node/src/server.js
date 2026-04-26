@@ -1,3 +1,5 @@
+//Server code, this is where we install the dependencies, specify the paths, create the session and generate the secret etc yap yap
+
 const express = require('express');
 const session = require('express-session');
 const path = require('path');
