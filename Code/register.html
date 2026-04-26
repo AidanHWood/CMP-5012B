@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Register</title>
+</head>
+<body>
+<h1>Register</h1>
+
+<div id="errorBox" style="display:none; color:red;"></div>
+<div id="successBox" style="display: none; color:green;"></div>
+
+<label>Username<br><input type="text" id="username"/></label><br><br>
+<label>Full Name<br><input type="text" id="real_name"/></label><br><br>
+<label>Email<br><input type="email" id="email"/></label><br><br>
+<label>Password<br><input type="password" id="password"/></label><br><br>
+<label>Confirm Password<br><input type="password" id="confirm_password"/></label><br><br>
+<label>Height (cm)<br><input type="number" id="height_cm"/></label><br><br>
+<label>Weight (kg)<br><input type="number" id="weight_kg"/></label><br><br>
+<label>Age<br><input type="number" id="age"/></label><br><br>
+<label>Gender<br>
+    <select id="gender">
+        <option value="">Prefer not to say</option>
+        <option value="male">Male</option>
+        <option value="female">Female</option>
+    </select>
+</label><br><br>
+
+<button id="registerBtn" onclick="handleRegister()">Create Account</button>
+<p><a href="/login">Already have an account? Sign in</a></p>
+<script src="/register.js"></script>
+</body>
+</html>

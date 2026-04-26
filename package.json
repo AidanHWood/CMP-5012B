@@ -1,0 +1,21 @@
+{
+  "name": "cmp-5012b",
+  "version": "1.0.0",
+  "description": "This repository is a starter template for team projects in **CMP-5012B – Software Engineering**.",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bcrypt": "^6.0.0",
+    "express": "^5.2.1",
+    "express-rate-limit": "^8.4.1",
+    "express-session": "^1.19.0"
+  }
+}
