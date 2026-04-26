@@ -126,19 +126,18 @@ body {
 }
 
 .content {
-    padding-top: 160px;
+    padding-top: 200px;
+    min-height: calc(100vh - 200px);
 
     display: flex;
     justify-content: center;
-    align-items: center;
-
-    min-height: 100vh;
+    align-items: flex-start;
 }
 
 .home-box {
     text-align: center;
 
-    background: rgba(255, 255, 255, 0.85);
+    background: rgba(255, 255, 255, 0.9);
     padding: 30px 40px;
 
     border-radius: 16px;
