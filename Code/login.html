@@ -1,25 +1,64 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8"/>
-    <title>Login</title>
+    <meta charset="UTF-8">
+    <title>Login - Health Tracking System</title>
+    <link rel="stylesheet" href="homepage.css">
+    <link rel="stylesheet" href="auth.css">
 </head>
+
 <body>
-<h1>Login</h1>
 
-<div id="errorBox" style="display:none; color:red;"></div>
+<header class="navbar">
+    <nav>
+        <input type="checkbox" id="menu-toggle" />
+        <label for="menu-toggle" class="menu-icon">☰</label>
 
-<label>Username or Email<br>
-    <input type="text" id="username" autocomplete="username"/>
-</label><br><br>
+        <ul class="nav-links">
+            <li><a href="homepage.html">Home</a></li>
+            <li><a href="dashboard.html">Dashboard</a></li>
+            <li><a href="logCalories.html">Log Calories</a></li>
+            <li><a href="logExercise.html">Log Exercise</a></li>
+            <li><a href="userSettings.html">User Settings</a></li>
+            <li><a href="login.html">Login</a></li>
+        </ul>
+    </nav>
+</header>
 
-<label>Password<br>
-    <input type="password" id="password" autocomplete="current-password"/>
-</label><br><br>
+<h1 class="site-title">
 
-<button id="loginBtn" onclick="handleLogin()">Sign In</button>
-<p>Don't have an account?</p>
-<a href="/register">Register</a>
-<script src="login.js"></script>
+    Health Tracking System
+
+</h1>
+
+<div class="content form-page">
+
+    <form class="form-card">
+
+        <h2>Login</h2>
+
+        <label for="username">Username or Email</label>
+
+        <input id="username" name="username" type="text" placeholder="Enter username or email" required>
+
+        <label for="password">Password</label>
+
+        <input id="password" name="password" type="password" placeholder="Enter password" required>
+
+        <button type="submit">Login</button>
+
+        <p class="form-link">
+
+            Don't have an account?
+
+            <a href="register.html">Register</a>
+
+        </p>
+
+    </form>
+
+</div>
+
 </body>
+
 </html>
