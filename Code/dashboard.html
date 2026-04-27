@@ -1,32 +1,100 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Dashboard - Health Tracking System</title>
-    <link rel="stylesheet" href="homepage.css">
-</head>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Dashboard</title>
+        <link rel="stylesheet" href="homepage.css">
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    </head>
+    <body>
+        <header class="navbar">
 
-<body>
+            <nav>
+                <input type="checkbox" id="menu-toggle" />
+                <label for="menu-toggle" class="menu-icon">☰</label>
+                <ul class="nav-links">
+                    <li><a href="homepage.html">Homepage</a></li>
+                    <li><a href="dashboard.html">Dashboard</a></li>
+                    <li><a href="logCalories.html">Log Calories</a></li>
+                    <li><a href="logExercise.html">Log Exercise</a></li>
+                    <li><a href="userSettings.html">User Settings</a></li>
+                </ul>
+            </nav>
+        </header>
 
-<header class="navbar">
-    <nav>
-        <input type="checkbox" id="menu-toggle" />
-        <label for="menu-toggle" class="menu-icon">☰</label>
+        <a href="homepage.html" class="site-title">
+            Temp title 
+        </a>
+        <a class="sub-title">
+            Dashboard
+        </a>
 
-        <ul class="nav-links">
-            <li><a href="homepage.html">Home</a></li>
-            <li><a href="dashboard.html">Dashboard</a></li>
-            <li><a href="logCalories.html">Log Calories</a></li>
-            <li><a href="logExercise.html">Log Exercise</a></li>
-            <li><a href="userSettings.html">User Settings</a></li>
-            <li><a href="login.html">Login</a></li>
-        </ul>
-    </nav>
-</header>
+        <div class="content">
+            <div class="dashboard">
+                <div class="card">
+                    <h3>Calories Remaining</h3>
+                    <canvas id="caloriesPie"></canvas>
+                </div>
 
-<a class="site-title">
-    Dashboard
-</a>
+                <div class="card">
+                    <h3>Macronutrients</h3>
+                    <canvas id="macrosPie"></canvas>
+                </div>
 
-</body>
+                <div class="card wide">
+                    <h3>Calories Throughout the Day</h3>
+                    <canvas id="caloriesLine"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <script id="chartjs-setup">
+            new Chart(document.getElementById('caloriesPie'), {
+                type: 'doughnut',
+                data: {
+                    labels: ['Consumed', 'Remaining'],
+                    datasets: [{
+                        data: [1500, 500],
+                        backgroundColor: ['#111', '#e5e5e5']
+                    }]
+                },
+                options: {
+                    plugins: {
+                        legend: { display: false }
+                    }
+                }
+            });
+
+            new Chart(document.getElementById('macrosPie'), {
+                type: 'doughnut',
+                data: {
+                    labels: ['Protein', 'Carbs', 'Fibre'],
+                    datasets: [{
+                        data: [120, 200, 30],
+                        backgroundColor: ['#111', '#777', '#ccc']
+                    }]
+                }
+            });
+
+
+            new Chart(document.getElementById('caloriesLine'), {
+                type: 'line',
+                data: {
+                    labels: ['Breakfast', 'Snack', 'Lunch', 'Snack', 'Dinner'],
+                    datasets: [{
+                        label: 'Calories',
+                        data: [300, 500, 900, 1100, 1500],
+                        borderColor: '#111',
+                        fill: false,
+                        tension: 0.3
+                    }]
+                },
+                options: {
+                    plugins: {
+                        legend: { display: false }
+                    }
+                }
+            });
+        </script>
+    </body>
 </html>
