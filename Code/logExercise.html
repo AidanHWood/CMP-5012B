@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title>Log Exercise - Health Tracking System</title>
     <link rel="stylesheet" href="homepage.css">
+    <link rel="stylesheet" href="logExercise.css">
 </head>
 
 <body>
@@ -24,9 +25,88 @@
     </nav>
 </header>
 
-<a class="site-title">
-    Log Exercise
-</a>
+<div class="content">
+    <div class="log-container">
+        <h1 class="page-heading">Log Exercise</h1>
 
-</body>
-</html>
+        <div class="total-banner">
+            TODAY'S BURN
+            <span class="cal-number">0 kcal</span>
+        </div>
+
+        <div class="form-card">
+            <label>Exercise Type</label>
+
+            <div class="meal-options">
+                <label class="meal-option">
+                    <input type="radio" name="exercise" value="running">
+                    <span>Running</span>
+                </label>
+
+                <label class="meal-option">
+                    <input type="radio" name="exercise" value="cycling">
+                    <span>Cycling</span>
+                </label>
+
+                <label class="meal-option">
+                    <input type="radio" name="exercise" value="walking">
+                    <span>Walking</span>
+                </label>
+
+                <label class="meal-option">
+                    <input type="radio" name="exercise" value="swimming">
+                    <span>Swimming</span>
+                </label>
+
+                <label class="meal-option">
+                    <input type="radio" name="exercise" value="gym">
+                    <span>Gym</span>
+                </label>
+
+                <label class="meal-option">
+                    <input type="radio" name="exercise" value="sport">
+                    <span>Sport</span>
+                </label>
+            </div>
+
+            <label>Duration</label>
+            <input type="number" id="duration" min="0">
+
+            <label>Intensity</label>
+            <div class="meal-options">
+                <label class="meal-option">
+                    <input type="radio" name="intensity" value="low">
+                    <span>Low</span>
+                </label>
+
+                <label class="meal-option">
+                    <input type="radio" name="intensity" value="medium">
+                    <span>Medium</span>
+                </label>
+
+                <label class="meal-option">
+                    <input type="radio" name="intensity" value="high">
+                    <span>High</span>
+                </label>
+            </div>
+
+            <label>Exercise Notes</label>
+            <input type="text" id="notes">
+
+            <div class="total-banner estimate-banner">
+                ESTIMATED BURN
+                <span class="cal-number">0 kcal</span>
+            </div>
+
+            <button class="submit-btn">+ Add Exercise</button>
+        </div>
+
+        <p class="log-section-title">Today's Exercise Log</p>
+
+        <div id="exerciseLogList">
+            <div class="empty-state">
+                No exercise logged yet.
+            </div>
+        </div>
+    </div>
+</div>
