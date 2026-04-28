@@ -250,3 +250,8 @@ button {
 button:hover {
     opacity: 0.8;
 }
+
+nav a.active {
+    text-decoration: underline;
+    font-weight: bold;
+}
