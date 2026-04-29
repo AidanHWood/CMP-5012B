@@ -1,0 +1,302 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Verify Code - Health Tracking System</title>
+    <link rel="stylesheet" href="/homepage.css" />
+    <link rel="stylesheet" href="/auth.css" />
+    <style>
+      /* Extra styles for the OTP input boxes */
+      .otp-inputs {
+        display: flex;
+        gap: 10px;
+        justify-content: center;
+        margin: 20px 0;
+      }
+
+      .otp-inputs input {
+        width: 48px;
+        height: 56px;
+        text-align: center;
+        font-size: 24px;
+        font-weight: 900;
+        border: 2px solid rgba(0, 0, 0, 0.12);
+        border-radius: 10px;
+        outline: none;
+        transition: border-color 0.2s ease;
+        font-family: inherit;
+        color: #0a0a0a;
+        padding: 0;
+      }
+
+      .otp-inputs input:focus {
+        border-color: #0a0a0a;
+      }
+
+      .timer-text {
+        text-align: center;
+        font-size: 13px;
+        color: #999;
+        margin-top: 12px;
+      }
+
+      .resend-link {
+        text-align: center;
+        font-size: 13px;
+        color: #999;
+        margin-top: 10px;
+      }
+
+      .resend-link a {
+        color: #0a0a0a;
+        font-weight: 700;
+        text-decoration: none;
+        cursor: pointer;
+      }
+
+      .resend-link a:hover {
+        opacity: 0.6;
+      }
+    </style>
+  </head>
+
+  <body>
+    <header class="navbar">
+      <nav>
+        <input type="checkbox" id="menu-toggle" />
+        <label for="menu-toggle" class="menu-icon">☰</label>
+
+        <ul class="nav-links">
+          <li><a href="homepage.html">Home</a></li>
+          <li><a href="dashboard.html">Dashboard</a></li>
+          <li><a href="logCalories.html">Log Calories</a></li>
+          <li><a href="logExercise.html">Log Exercise</a></li>
+          <li><a href="userSettings.html">User Settings</a></li>
+          <li><a href="login.html">Login</a></li>
+        </ul>
+      </nav>
+    </header>
+
+    <h1 class="site-title">Health Tracking System</h1>
+
+    <div class="content form-page">
+      <div class="form-card">
+        <h2>Enter Your Code</h2>
+        <p
+          style="
+            text-align: center;
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 8px;
+          "
+        >
+          We sent a 6-digit code to
+          <strong id="emailDisplay">your email</strong>
+        </p>
+
+        <div
+          id="errorBox"
+          style="display: none; color: red; font-size: 14px"
+        ></div>
+        <div
+          id="successBox"
+          style="display: none; color: green; font-size: 14px"
+        ></div>
+
+        <!-- 6 individual digit boxes -->
+        <div class="otp-inputs">
+          <input type="text" maxlength="1" id="otp1" autofocus />
+          <input type="text" maxlength="1" id="otp2" />
+          <input type="text" maxlength="1" id="otp3" />
+          <input type="text" maxlength="1" id="otp4" />
+          <input type="text" maxlength="1" id="otp5" />
+          <input type="text" maxlength="1" id="otp6" />
+        </div>
+
+        <button type="button" id="verifyBtn" onclick="handleVerify()">
+          Verify Code
+        </button>
+
+        <div class="timer-text" id="timer">Code expires in 5:00</div>
+
+        <div class="resend-link">
+          Didn't get the code? <a onclick="handleResend()">Resend</a>
+        </div>
+
+        <p class="form-link" style="margin-top: 16px">
+          <a href="forgot-password.html">← Use a different email</a>
+        </p>
+      </div>
+    </div>
+
+    <script>
+      // ——— Get the email from localStorage ———
+      const resetEmail = localStorage.getItem("resetEmail") || "";
+      if (resetEmail) {
+        document.getElementById("emailDisplay").textContent = resetEmail;
+      } else {
+        // No email stored — send them back
+        window.location.href = "forgot-password.html";
+      }
+
+      // ——— OTP input auto-focus behavior ———
+      // When you type a digit, it automatically jumps to the next box.
+      // Backspace goes back to the previous box.
+      // Pasting a full 6-digit code fills all boxes at once.
+      const otpInputs = document.querySelectorAll(".otp-inputs input");
+
+      otpInputs.forEach((input, index) => {
+        // Only allow digits
+        input.addEventListener("input", function () {
+          this.value = this.value.replace(/[^0-9]/g, "");
+          if (this.value && index < otpInputs.length - 1) {
+            otpInputs[index + 1].focus();
+          }
+        });
+
+        // Backspace moves to previous box
+        input.addEventListener("keydown", function (e) {
+          if (e.key === "Backspace" && !this.value && index > 0) {
+            otpInputs[index - 1].focus();
+          }
+          if (e.key === "Enter") {
+            handleVerify();
+          }
+        });
+
+        // Handle paste — fills all 6 boxes from clipboard
+        input.addEventListener("paste", function (e) {
+          e.preventDefault();
+          const pasted = e.clipboardData.getData("text").replace(/[^0-9]/g, "");
+          otpInputs.forEach((inp, i) => {
+            if (pasted[i]) inp.value = pasted[i];
+          });
+          const focusIndex = Math.min(pasted.length, otpInputs.length) - 1;
+          if (focusIndex >= 0) otpInputs[focusIndex].focus();
+        });
+      });
+
+      // ——— Countdown timer ———
+      // Shows how much time is left before the code expires.
+      // When it hits 0, the message changes to tell them to request a new code.
+      let timeLeft = 5 * 60; // 5 minutes in seconds
+
+      const timerInterval = setInterval(() => {
+        timeLeft--;
+        const mins = Math.floor(timeLeft / 60);
+        const secs = timeLeft % 60;
+        document.getElementById("timer").textContent =
+          `Code expires in ${mins}:${secs.toString().padStart(2, "0")}`;
+
+        if (timeLeft <= 0) {
+          clearInterval(timerInterval);
+          document.getElementById("timer").textContent =
+            "Code expired — request a new one";
+          document.getElementById("timer").style.color = "#d11a2a";
+        }
+      }, 1000);
+
+      // ——— Verify the OTP ———
+      async function handleVerify() {
+        // Collect all 6 digits into one string
+        const otp = Array.from(otpInputs)
+          .map((i) => i.value)
+          .join("");
+        const errorBox = document.getElementById("errorBox");
+        const successBox = document.getElementById("successBox");
+        const btn = document.getElementById("verifyBtn");
+
+        errorBox.style.display = "none";
+        successBox.style.display = "none";
+
+        if (otp.length !== 6) {
+          errorBox.textContent = "Please enter the full 6-digit code.";
+          errorBox.style.display = "block";
+          return;
+        }
+
+        btn.disabled = true;
+        btn.textContent = "Verifying...";
+
+        try {
+          const res = await fetch("/api/verify-otp", {
+            method: "POST",
+            credentials: "same-origin",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email: resetEmail, otp }),
+          });
+
+          const data = await res.json();
+
+          if (!res.ok) {
+            errorBox.textContent = data.errors
+              ? data.errors.join(" ")
+              : "Invalid code.";
+            errorBox.style.display = "block";
+          } else {
+            successBox.textContent = "Code verified! Redirecting...";
+            successBox.style.display = "block";
+            clearInterval(timerInterval);
+            setTimeout(() => {
+              window.location.href = "reset-password.html";
+            }, 1000);
+          }
+        } catch (err) {
+          errorBox.textContent = "Network error. Please try again.";
+          errorBox.style.display = "block";
+        }
+
+        btn.disabled = false;
+        btn.textContent = "Verify Code";
+      }
+
+      // ——— Resend the code ———
+      async function handleResend() {
+        const errorBox = document.getElementById("errorBox");
+        const successBox = document.getElementById("successBox");
+
+        errorBox.style.display = "none";
+        successBox.style.display = "none";
+
+        try {
+          const csrfRes = await fetch("/api/csrf-token", {
+            credentials: "same-origin",
+          });
+          const csrfData = await csrfRes.json();
+
+          const res = await fetch("/api/forgot-password", {
+            method: "POST",
+            credentials: "same-origin",
+            headers: {
+              "Content-Type": "application/json",
+              "X-CSRF-Token": csrfData.csrfToken,
+            },
+            body: JSON.stringify({
+              email: resetEmail,
+              _csrf: csrfData.csrfToken,
+            }),
+          });
+
+          if (res.ok) {
+            successBox.textContent = "New code sent! Check your email.";
+            successBox.style.display = "block";
+
+            // Reset timer
+            timeLeft = 5 * 60;
+            document.getElementById("timer").style.color = "#999";
+
+            // Clear old input
+            otpInputs.forEach((i) => (i.value = ""));
+            otpInputs[0].focus();
+          } else {
+            errorBox.textContent = "Could not resend code. Try again.";
+            errorBox.style.display = "block";
+          }
+        } catch (err) {
+          errorBox.textContent = "Network error. Please try again.";
+          errorBox.style.display = "block";
+        }
+      }
+    </script>
+  </body>
+</html>
