@@ -1,155 +1,278 @@
-.log-container {
-    max-width: 520px;
-    margin: 0 auto;
+:root {
+    --green:    #1a6b3c;
+    --green2:   #2d9156;
+    --lime:     #a8e063;
+    --cream:    #f7f4ef;
+    --dark:     #0e1a12;
+    --muted:    #6b7c6e;
 }
 
-.page-heading {
-    text-align: center;
-    font-size: 32px;
-    font-weight: 900;
-    letter-spacing: -1px;
-    color: #0a0a0a;
-    margin-bottom: 30px;
-}
+    .log-container {
+        max-width: 520px;
+        margin: 0 auto;
+    }
 
-.total-banner {
-    background: #007bb8;
-    color: #fff;
-    text-align: center;
-    padding: 20px;
-    border-radius: 14px;
-    margin-bottom: 24px;
-    font-size: 15px;
-    font-weight: 700;
-    letter-spacing: 0.5px;
-}
+    .page-heading {
+        text-align: center;
+        font-size: 32px;
+        font-weight: 900;
+        letter-spacing: -1px;
+        color: var(--dark);
+        margin-bottom: 30px;
+    }
 
-.total-banner .cal-number {
-    font-size: 40px;
-    font-weight: 900;
-    letter-spacing: -1.5px;
-    display: block;
-    margin-top: 4px;
-}
+    /* Daily total banner */
+    .total-banner {
+        background: var(--green);
+        color: #fff;
+        text-align: center;
+        padding: 20px;
+        border-radius: 14px;
+        margin-bottom: 24px;
+        font-size: 15px;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+    }
 
-.form-card {
-    background: rgba(255, 255, 255, 0.75);
-    backdrop-filter: blur(8px);
-    border: 1px solid rgba(0, 0, 0, 0.05);
-    border-radius: 14px;
-    padding: 24px;
-    margin-bottom: 24px;
-}
+    .total-banner .cal-number {
+        font-size: 40px;
+        font-weight: 900;
+        letter-spacing: -1.5px;
+        display: block;
+        margin-top: 4px;
+    }
 
-.form-card label {
-    display: block;
-    font-size: 13px;
-    font-weight: 700;
-    color: #0a0a0a;
-    margin-bottom: 8px;
-    letter-spacing: 0.3px;
-    text-transform: uppercase;
-}
+    /* Form card — matches your homepage glass style */
+    .form-card {
+        background: rgba(255, 255, 255, 0.75);
+        backdrop-filter: blur(8px);
+        border: 1px solid rgba(0, 0, 0, 0.05);
+        border-radius: 14px;
+        padding: 24px;
+        margin-bottom: 24px;
+    }
 
-.meal-options {
-    display: flex;
-    gap: 8px;
-    margin-bottom: 18px;
-    flex-wrap: wrap;
-}
+    .form-card label {
+        display: block;
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--dark);
+        margin-bottom: 8px;
+        letter-spacing: 0.3px;
+        text-transform: uppercase;
+    }
 
-.meal-option {
-    flex: 1;
-    min-width: 100px;
-}
+    /* Meal type radio buttons */
+    .meal-options {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 18px;
+        flex-wrap: wrap;
+    }
 
-.meal-option input[type="radio"] {
-    display: none;
-}
+    .meal-option {
+        flex: 1;
+        min-width: 100px;
+    }
 
-.meal-option span {
-    display: block;
-    text-align: center;
-    padding: 12px 8px;
-    border: 2px solid rgba(0, 0, 0, 0.08);
-    border-radius: 10px;
-    font-size: 14px;
-    font-weight: 700;
-    color: #007bb8;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    background: white;
-}
+    .meal-option input[type="radio"] {
+        display: none;
+    }
 
-.meal-option span:hover {
-    border-color: rgba(0, 0, 0, 0.2);
-}
+    .meal-option span {
+        display: block;
+        text-align: center;
+        padding: 12px 8px;
+        border: 2px solid rgba(0, 0, 0, 0.08);
+        border-radius: 10px;
+        font-size: 14px;
+        font-weight: 700;
+        color: var(--green);
+        cursor: pointer;
+        transition: all 0.2s ease;
+        background: #fff;
+    }
 
-.meal-option input[type="radio"]:checked + span {
-    border-color: #fff;
-    background: #007bb8;
-    color: #fff;
-}
+    .meal-option span:hover {
+        border-color: rgba(0, 0, 0, 0.2);
+    }
 
-.form-card input[type="text"],
-.form-card input[type="number"] {
-    width: 100%;
-    padding: 14px 16px;
-    border: 2px solid rgba(0, 0, 0, 0.08);
-    border-radius: 10px;
-    font-size: 15px;
-    font-family: inherit;
-    color: #0a0a0a;
-    background: white;
-    margin-bottom: 14px;
-    box-sizing: border-box;
-    transition: border-color 0.2s ease;
-}
+    .meal-option input[type="radio"]:checked + span {
+        border-color: #fff;
+        background: var(--green);
+        color: #fff;
+    }
 
-.form-card input:focus {
-    outline: none;
-    border-color: #0a0a0a;
-}
+    /* Text and number inputs */
+    .form-card input[type="text"],
+    .form-card input[type="number"] {
+        width: 100%;
+        padding: 14px 16px;
+        border: 2px solid rgba(0, 0, 0, 0.08);
+        border-radius: 10px;
+        font-size: 15px;
+        font-family: inherit;
+        color: var(--dark);
+        background: #fff;
+        margin-bottom: 14px;
+        box-sizing: border-box;
+        transition: border-color 0.2s ease;
+    }
 
-.submit-btn {
-    width: 100%;
-    padding: 14px;
-    background: #007bb8;
-    color: #fff;
-    border: none;
-    border-radius: 10px;
-    font-size: 15px;
-    font-weight: 700;
-    font-family: inherit;
-    cursor: pointer;
-    transition: opacity 0.2s ease;
-}
+    .form-card input:focus {
+        outline: none;
+        border-color: var(--dark);
+    }
 
-.submit-btn:hover {
-    opacity: 0.7;
-}
+    .form-card input::placeholder {
+        color: rgba(107, 124, 110, 0.65);
+    }
 
-.log-section-title {
-    font-size: 13px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    color: #999;
-    margin-bottom: 12px;
-}
+    /* Submit button */
+    .submit-btn {
+        width: 100%;
+        padding: 14px;
+        background: var(--green);
+        color: #fff;
+        border: none;
+        border-radius: 10px;
+        font-size: 15px;
+        font-weight: 700;
+        font-family: inherit;
+        cursor: pointer;
+        transition: opacity 0.2s ease;
+    }
 
-.empty-state {
-    text-align: center;
-    padding: 40px 20px;
-    color: #bbb;
-    font-size: 15px;
-    font-weight: 600;
-}
+    .submit-btn:hover {
+        opacity: 0.7;
+    }
 
-.content {
-    padding-top: 80px;
-}
+    /* Log list */
+    .log-section-title {
+        font-size: 13px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: var(--muted);
+        margin-bottom: 12px;
+    }
 
-.estimate-banner {
-    margin-top: 4px;
-}
+    .log-entry {
+        background: rgba(255, 255, 255, 0.75);
+        backdrop-filter: blur(8px);
+        border: 1px solid rgba(0, 0, 0, 0.05);
+        border-radius: 12px;
+        padding: 16px 20px;
+        margin-bottom: 8px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .entry-left {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .meal-tag {
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: var(--muted);
+    }
+
+    .entry-desc {
+        font-size: 15px;
+        font-weight: 600;
+        color: var(--dark);
+    }
+
+    .entry-right {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+    }
+
+    .entry-cals {
+        font-size: 18px;
+        font-weight: 900;
+        color: var(--dark);
+        letter-spacing: -0.5px;
+    }
+
+    .entry-cals small {
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--muted);
+    }
+
+    .delete-btn {
+        background: none;
+        border: none;
+        font-size: 18px;
+        color: rgba(107, 124, 110, 0.45);
+        cursor: pointer;
+        padding: 4px;
+        transition: color 0.2s ease;
+    }
+
+    .delete-btn:hover {
+        color: #e53935;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 40px 20px;
+        color: rgba(107, 124, 110, 0.55);
+        font-size: 15px;
+        font-weight: 600;
+    }
+    .entry-mode-buttons {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 18px;
+    }
+
+    .entry-mode-buttons button {
+        flex: 1;
+        padding: 12px 8px;
+        border: 2px solid rgba(0, 0, 0, 0.08);
+        border-radius: 10px;
+        font-size: 14px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        background: #fff;
+        color: var(--green);
+    }
+
+    .entry-mode-buttons button:hover {
+        border-color: rgba(0, 0, 0, 0.2);
+    }
+
+    .entry-mode-buttons button.active {
+        background: var(--green);
+        color: #fff;
+        border-color: var(--green);
+    }
+    .content {
+        padding-top: 80px;
+    }
+    #m_food_name {
+        margin-bottom: 14px;
+        width: 415px;
+    }
+
+    #m_quantity {
+        margin-bottom: 14px;
+    }
+    #m_meal_type {
+        height: 35px;
+        border-radius: 5px;
+        border: 1px solid rgba(26, 107, 60, 0.2);
+        width: 190px;
+        appearance: none;
+        -webkit-appearance: none;
+    }
