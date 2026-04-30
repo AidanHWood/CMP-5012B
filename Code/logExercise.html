@@ -1,112 +1,439 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
+  <head>
+    <meta charset="UTF-8" />
     <title>Log Exercise - Health Tracking System</title>
-    <link rel="stylesheet" href="homepage.css">
-    <link rel="stylesheet" href="logExercise.css">
-</head>
+    <link rel="stylesheet" href="homepage.css" />
+    <link rel="stylesheet" href="logExercise.css" />
+  </head>
 
-<body>
-
-<header class="navbar">
-    <nav>
+  <body>
+    <header class="navbar">
+      <nav>
         <input type="checkbox" id="menu-toggle" />
         <label for="menu-toggle" class="menu-icon">☰</label>
 
         <ul class="nav-links">
-            <li><a href="homepage.html">Home</a></li>
-            <li><a href="dashboard.html">Dashboard</a></li>
-            <li><a href="logCalories.html">Log Calories</a></li>
-            <li><a href="logExercise.html" class="active">Log Exercise</a></li>
-            <li><a href="userSettings.html">User Settings</a></li>
-            <li><a href="login.html">Login</a></li>
+          <li><a href="homepage.html">Home</a></li>
+          <li><a href="dashboard.html">Dashboard</a></li>
+          <li><a href="logCalories.html">Log Calories</a></li>
+          <li><a href="logExercise.html" class="active">Log Exercise</a></li>
+          <li><a href="userSettings.html">User Settings</a></li>
+          <li><a href="login.html">Login</a></li>
         </ul>
-    </nav>
-</header>
+      </nav>
+    </header>
 
-<div class="content">
-    <div class="log-container">
+    <div class="content">
+      <div class="log-container">
         <h1 class="page-heading">Log Exercise</h1>
 
         <div class="total-banner">
-            TODAY'S BURN
-            <span class="cal-number">0 kcal</span>
+          TODAY'S BURN
+          <span class="cal-number" id="totalBurn">0 kcal</span>
         </div>
 
         <div class="form-card">
-            <label>Exercise Type</label>
+          <label>Exercise Type</label>
 
-            <div class="meal-options">
-                <label class="meal-option">
-                    <input type="radio" name="exercise" value="running">
-                    <span>Running</span>
-                </label>
+          <div class="meal-options">
+            <label class="meal-option">
+              <input
+                type="radio"
+                name="exercise"
+                value="running"
+                onchange="onFormChange()"
+              />
+              <span>Running</span>
+            </label>
 
-                <label class="meal-option">
-                    <input type="radio" name="exercise" value="cycling">
-                    <span>Cycling</span>
-                </label>
+            <label class="meal-option">
+              <input
+                type="radio"
+                name="exercise"
+                value="cycling"
+                onchange="onFormChange()"
+              />
+              <span>Cycling</span>
+            </label>
 
-                <label class="meal-option">
-                    <input type="radio" name="exercise" value="walking">
-                    <span>Walking</span>
-                </label>
+            <label class="meal-option">
+              <input
+                type="radio"
+                name="exercise"
+                value="walking"
+                onchange="onFormChange()"
+              />
+              <span>Walking</span>
+            </label>
 
-                <label class="meal-option">
-                    <input type="radio" name="exercise" value="swimming">
-                    <span>Swimming</span>
-                </label>
+            <label class="meal-option">
+              <input
+                type="radio"
+                name="exercise"
+                value="swimming"
+                onchange="onFormChange()"
+              />
+              <span>Swimming</span>
+            </label>
 
-                <label class="meal-option">
-                    <input type="radio" name="exercise" value="gym">
-                    <span>Gym</span>
-                </label>
+            <label class="meal-option">
+              <input
+                type="radio"
+                name="exercise"
+                value="gym"
+                onchange="onFormChange()"
+              />
+              <span>Gym</span>
+            </label>
 
-                <label class="meal-option">
-                    <input type="radio" name="exercise" value="sport">
-                    <span>Sport</span>
-                </label>
-            </div>
+            <label class="meal-option">
+              <input
+                type="radio"
+                name="exercise"
+                value="sport"
+                onchange="onFormChange()"
+              />
+              <span>Sport</span>
+            </label>
+          </div>
 
-            <label>Duration</label>
-            <input type="number" id="duration" min="0">
+          <!-- Distance field — only visible for running, cycling, walking, swimming -->
+          <div id="distanceSection" style="display: none">
+            <label>Distance (km)</label>
+            <input
+              type="number"
+              id="distance"
+              placeholder="e.g. 5.0"
+              min="0"
+              step="0.1"
+              oninput="onFormChange()"
+            />
+          </div>
 
-            <label>Intensity</label>
-            <div class="meal-options">
-                <label class="meal-option">
-                    <input type="radio" name="intensity" value="low">
-                    <span>Low</span>
-                </label>
+          <label>Duration (minutes)</label>
+          <input
+            type="number"
+            id="duration"
+            placeholder="e.g. 30"
+            min="0"
+            oninput="onFormChange()"
+          />
 
-                <label class="meal-option">
-                    <input type="radio" name="intensity" value="medium">
-                    <span>Medium</span>
-                </label>
+          <label>Intensity</label>
+          <div class="meal-options">
+            <label class="meal-option">
+              <input
+                type="radio"
+                name="intensity"
+                value="low"
+                onchange="onFormChange()"
+              />
+              <span>Low</span>
+            </label>
 
-                <label class="meal-option">
-                    <input type="radio" name="intensity" value="high">
-                    <span>High</span>
-                </label>
-            </div>
+            <label class="meal-option">
+              <input
+                type="radio"
+                name="intensity"
+                value="medium"
+                onchange="onFormChange()"
+              />
+              <span>Medium</span>
+            </label>
 
-            <label>Exercise Notes</label>
-            <input type="text" id="notes">
+            <label class="meal-option">
+              <input
+                type="radio"
+                name="intensity"
+                value="high"
+                onchange="onFormChange()"
+              />
+              <span>High</span>
+            </label>
+          </div>
 
-            <div class="total-banner estimate-banner">
-                ESTIMATED BURN
-                <span class="cal-number">0 kcal</span>
-            </div>
+          <label>Exercise Notes</label>
+          <input type="text" id="notes" placeholder="Optional notes..." />
 
-            <button class="submit-btn">+ Add Exercise</button>
+          <!-- Estimated burn — auto-calculated, but user can override -->
+          <div class="total-banner estimate-banner">
+            ESTIMATED BURN
+            <span class="cal-number" id="estimatedBurn">0 kcal</span>
+          </div>
+
+          <!-- Override field — lets the user manually set calories if they disagree with estimate -->
+          <div id="overrideSection">
+            <label>Override Calories (leave blank to use estimate)</label>
+            <input
+              type="number"
+              id="caloriesOverride"
+              placeholder="e.g. 350"
+              min="0"
+            />
+          </div>
+
+          <button class="submit-btn" onclick="addExercise()">
+            + Add Exercise
+          </button>
         </div>
 
         <p class="log-section-title">Today's Exercise Log</p>
 
         <div id="exerciseLogList">
-            <div class="empty-state">
-                No exercise logged yet.
-            </div>
+          <div class="empty-state">No exercise logged yet.</div>
         </div>
+      </div>
     </div>
-</div>
+
+    <script>
+      // ═══════════════════════════════════════════════════════════════
+      //  MET Values (Metabolic Equivalent of Task)
+      // ═══════════════════════════════════════════════════════════════
+      //
+      //  MET is a standard scientific measure of exercise intensity.
+      //  1 MET = energy cost of sitting quietly ≈ 1 kcal/kg/hour.
+      //
+      //  The formula to calculate calories burned:
+      //    Calories = MET × weight (kg) × duration (hours)
+      //
+      //  Example: Running at medium intensity (MET 8.0), 75kg person, 30 min:
+      //    8.0 × 75 × (30/60) = 300 kcal
+      //
+      //  These MET values come from the Compendium of Physical Activities,
+      //  a widely used research database maintained by Arizona State University.
+      //
+      //  Source: Ainsworth BE et al. "Compendium of Physical Activities"
+      //  https://pacompendium.com/
+      //
+      //  The user can always override the estimate with their own value.
+      // ═══════════════════════════════════════════════════════════════
+
+      const MET_VALUES = {
+        running: { low: 6.0, medium: 8.0, high: 11.5 }, // jogging → running → fast running
+        cycling: { low: 4.0, medium: 6.8, high: 10.0 }, // leisure → moderate → vigorous
+        walking: { low: 2.5, medium: 3.5, high: 5.0 }, // slow → brisk → power walking
+        swimming: { low: 4.5, medium: 7.0, high: 10.0 }, // leisurely → moderate → vigorous
+        gym: { low: 3.5, medium: 5.0, high: 8.0 }, // light weights → moderate → intense
+        sport: { low: 4.0, medium: 6.0, high: 8.0 }, // casual → competitive → intense
+      };
+
+      // Which exercise types should show the distance field
+      const DISTANCE_TYPES = ["running", "cycling", "walking", "swimming"];
+
+      // User's weight — fetched from the database on page load, defaults to 70kg
+      let userWeight = 70;
+
+      // ═══════════════════════════════════════════════════════════════
+      //  Fetch the user's weight from their profile
+      // ═══════════════════════════════════════════════════════════════
+
+      async function loadUserWeight() {
+        try {
+          const res = await fetch("/api/user-weight");
+          if (res.ok) {
+            const data = await res.json();
+            userWeight = data.weight_kg || 70;
+          }
+        } catch (err) {
+          console.log("Could not fetch user weight, using default 70kg");
+        }
+      }
+
+      // ═══════════════════════════════════════════════════════════════
+      //  Calculate estimated calories using MET formula
+      //
+      //  Calories = MET × weight_kg × (duration_min / 60)
+      // ═══════════════════════════════════════════════════════════════
+
+      function calculateBurn(exerciseType, intensity, durationMin) {
+        const met = MET_VALUES[exerciseType]?.[intensity] || 5.0;
+        const hours = durationMin / 60;
+        return Math.round(met * userWeight * hours);
+      }
+
+      // ═══════════════════════════════════════════════════════════════
+      //  Auto-estimate: runs every time the user changes type,
+      //  duration, or intensity
+      // ═══════════════════════════════════════════════════════════════
+
+      function onFormChange() {
+        const exerciseEl = document.querySelector(
+          'input[name="exercise"]:checked',
+        );
+        const intensityEl = document.querySelector(
+          'input[name="intensity"]:checked',
+        );
+        const duration = Number(document.getElementById("duration").value) || 0;
+
+        // Show/hide distance field based on exercise type
+        const distanceSection = document.getElementById("distanceSection");
+        if (exerciseEl && DISTANCE_TYPES.includes(exerciseEl.value)) {
+          distanceSection.style.display = "block";
+        } else {
+          distanceSection.style.display = "none";
+        }
+
+        // Calculate estimated burn using MET formula
+        let estimate = 0;
+        if (exerciseEl && intensityEl && duration > 0) {
+          estimate = calculateBurn(
+            exerciseEl.value,
+            intensityEl.value,
+            duration,
+          );
+        }
+
+        document.getElementById("estimatedBurn").textContent =
+          estimate + " kcal";
+      }
+
+      // ═══════════════════════════════════════════════════════════════
+      //  Add exercise — sends to the server API
+      // ═══════════════════════════════════════════════════════════════
+
+      async function addExercise() {
+        const exerciseEl = document.querySelector(
+          'input[name="exercise"]:checked',
+        );
+        const intensityEl = document.querySelector(
+          'input[name="intensity"]:checked',
+        );
+        const duration = document.getElementById("duration").value;
+        const distance = document.getElementById("distance").value;
+        const overrideCals = document.getElementById("caloriesOverride").value;
+
+        // Validation
+        if (!exerciseEl) return alert("Please select an exercise type.");
+        if (!duration || duration <= 0)
+          return alert("Please enter a valid duration.");
+        if (!intensityEl) return alert("Please select an intensity level.");
+
+        // Use override if provided, otherwise use MET calculation
+        let calories;
+        if (overrideCals && Number(overrideCals) > 0) {
+          calories = Number(overrideCals);
+        } else {
+          calories = calculateBurn(
+            exerciseEl.value,
+            intensityEl.value,
+            Number(duration),
+          );
+        }
+
+        try {
+          const res = await fetch("/api/exercise", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              exercise_type: exerciseEl.value,
+              duration_min: Number(duration),
+              distance_km: distance ? Number(distance) : null,
+              calories_burned: calories,
+            }),
+          });
+
+          if (!res.ok) {
+            const data = await res.json();
+            return alert(data.error || "Failed to save exercise.");
+          }
+
+          // Reset the form
+          exerciseEl.checked = false;
+          intensityEl.checked = false;
+          document.getElementById("duration").value = "";
+          document.getElementById("distance").value = "";
+          document.getElementById("caloriesOverride").value = "";
+          document.getElementById("estimatedBurn").textContent = "0 kcal";
+          document.getElementById("distanceSection").style.display = "none";
+
+          // Reload the log
+          loadExerciseLogs();
+        } catch (err) {
+          alert("Error saving exercise. Is the server running?");
+        }
+      }
+
+      // ═══════════════════════════════════════════════════════════════
+      //  Delete an exercise entry
+      // ═══════════════════════════════════════════════════════════════
+
+      async function deleteExercise(id) {
+        try {
+          await fetch("/api/exercise/" + id, { method: "DELETE" });
+          loadExerciseLogs();
+        } catch (err) {
+          alert("Error deleting exercise.");
+        }
+      }
+
+      // ═══════════════════════════════════════════════════════════════
+      //  Load today's exercise logs from the server
+      // ═══════════════════════════════════════════════════════════════
+
+      async function loadExerciseLogs() {
+        try {
+          const res = await fetch("/api/exercise");
+
+          if (res.status === 401) {
+            // Not logged in — show message
+            document.getElementById("exerciseLogList").innerHTML =
+              '<div class="empty-state">Please <a href="login.html" style="color:#007bb8; font-weight:700;">log in</a> to track exercises.</div>';
+            return;
+          }
+
+          const logs = await res.json();
+
+          // Update today's total burn
+          const total = logs.reduce(
+            (sum, l) => sum + (l.calories_burned || 0),
+            0,
+          );
+          document.getElementById("totalBurn").textContent = total + " kcal";
+
+          const listEl = document.getElementById("exerciseLogList");
+
+          if (logs.length === 0) {
+            listEl.innerHTML =
+              '<div class="empty-state">No exercise logged yet.</div>';
+            return;
+          }
+
+          // Build the log entries HTML
+          listEl.innerHTML = logs
+            .map((log) => {
+              // Format the exercise type nicely (e.g. "running" → "Running")
+              const typeName =
+                log.exercise_type.charAt(0).toUpperCase() +
+                log.exercise_type.slice(1);
+
+              // Show distance if it exists
+              const distanceText = log.distance_km
+                ? `${log.distance_km} km · `
+                : "";
+
+              return `
+                <div class="log-entry">
+                    <div class="entry-left">
+                        <span class="meal-tag">${typeName}</span>
+                        <span class="entry-desc">${distanceText}${log.duration_min} min</span>
+                    </div>
+                    <div class="entry-right">
+                        <span class="entry-cals">${log.calories_burned} <small>kcal</small></span>
+                        <button class="delete-btn" onclick="deleteExercise(${log.exercise_log_id})">&times;</button>
+                    </div>
+                </div>
+            `;
+            })
+            .join("");
+        } catch (err) {
+          console.error("Error loading exercises:", err);
+        }
+      }
+
+      // Load user weight and exercise logs when the page opens
+      loadUserWeight();
+      loadExerciseLogs();
+    </script>
+  </body>
+</html>

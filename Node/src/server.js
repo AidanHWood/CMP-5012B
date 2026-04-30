@@ -1,4 +1,3 @@
-
 // --------------------------------------------------------------
 //  server.js — Main entry point
 //  This is the "brain" that starts Express, sets up middleware,
@@ -11,32 +10,22 @@ const path = require('path');
 const session = require('express-session');
  
 // Load environment variables from .env file
-// This keeps secrets (DB password, email password) out of your code
 require('dotenv').config({ path: path.join(__dirname, '../.env') });
  
 const app = express();
  
 // ——— Middleware ———
-// These run on EVERY request before your routes
- 
-// Parses JSON bodies (for fetch() with Content-Type: application/json)
 app.use(express.json());
- 
-// Parses form submissions (for traditional <form> posts)
 app.use(express.urlencoded({ extended: true }));
  
 // ——— Session Setup ———
-// Sessions let the server "remember" a logged-in user between requests.
-// When someone logs in, we store their user_id in req.session.
-// Express creates a cookie called "connect.sid" in the browser,
-// which links back to the session data stored on the server.
 app.use(session({
     secret: process.env.SESSION_SECRET || 'change-this-to-something-random',
-    resave: false,              // Don't save session if nothing changed
-    saveUninitialized: false,   // Don't create session until something is stored
+    resave: false,
+    saveUninitialized: false,
     cookie: {
-        maxAge: 1000 * 60 * 60 * 24,  // Cookie lasts 24 hours
-        httpOnly: true                  // JavaScript can't access the cookie (security)
+        maxAge: 1000 * 60 * 60 * 24,
+        httpOnly: true
     }
 }));
  
@@ -44,12 +33,10 @@ app.use(session({
 app.use(express.static(path.join(__dirname, '../../Code')));
  
 // ——— Wire in the Auth router ———
-// Auth.js exports a router with all the login/register/reset routes.
-// app.use() plugs it in so those routes are active.
 const authRouter = require('./Auth');
 app.use(authRouter);
  
-// ——— Existing food JSON route ———
+// ——— Wire in Food routes ———
 const filePath = path.join(__dirname, 'data', 'food.json');
 const foodRoutes = require('./food');
 app.use('/', foodRoutes);
@@ -93,7 +80,68 @@ app.delete('/api/calories/:id', (req, res) => {
     calorieLog = calorieLog.filter(e => e.id !== Number(req.params.id));
     res.status(204).send();
 });
- 
+
+
+// ——— Exercise Logging Routes (PostgreSQL) ———
+const pool = require('./db');
+
+app.get('/api/user-weight', async (req, res) => {
+    if (!req.session.userId) return res.status(401).json({ error: 'Not logged in' });
+    try {
+        const result = await pool.query('SELECT weight_kg FROM users WHERE user_id = $1', [req.session.userId]);
+        res.json({ weight_kg: result.rows[0]?.weight_kg || 70 });
+    } catch (err) {
+        console.error('Fetch weight error:', err);
+        res.json({ weight_kg: 70 });
+    }
+});
+
+app.get('/api/exercise', async (req, res) => {
+    if (!req.session.userId) return res.status(401).json({ error: 'Not logged in' });
+    try {
+        const result = await pool.query(
+            `SELECT exercise_log_id, exercise_type, duration_min, distance_km, calories_burned, log_date
+             FROM exercise_logs WHERE user_id = $1 AND DATE(log_date) = CURRENT_DATE ORDER BY log_date DESC`,
+            [req.session.userId]
+        );
+        res.json(result.rows);
+    } catch (err) {
+        console.error('Fetch exercise error:', err);
+        res.status(500).json({ error: 'Server error' });
+    }
+});
+
+app.post('/api/exercise', async (req, res) => {
+    if (!req.session.userId) return res.status(401).json({ error: 'Not logged in' });
+    const { exercise_type, duration_min, distance_km, calories_burned } = req.body;
+    if (!exercise_type || !duration_min) return res.status(400).json({ error: 'Exercise type and duration are required' });
+    try {
+        const result = await pool.query(
+            `INSERT INTO exercise_logs (user_id, exercise_type, duration_min, distance_km, calories_burned, log_date)
+             VALUES ($1, $2, $3, $4, $5, NOW())
+             RETURNING exercise_log_id, exercise_type, duration_min, distance_km, calories_burned, log_date`,
+            [req.session.userId, exercise_type, Number(duration_min), distance_km ? Number(distance_km) : null, Number(calories_burned) || 0]
+        );
+        res.status(201).json(result.rows[0]);
+    } catch (err) {
+        console.error('Log exercise error:', err);
+        res.status(500).json({ error: 'Server error' });
+    }
+});
+
+app.delete('/api/exercise/:id', async (req, res) => {
+    if (!req.session.userId) return res.status(401).json({ error: 'Not logged in' });
+    try {
+        await pool.query('DELETE FROM exercise_logs WHERE exercise_log_id = $1 AND user_id = $2', [req.params.id, req.session.userId]);
+        res.status(204).send();
+    } catch (err) {
+        console.error('Delete exercise error:', err);
+        res.status(500).json({ error: 'Server error' });
+    }
+});
+
+
+
 // ——— Homepage route ———
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, '../../Code/homepage.html'));
