@@ -28,7 +28,7 @@ body {
     height: 60px;
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: left;
     padding: 0 30px;
     background: rgba(247, 244, 239, 0.85);
     backdrop-filter: blur(12px);
@@ -40,8 +40,9 @@ body {
 .nav-links a {
     text-decoration: none;
     color: var(--dark);
-    font-size: 14px;
-    font-weight: 500;
+    font-size: 15px;
+    font-weight: bold;
+    padding-right: 10px;
     opacity: 0.7;
     transition: opacity 0.2s;
 }

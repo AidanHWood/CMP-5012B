@@ -1,83 +1,124 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
+  <head>
+    <meta charset="UTF-8" />
     <title>Register - Health Tracking System</title>
-    <link rel="stylesheet" href="/homepage.css">
-    <link rel="stylesheet" href="/auth.css">
-</head>
+    <link rel="stylesheet" href="/homepage.css" />
+    <link rel="stylesheet" href="/auth.css" />
+  </head>
 
-<body>
-
-<header class="navbar">
-    <nav>
+  <body>
+    <header class="navbar">
+      <nav>
         <input type="checkbox" id="menu-toggle" />
         <label for="menu-toggle" class="menu-icon">☰</label>
 
         <ul class="nav-links">
-            <li><a href="homepage.html">Home</a></li>
-            <li><a href="dashboard.html">Dashboard</a></li>
-            <li><a href="logCalories.html">Log Calories</a></li>
-            <li><a href="logExercise.html">Log Exercise</a></li>
-            <li><a href="userSettings.html">User Settings</a></li>
-            <li><a href="login.html">Login</a></li>
+          <!-- <li><a href="homepage.html">Home</a></li> -->
+          <li><a href="dashboard.html">Dashboard</a></li>
+          <li><a href="logCalories.html">Log Calories</a></li>
+          <li><a href="logExercise.html">Log Exercise</a></li>
+          <li><a href="userSettings.html">User Settings</a></li>
+          <!-- <li><a href="login.html">Login</a></li> -->
         </ul>
-    </nav>
-</header>
+      </nav>
+    </header>
 
-<h1 class="site-title">Health Tracking System</h1>
+    <h1 class="site-title">Health Tracking System</h1>
 
-<div class="content form-page">
-    <form class="form-card">
+    <div class="content form-page">
+      <form class="form-card">
         <h2>Create Account</h2>
 
-        <div id="errorBox" style="display:none; color:red;"></div>
-        <div id="successBox" style="display:none; color:green;"></div>
+        <div id="errorBox" style="display: none; color: red"></div>
+        <div id="successBox" style="display: none; color: green"></div>
 
         <label for="username">Username</label>
-        <input id="username" name="username" type="text" placeholder="Enter username" required>
+        <input
+          id="username"
+          name="username"
+          type="text"
+          placeholder="Enter username"
+          required
+        />
 
         <label for="real_name">Full Name</label>
-        <input id="real_name" name="real_name" type="text" placeholder="Enter full name" required>
+        <input
+          id="real_name"
+          name="real_name"
+          type="text"
+          placeholder="Enter full name"
+          required
+        />
 
         <label for="email">Email</label>
-        <input id="email" name="email" type="email" placeholder="Enter email" required>
+        <input
+          id="email"
+          name="email"
+          type="email"
+          placeholder="Enter email"
+          required
+        />
 
         <label for="password">Password</label>
-        <input id="password" name="password" type="password" placeholder="Enter password" required>
-        <p style="font-size:12px; color:#888; margin: 0px 0 12px 0;">
-            Must be at least 8 characters and include an uppercase letter, lowercase letter, number, and special character (e.g. !@#$%).
+        <input
+          id="password"
+          name="password"
+          type="password"
+          placeholder="Enter password"
+          required
+        />
+        <p style="font-size: 12px; color: #888; margin: 0px 0 12px 0">
+          Must be at least 8 characters and include an uppercase letter,
+          lowercase letter, number, and special character (e.g. !@#$%).
         </p>
 
         <label for="confirm_password">Confirm Password</label>
-        <input id="confirm_password" name="confirm_password" type="password" placeholder="Confirm password" required>
+        <input
+          id="confirm_password"
+          name="confirm_password"
+          type="password"
+          placeholder="Confirm password"
+          required
+        />
 
         <label for="height_cm">Height (cm)</label>
-        <input id="height_cm" name="height_cm" type="number" placeholder="Enter height">
+        <input
+          id="height_cm"
+          name="height_cm"
+          type="number"
+          placeholder="Enter height"
+        />
 
         <label for="weight_kg">Weight (kg)</label>
-        <input id="weight_kg" name="weight_kg" type="number" placeholder="Enter weight">
+        <input
+          id="weight_kg"
+          name="weight_kg"
+          type="number"
+          placeholder="Enter weight"
+        />
 
         <label for="age">Age</label>
-        <input id="age" name="age" type="number" placeholder="Enter age">
+        <input id="age" name="age" type="number" placeholder="Enter age" />
 
         <label for="gender">Gender</label>
         <select id="gender" name="gender">
-            <option value="">Prefer not to say</option>
-            <option value="male">Male</option>
-            <option value="female">Female</option>
+          <option value="">Prefer not to say</option>
+          <option value="male">Male</option>
+          <option value="female">Female</option>
         </select>
 
-        <button type="button" id="registerBtn" onclick="handleRegister()">Create Account</button>
+        <button type="button" id="registerBtn" onclick="handleRegister()">
+          Create Account
+        </button>
 
         <p class="form-link">
-            Already have an account?
-            <a href="/login">Login</a>
+          Already have an account?
+          <a href="/login">Login</a>
         </p>
-    </form>
-</div>
+      </form>
+    </div>
 
-<script src="/register.js"></script>
-
-</body>
+    <script src="/register.js"></script>
+  </body>
 </html>

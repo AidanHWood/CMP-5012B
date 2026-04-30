@@ -1,131 +1,122 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
+  <head>
+    <meta charset="UTF-8" />
     <title>User Settings - Health Tracking System</title>
-    <link rel="stylesheet" href="homepage.css">
-    <link rel="stylesheet" href="userSettings.css">
-</head>
+    <link rel="stylesheet" href="homepage.css" />
+    <link rel="stylesheet" href="userSettings.css" />
+  </head>
 
-<body>
-
-<header class="navbar">
-    <nav>
+  <body>
+    <header class="navbar">
+      <nav>
         <input type="checkbox" id="menu-toggle" />
         <label for="menu-toggle" class="menu-icon">☰</label>
 
         <ul class="nav-links">
-            <li><a href="homepage.html">Home</a></li>
-            <li><a href="dashboard.html">Dashboard</a></li>
-            <li><a href="logCalories.html">Log Calories</a></li>
-            <li><a href="logExercise.html">Log Exercise</a></li>
-            <li><a href="userSettings.html" class="active">User Settings</a></li>
-            <li><a href="login.html">Login</a></li>
+          <!-- <li><a href="homepage.html">Home</a></li> -->
+          <li><a href="dashboard.html">Dashboard</a></li>
+          <li><a href="logCalories.html">Log Calories</a></li>
+          <li><a href="logExercise.html">Log Exercise</a></li>
+          <li><a href="userSettings.html" class="active">User Settings</a></li>
+          <li><a href="login.html">Logout</a></li>
         </ul>
-    </nav>
-</header>
+      </nav>
+    </header>
 
-<div class="content">
-    <div class="log-container">
-
+    <div class="content">
+      <div class="log-container">
         <h1 class="page-heading">User Settings</h1>
 
         <div class="total-banner">
-            PROFILE
-            <span class="cal-number">User</span>
+          PROFILE
+          <span class="cal-number">User</span>
         </div>
 
         <!-- Personal Details -->
         <div class="form-card">
+          <label>Full Name</label>
+          <input type="text" />
 
-            <label>Full Name</label>
-            <input type="text">
+          <label>Username</label>
+          <input type="text" />
 
-            <label>Username</label>
-            <input type="text">
+          <label>Email Address</label>
+          <input type="text" />
 
-            <label>Email Address</label>
-            <input type="text">
+          <label>Age</label>
+          <input type="number" />
 
-            <label>Age</label>
-            <input type="number">
+          <label>Height</label>
+          <input type="number" />
 
-            <label>Height</label>
-            <input type="number">
+          <label>Weight</label>
+          <input type="number" />
 
-            <label>Weight</label>
-            <input type="number">
+          <label>Biological Sex</label>
+          <div class="meal-options">
+            <label class="meal-option">
+              <input type="radio" name="sex" />
+              <span>Male</span>
+            </label>
 
-            <label>Biological Sex</label>
-            <div class="meal-options">
+            <label class="meal-option">
+              <input type="radio" name="sex" />
+              <span>Female</span>
+            </label>
 
-                <label class="meal-option">
-                    <input type="radio" name="sex">
-                    <span>Male</span>
-                </label>
-
-                <label class="meal-option">
-                    <input type="radio" name="sex">
-                    <span>Female</span>
-                </label>
-
-                <label class="meal-option">
-                    <input type="radio" name="sex">
-                    <span>Other</span>
-                </label>
-
-            </div>
+            <label class="meal-option">
+              <input type="radio" name="sex" />
+              <span>Other</span>
+            </label>
+          </div>
         </div>
 
         <!-- Preferences -->
         <div class="form-card">
+          <label>Daily Calorie Goal</label>
+          <input type="number" />
 
-            <label>Daily Calorie Goal</label>
-            <input type="number">
+          <label>Weekly Exercise Goal</label>
+          <input type="number" />
 
-            <label>Weekly Exercise Goal</label>
-            <input type="number">
+          <label>Units</label>
+          <div class="meal-options">
+            <label class="meal-option">
+              <input type="radio" name="units" />
+              <span>Metric</span>
+            </label>
 
-            <label>Units</label>
-            <div class="meal-options">
+            <label class="meal-option">
+              <input type="radio" name="units" />
+              <span>Imperial</span>
+            </label>
+          </div>
 
-                <label class="meal-option">
-                    <input type="radio" name="units">
-                    <span>Metric</span>
-                </label>
+          <label>Notifications</label>
+          <div class="meal-options">
+            <label class="meal-option">
+              <input type="radio" name="notifications" />
+              <span>Enabled</span>
+            </label>
 
-                <label class="meal-option">
-                    <input type="radio" name="units">
-                    <span>Imperial</span>
-                </label>
+            <label class="meal-option">
+              <input type="radio" name="notifications" />
+              <span>Disabled</span>
+            </label>
+          </div>
 
-            </div>
-
-            <label>Notifications</label>
-            <div class="meal-options">
-
-                <label class="meal-option">
-                    <input type="radio" name="notifications">
-                    <span>Enabled</span>
-                </label>
-
-                <label class="meal-option">
-                    <input type="radio" name="notifications">
-                    <span>Disabled</span>
-                </label>
-
-            </div>
-
-            <button class="submit-btn">Save Settings</button>
+          <button class="submit-btn">Save Settings</button>
         </div>
 
         <!-- Account Section -->
         <p class="log-section-title">Account</p>
 
         <div class="account-actions">
-            <button class="secondary-btn">Change Password</button>
-            <button class="secondary-btn logout">Log Out</button>
+          <button class="secondary-btn">Change Password</button>
+          <button class="secondary-btn logout">Log Out</button>
         </div>
-
+      </div>
     </div>
-</div>
+  </body>
+</html>
