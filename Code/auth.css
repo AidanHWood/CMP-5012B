@@ -113,24 +113,6 @@
     z-index: 1000;
 }
 
-.form-text {
-    text-align: center;
-    color: var(--muted);
-    font-size: 14px;
-    line-height: 1.5;
-    margin: -4px 0 12px;
-}
-
-#successBox {
-    background: rgba(26, 107, 60, 0.08);
-    border: 1px solid rgba(26, 107, 60, 0.2);
-    border-radius: 14px;
-    padding: 10px 12px;
-    font-size: 14px;
-    text-align: center;
-    color: var(--green);
-}
-
 @media (max-width: 768px) {
     .form-page {
         padding: 90px 18px 40px;
