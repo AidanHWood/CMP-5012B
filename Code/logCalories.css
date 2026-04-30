@@ -1,253 +1,269 @@
-.log-container {
-    max-width: 520px;
-    margin: 0 auto;
-}
+    .log-container {
+        max-width: 520px;
+        margin: 0 auto;
+    }
 
-.page-heading {
-    text-align: center;
-    font-size: 32px;
-    font-weight: 900;
-    letter-spacing: -1px;
-    color: #0a0a0a;
-    margin-bottom: 30px;
-}
+    .page-heading {
+        text-align: center;
+        font-size: 32px;
+        font-weight: 900;
+        letter-spacing: -1px;
+        color: #0a0a0a;
+        margin-bottom: 30px;
+    }
 
-/* Daily total banner */
-.total-banner {
-    background: #007bb8;
-    color: #fff;
-    text-align: center;
-    padding: 20px;
-    border-radius: 14px;
-    margin-bottom: 24px;
-    font-size: 15px;
-    font-weight: 700;
-    letter-spacing: 0.5px;
-}
+    /* Daily total banner */
+    .total-banner {
+        background: #007bb8;
+        color: #fff;
+        text-align: center;
+        padding: 20px;
+        border-radius: 14px;
+        margin-bottom: 24px;
+        font-size: 15px;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+    }
 
-.total-banner .cal-number {
-    font-size: 40px;
-    font-weight: 900;
-    letter-spacing: -1.5px;
-    display: block;
-    margin-top: 4px;
-}
+    .total-banner .cal-number {
+        font-size: 40px;
+        font-weight: 900;
+        letter-spacing: -1.5px;
+        display: block;
+        margin-top: 4px;
+    }
 
-/* Form card — matches your homepage glass style */
-.form-card {
-    background: rgba(255, 255, 255, 0.75);
-    backdrop-filter: blur(8px);
-    border: 1px solid rgba(0, 0, 0, 0.05);
-    border-radius: 14px;
-    padding: 24px;
-    margin-bottom: 24px;
-}
+    /* Form card — matches your homepage glass style */
+    .form-card {
+        background: rgba(255, 255, 255, 0.75);
+        backdrop-filter: blur(8px);
+        border: 1px solid rgba(0, 0, 0, 0.05);
+        border-radius: 14px;
+        padding: 24px;
+        margin-bottom: 24px;
+    }
 
-.form-card label {
-    display: block;
-    font-size: 13px;
-    font-weight: 700;
-    color: #0a0a0a;
-    margin-bottom: 8px;
-    letter-spacing: 0.3px;
-    text-transform: uppercase;
-}
+    .form-card label {
+        display: block;
+        font-size: 13px;
+        font-weight: 700;
+        color: #0a0a0a;
+        margin-bottom: 8px;
+        letter-spacing: 0.3px;
+        text-transform: uppercase;
+    }
 
-/* Meal type radio buttons */
-.meal-options {
-    display: flex;
-    gap: 8px;
-    margin-bottom: 18px;
-    flex-wrap: wrap;
-}
+    /* Meal type radio buttons */
+    .meal-options {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 18px;
+        flex-wrap: wrap;
+    }
 
-.meal-option {
-    flex: 1;
-    min-width: 100px;
-}
+    .meal-option {
+        flex: 1;
+        min-width: 100px;
+    }
 
-.meal-option input[type="radio"] {
-    display: none;
-}
+    .meal-option input[type="radio"] {
+        display: none;
+    }
 
-.meal-option span {
-    display: block;
-    text-align: center;
-    padding: 12px 8px;
-    border: 2px solid rgba(0, 0, 0, 0.08);
-    border-radius: 10px;
-    font-size: 14px;
-    font-weight: 700;
-    color: #007bb8;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    background: white;
-}
+    .meal-option span {
+        display: block;
+        text-align: center;
+        padding: 12px 8px;
+        border: 2px solid rgba(0, 0, 0, 0.08);
+        border-radius: 10px;
+        font-size: 14px;
+        font-weight: 700;
+        color: #007bb8;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        background: white;
+    }
 
-.meal-option span:hover {
-    border-color: rgba(0, 0, 0, 0.2);
-}
+    .meal-option span:hover {
+        border-color: rgba(0, 0, 0, 0.2);
+    }
 
-.meal-option input[type="radio"]:checked + span {
-    border-color: #fff;
-    background: #007bb8;
-    color: #fff;
-}
+    .meal-option input[type="radio"]:checked + span {
+        border-color: #fff;
+        background: #007bb8;
+        color: #fff;
+    }
 
-/* Text and number inputs */
-.form-card input[type="text"],
-.form-card input[type="number"] {
-    width: 100%;
-    padding: 14px 16px;
-    border: 2px solid rgba(0, 0, 0, 0.08);
-    border-radius: 10px;
-    font-size: 15px;
-    font-family: inherit;
-    color: #0a0a0a;
-    background: white;
-    margin-bottom: 14px;
-    box-sizing: border-box;
-    transition: border-color 0.2s ease;
-}
+    /* Text and number inputs */
+    .form-card input[type="text"],
+    .form-card input[type="number"] {
+        width: 100%;
+        padding: 14px 16px;
+        border: 2px solid rgba(0, 0, 0, 0.08);
+        border-radius: 10px;
+        font-size: 15px;
+        font-family: inherit;
+        color: #0a0a0a;
+        background: white;
+        margin-bottom: 14px;
+        box-sizing: border-box;
+        transition: border-color 0.2s ease;
+    }
 
-.form-card input:focus {
-    outline: none;
-    border-color: #0a0a0a;
-}
+    .form-card input:focus {
+        outline: none;
+        border-color: #0a0a0a;
+    }
 
-.form-card input::placeholder {
-    color: #aaa;
-}
+    .form-card input::placeholder {
+        color: #aaa;
+    }
 
-/* Submit button */
-.submit-btn {
-    width: 100%;
-    padding: 14px;
-    background: #007bb8;
-    color: #fff;
-    border: none;
-    border-radius: 10px;
-    font-size: 15px;
-    font-weight: 700;
-    font-family: inherit;
-    cursor: pointer;
-    transition: opacity 0.2s ease;
-}
+    /* Submit button */
+    .submit-btn {
+        width: 100%;
+        padding: 14px;
+        background: #007bb8;
+        color: #fff;
+        border: none;
+        border-radius: 10px;
+        font-size: 15px;
+        font-weight: 700;
+        font-family: inherit;
+        cursor: pointer;
+        transition: opacity 0.2s ease;
+    }
 
-.submit-btn:hover {
-    opacity: 0.7;
-}
+    .submit-btn:hover {
+        opacity: 0.7;
+    }
 
-/* Log list */
-.log-section-title {
-    font-size: 13px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    color: #999;
-    margin-bottom: 12px;
-}
+    /* Log list */
+    .log-section-title {
+        font-size: 13px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: #999;
+        margin-bottom: 12px;
+    }
 
-.log-entry {
-    background: rgba(255, 255, 255, 0.75);
-    backdrop-filter: blur(8px);
-    border: 1px solid rgba(0, 0, 0, 0.05);
-    border-radius: 12px;
-    padding: 16px 20px;
-    margin-bottom: 8px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
+    .log-entry {
+        background: rgba(255, 255, 255, 0.75);
+        backdrop-filter: blur(8px);
+        border: 1px solid rgba(0, 0, 0, 0.05);
+        border-radius: 12px;
+        padding: 16px 20px;
+        margin-bottom: 8px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
 
-.entry-left {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-}
+    .entry-left {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
 
-.meal-tag {
-    font-size: 11px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    color: #999;
-}
+    .meal-tag {
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: #999;
+    }
 
-.entry-desc {
-    font-size: 15px;
-    font-weight: 600;
-    color: #0a0a0a;
-}
+    .entry-desc {
+        font-size: 15px;
+        font-weight: 600;
+        color: #0a0a0a;
+    }
 
-.entry-right {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-}
+    .entry-right {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+    }
 
-.entry-cals {
-    font-size: 18px;
-    font-weight: 900;
-    color: #0a0a0a;
-    letter-spacing: -0.5px;
-}
+    .entry-cals {
+        font-size: 18px;
+        font-weight: 900;
+        color: #0a0a0a;
+        letter-spacing: -0.5px;
+    }
 
-.entry-cals small {
-    font-size: 12px;
-    font-weight: 600;
-    color: #999;
-}
+    .entry-cals small {
+        font-size: 12px;
+        font-weight: 600;
+        color: #999;
+    }
 
-.delete-btn {
-    background: none;
-    border: none;
-    font-size: 18px;
-    color: #ccc;
-    cursor: pointer;
-    padding: 4px;
-    transition: color 0.2s ease;
-}
+    .delete-btn {
+        background: none;
+        border: none;
+        font-size: 18px;
+        color: #ccc;
+        cursor: pointer;
+        padding: 4px;
+        transition: color 0.2s ease;
+    }
 
-.delete-btn:hover {
-    color: #e53935;
-}
+    .delete-btn:hover {
+        color: #e53935;
+    }
 
-.empty-state {
-    text-align: center;
-    padding: 40px 20px;
-    color: #bbb;
-    font-size: 15px;
-    font-weight: 600;
-}
-.entry-mode-buttons {
-    display: flex;
-    gap: 8px;
-    margin-bottom: 18px;
-}
+    .empty-state {
+        text-align: center;
+        padding: 40px 20px;
+        color: #bbb;
+        font-size: 15px;
+        font-weight: 600;
+    }
+    .entry-mode-buttons {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 18px;
+    }
 
-.entry-mode-buttons button {
-    flex: 1;
-    padding: 12px 8px;
-    border: 2px solid rgba(0, 0, 0, 0.08);
-    border-radius: 10px;
-    font-size: 14px;
-    font-weight: 700;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    background: white;
-    color: #007bb8;
-}
+    .entry-mode-buttons button {
+        flex: 1;
+        padding: 12px 8px;
+        border: 2px solid rgba(0, 0, 0, 0.08);
+        border-radius: 10px;
+        font-size: 14px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        background: white;
+        color: #007bb8;
+    }
 
-.entry-mode-buttons button:hover {
-    border-color: rgba(0, 0, 0, 0.2);
-}
+    .entry-mode-buttons button:hover {
+        border-color: rgba(0, 0, 0, 0.2);
+    }
 
-.entry-mode-buttons button.active {
-    background: #007bb8;
-    color: #fff;
-    border-color: #007bb8;
-}
-.content {
-    padding-top: 80px;
-}
+    .entry-mode-buttons button.active {
+        background: #007bb8;
+        color: #fff;
+        border-color: #007bb8;
+    }
+    .content {
+        padding-top: 80px;
+    }
+    #m_food_name {
+        margin-bottom: 14px;
+        width: 415px;
+    }
+
+    #m_quantity {
+        margin-bottom: 14px;
+    }
+    #m_meal_type {
+        height: 35px;
+        border-radius: 5px;
+        border: 1px solid #d3d3d3;
+        width: 190px;
+        appearance: none;
+        -webkit-appearance: none;
+    }

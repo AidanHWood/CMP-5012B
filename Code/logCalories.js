@@ -1,0 +1,209 @@
+// ── Mode toggle ───────────────────────────────────────────
+function showMode(mode) {
+    document.getElementById('lookupSection').style.display = mode === 'lookup' ? 'block' : 'none';
+    const buttons = document.querySelectorAll('.entry-mode-buttons button');
+    buttons[0].classList.toggle('active', mode === 'lookup');
+    buttons[1].classList.toggle('active', false);
+}
+
+// ── Manual popup ──────────────────────────────────────────
+function openManual() {
+    const mealEl = document.querySelector('input[name="meal"]:checked');
+    if (mealEl) {
+        document.getElementById('m_meal_type').value = mealEl.value;
+    }
+    document.getElementById('manualOverlay').style.display = 'block';
+    document.querySelectorAll('.entry-mode-buttons button')[1].classList.add('active');
+}
+
+function closeManual() {
+    document.getElementById('manualOverlay').style.display = 'none';
+    document.getElementById('manualError').style.display = 'none';
+    document.querySelectorAll('.entry-mode-buttons button')[1].classList.remove('active');
+}
+
+async function submitManual() {
+    const btn      = document.getElementById('manualSubmitBtn');
+    const errorEl  = document.getElementById('manualError');
+    errorEl.style.display = 'none';
+
+    const food_name    = document.getElementById('m_food_name').value.trim();
+    const calories     = document.getElementById('m_calories').value;
+    const energy       = document.getElementById('m_energy').value;
+    const protein      = document.getElementById('m_protein').value;
+    const fat          = document.getElementById('m_fat').value;
+    const carbs        = document.getElementById('m_carbs').value;
+    const fibre        = document.getElementById('m_fibre').value;
+    const sugars       = document.getElementById('m_sugars').value;
+    const sodium       = document.getElementById('m_sodium').value;
+    const quantity     = document.getElementById('m_quantity').value;
+    const meal_type    = document.getElementById('m_meal_type').value;
+
+    if (!food_name)  return showError('Food name is required.');
+    if (!calories)   return showError('Calories are required.');
+    if (!quantity)   return showError('Quantity is required.');
+    if (!meal_type)  return showError('Please select a meal type.');
+
+    function showError(msg) {
+        errorEl.textContent   = msg;
+        errorEl.style.display = 'block';
+    }
+
+    btn.disabled    = true;
+    btn.textContent = 'Saving...';
+
+    try {
+        const csrfRes = await fetch('/api/csrf-token');
+        const { csrfToken } = await csrfRes.json();
+
+        const res  = await fetch('/api/foods/manual', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': csrfToken },
+            body: JSON.stringify({
+                food_name, calories, energy, protein, fat, carbs,
+                fibre, sugars, sodium,
+                quantity_grams: quantity,
+                meal_type,
+                _csrf: csrfToken
+            }),
+        });
+
+        const data = await res.json();
+
+        if (!data.success) {
+            showError(data.error || 'Something went wrong.');
+            btn.disabled    = false;
+            btn.textContent = '+ Save & Log Food';
+            return;
+        }
+
+        // Success — close popup and reset
+        closeManual();
+        ['m_food_name','m_calories','m_energy','m_protein','m_fat',
+            'm_carbs','m_fibre','m_sugars','m_sodium','m_quantity'].forEach(id => {
+            document.getElementById(id).value = '';
+        });
+        document.getElementById('m_meal_type').value = '';
+        loadLogs();
+
+    } catch (err) {
+        showError('Network error. Please try again.');
+    }
+
+    btn.disabled    = false;
+    btn.textContent = '+ Save & Log Food';
+}
+
+// ── Food search ───────────────────────────────────────────
+let searchTimeout;
+async function searchFood() {
+    const query     = document.getElementById('foodSearch').value.trim();
+    const resultsEl = document.getElementById('searchResults');
+    if (query.length < 2) { resultsEl.innerHTML = ''; return; }
+
+    clearTimeout(searchTimeout);
+    searchTimeout = setTimeout(async () => {
+        resultsEl.innerHTML = '<div style="padding:8px 16px;color:#888;font-size:13px;">Searching...</div>';
+        try {
+            const res  = await fetch('/api/foods/search?q=' + encodeURIComponent(query));
+            const data = await res.json();
+            const foods = data.foods || data;
+
+            if (!foods.length) {
+                resultsEl.innerHTML = '<div style="padding:8px 16px;color:#888;font-size:13px;">No results found.</div>';
+                return;
+            }
+
+            resultsEl.innerHTML = foods.map(f => `
+              <div class="food-result" onclick="selectFood(${f.food_id}, '${f.food_name.replace(/'/g, "\\'")}', ${f.calories || 0})">
+                <span>${f.food_name}</span>
+                <span style="float:right;color:#888;font-weight:400;">${f.calories || '?'} kcal/100g</span>
+              </div>
+            `).join('');
+        } catch (err) {
+            resultsEl.innerHTML = '<div style="padding:8px 16px;color:red;font-size:13px;">Search failed.</div>';
+        }
+    }, 400);
+}
+
+function selectFood(foodId, foodName, caloriesPer100g) {
+    document.getElementById('selectedFoodId').value          = foodId;
+    document.getElementById('selectedFoodName').textContent  = foodName;
+    document.getElementById('selectedFoodCals').textContent  = ` — ${caloriesPer100g} kcal per 100g`;
+    document.getElementById('selectedFood').style.display    = 'block';
+    document.getElementById('searchResults').innerHTML       = '';
+    document.getElementById('foodSearch').value             = foodName;
+}
+
+// ── Lookup log entry ──────────────────────────────────────
+async function addLookupLog() {
+    const mealEl       = document.querySelector('input[name="meal"]:checked');
+    const foodId       = document.getElementById('selectedFoodId').value;
+    const quantityGrams = document.getElementById('quantityGrams').value;
+
+    if (!mealEl)                          return alert('Please select a meal type.');
+    if (!foodId)                          return alert('Please search and select a food.');
+    if (!quantityGrams || quantityGrams <= 0) return alert('Please enter a quantity in grams.');
+
+    try {
+        const csrfRes = await fetch('/api/csrf-token');
+        const { csrfToken } = await csrfRes.json();
+
+        const res  = await fetch('/api/food-log', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': csrfToken },
+            body: JSON.stringify({ food_id: foodId, quantity_grams: quantityGrams, meal_type: mealEl.value, _csrf: csrfToken }),
+        });
+        const data = await res.json();
+        if (!data.success) return alert('Error: ' + (data.error || 'Unknown error'));
+
+        document.getElementById('selectedFoodId').value       = '';
+        document.getElementById('selectedFood').style.display = 'none';
+        document.getElementById('foodSearch').value          = '';
+        document.getElementById('quantityGrams').value       = '';
+        document.getElementById('searchResults').innerHTML   = '';
+        mealEl.checked = false;
+        loadLogs();
+    } catch (err) { alert('Error saving entry.'); }
+}
+
+// ── Delete entry ──────────────────────────────────────────
+async function deleteLog(id) {
+    try {
+        await fetch('/api/food-log/' + id, { method: 'DELETE' });
+        loadLogs();
+    } catch (err) { alert('Error deleting entry.'); }
+}
+
+// ── Load today's logs ─────────────────────────────────────
+async function loadLogs() {
+    try {
+        const res    = await fetch('/api/food-log/today');
+        const data   = await res.json();
+        const entries = data.entries || [];
+
+        document.getElementById('totalCals').textContent = (data.total_calories || 0) + ' kcal';
+
+        const listEl = document.getElementById('logList');
+        if (!entries.length) {
+            listEl.innerHTML = '<div class="empty-state">No entries yet — add your first meal above.</div>';
+            return;
+        }
+
+        listEl.innerHTML = entries.map(log => `
+            <div class="log-entry">
+              <div class="entry-left">
+                <span class="meal-tag">${log.meal_type}</span>
+                <span class="entry-desc">${log.food_name} (${log.quantity_grams}g)</span>
+              </div>
+              <div class="entry-right">
+                <span class="entry-cals">${log.calories} <small>kcal</small></span>
+                <button class="delete-btn" onclick="deleteLog(${log.f_log_id})">&times;</button>
+              </div>
+            </div>
+          `).join('');
+    } catch (err) { console.error('Load logs error:', err); }
+}
+
+showMode('lookup');
+loadLogs();

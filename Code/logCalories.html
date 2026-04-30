@@ -1,211 +1,144 @@
 <!doctype html>
-<html>
-  <head>
-    <meta charset="UTF-8" />
-    <title>Log Calories</title>
-    <link rel="stylesheet" href="homepage.css" />
-    <link rel="stylesheet" href="logCalories.css" />
-  </head>
-  <body>
-    <header class="navbar">
-      <nav>
-        <input type="checkbox" id="menu-toggle" />
-        <label for="menu-toggle" class="menu-icon">&#9776;</label>
-        <ul class="nav-links">
-            <li><a href="homepage.html">Home</a></li>
-            <li><a href="dashboard.html">Dashboard</a></li>
-            <li><a href="logCalories.html" class="active">Log Calories</a></li>
-            <li><a href="logExercise.html">Log Exercise</a></li>
-            <li><a href="userSettings.html">User Settings</a></li>
-            <li><a href="login.html">Login</a></li>
-        </ul>
-      </nav>
-    </header>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Log Calories</title>
+  <link rel="stylesheet" href="homepage.css" />
+  <link rel="stylesheet" href="logCalories.css" />
+</head>
+<body>
+<header class="navbar">
+  <nav>
+    <input type="checkbox" id="menu-toggle" />
+    <label for="menu-toggle" class="menu-icon">&#9776;</label>
+    <ul class="nav-links">
+      <li><a href="homepage.html">Home</a></li>
+      <li><a href="dashboard.html">Dashboard</a></li>
+      <li><a href="logCalories.html" class="active">Log Calories</a></li>
+      <li><a href="logExercise.html">Log Exercise</a></li>
+      <li><a href="userSettings.html">User Settings</a></li>
+      <li><a href="login.html">Login</a></li>
+    </ul>
+  </nav>
+</header>
 
-    <div class="content">
-      <div class="log-container">
-        <h1 class="page-heading">Log Calories</h1>
+<div class="content">
+  <div class="log-container">
+    <h1 class="page-heading">Log Calories</h1>
 
-        <div class="total-banner">
-          TODAY'S TOTAL
-          <span class="cal-number" id="totalCals">0 kcal</span>
+    <div class="total-banner">
+      TODAY'S TOTAL
+      <span class="cal-number" id="totalCals">0 kcal</span>
+    </div>
+
+    <div class="form-card">
+      <label>Meal Type</label>
+      <div class="meal-options">
+        <label class="meal-option"><input type="radio" name="meal" value="breakfast" /><span>Breakfast</span></label>
+        <label class="meal-option"><input type="radio" name="meal" value="lunch" /><span>Lunch</span></label>
+        <label class="meal-option"><input type="radio" name="meal" value="dinner" /><span>Dinner</span></label>
+        <label class="meal-option"><input type="radio" name="meal" value="snack" /><span>Snack</span></label>
+      </div>
+
+      <div class="entry-mode-buttons">
+        <button type="button" onclick="showMode('lookup')">Lookup Food</button>
+        <button type="button" onclick="openManual()">Manual Entry</button>
+      </div>
+
+      <!-- Lookup mode -->
+      <div id="lookupSection" style="display:none">
+        <label>Search Food</label>
+        <input type="text" id="foodSearch" placeholder="Search for a food..." oninput="searchFood()" />
+        <div id="searchResults"></div>
+        <input type="hidden" id="selectedFoodId" />
+        <div id="selectedFood" style="display:none; margin-top:10px;">
+          <strong id="selectedFoodName"></strong>
+          <span id="selectedFoodCals"></span>
         </div>
-
-        <div class="form-card">
-          <label>Meal Type</label>
-          <div class="meal-options">
-            <label class="meal-option">
-              <input type="radio" name="meal" value="breakfast" />
-              <span>Breakfast</span>
-            </label>
-            <label class="meal-option">
-              <input type="radio" name="meal" value="lunch" />
-              <span>Lunch</span>
-            </label>
-            <label class="meal-option">
-              <input type="radio" name="meal" value="dinner" />
-              <span>Dinner</span>
-            </label>
-            <label class="meal-option">
-              <input type="radio" name="meal" value="snack" />
-              <span>Snack</span>
-            </label>
-          </div>
-
-          <div class="entry-mode-buttons">
-            <button type="button" onclick="showMode('lookup')">
-              Lookup Food
-            </button>
-            <button type="button" onclick="showMode('manual')">
-              Manual Entry
-            </button>
-          </div>
-
-          <div id="lookupSection" style="display: none">
-            <label>Search Food</label>
-            <input
-              type="text"
-              id="foodSearch"
-              placeholder="Search for a food..."
-              oninput="searchFood()"
-            />
-            <div id="searchResults"></div>
-          </div>
-
-          <div id="manualSection" style="display: none">
-            <label>Description</label>
-            <input
-              type="text"
-              id="description"
-              placeholder="e.g. Chicken salad"
-            />
-            <label>Calories</label>
-            <input type="number" id="calories" placeholder="e.g. 450" min="0" />
-          </div>
-
-          <button class="submit-btn" onclick="addLog()">+ Add Entry</button>
-        </div>
-
-        <p class="log-section-title">Today's Log</p>
-        <div id="logList">
-          <div class="empty-state">
-            No entries yet — add your first meal above.
-          </div>
-        </div>
+        <label style="margin-top:10px;">Quantity (grams)</label>
+        <input type="number" id="quantityGrams" placeholder="e.g. 150" min="1" />
+        <button class="submit-btn" onclick="addLookupLog()">+ Add Entry</button>
       </div>
     </div>
 
-    <script>
-      function showMode(mode) {
-        document.getElementById("lookupSection").style.display =
-          mode === "lookup" ? "block" : "none";
-        document.getElementById("manualSection").style.display =
-          mode === "manual" ? "block" : "none";
+    <p class="log-section-title">Today's Log</p>
+    <div id="logList">
+      <div class="empty-state">No entries yet — add your first meal above.</div>
+    </div>
+  </div>
+</div>
 
-        const buttons = document.querySelectorAll(".entry-mode-buttons button");
-        buttons[0].classList.toggle("active", mode === "lookup");
-        buttons[1].classList.toggle("active", mode === "manual");
-      }
+<!-- ── Manual Entry Popup ── -->
+<div id="manualOverlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1000; overflow-y:auto;">
+  <div style="background:white; max-width:480px; margin:40px auto; border-radius:14px; padding:28px; position:relative;">
 
-      let logs = [];
+    <button onclick="closeManual()" style="position:absolute; top:16px; right:16px; background:none; border:none; font-size:22px; cursor:pointer; color:#999;">&times;</button>
 
-      async function addLog() {
-        const mealEl = document.querySelector('input[name="meal"]:checked');
-        const calories = document.getElementById("calories").value;
-        const description = document.getElementById("description").value;
+    <h2 style="font-size:22px; font-weight:900; margin-bottom:6px;">Add Food Manually</h2>
+    <p style="color:#999; font-size:13px; margin-bottom:20px;">Saves the food to the database and logs it for today.</p>
 
-        if (!mealEl) return alert("Please select a meal type.");
-        if (!calories || calories <= 0)
-          return alert("Please enter a valid calorie amount.");
+    <div id="manualError" style="display:none; background:#fdf0ef; border:1.5px solid #f5c6c2; border-radius:8px; padding:10px 14px; margin-bottom:16px; color:#c0392b; font-size:13px;"></div>
 
-        try {
-          const res = await fetch("/api/calories", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              meal: mealEl.value,
-              calories: Number(calories),
-              description: description || "No description",
-            }),
-          });
-          if (!res.ok) throw new Error("Failed to save");
+    <label class="popup-label">Food Name *</label>
+    <input type="text" id="m_food_name" placeholder="e.g. Grilled Chicken Breast" class="popup-input" />
 
-          mealEl.checked = false;
-          document.getElementById("calories").value = "";
-          document.getElementById("description").value = "";
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+      <div>
+        <label class="popup-label">Calories (kcal) *</label>
+        <input type="number" id="m_calories" placeholder="e.g. 165" min="0" class="popup-input" />
+      </div>
+      <div>
+        <label class="popup-label">Energy (kJ)</label>
+        <input type="number" id="m_energy" placeholder="e.g. 690" min="0" class="popup-input" />
+      </div>
+      <div>
+        <label class="popup-label">Protein (g)</label>
+        <input type="number" id="m_protein" placeholder="e.g. 31" min="0" step="0.1" class="popup-input" />
+      </div>
+      <div>
+        <label class="popup-label">Fat (g)</label>
+        <input type="number" id="m_fat" placeholder="e.g. 3.6" min="0" step="0.1" class="popup-input" />
+      </div>
+      <div>
+        <label class="popup-label">Carbs (g)</label>
+        <input type="number" id="m_carbs" placeholder="e.g. 0" min="0" step="0.1" class="popup-input" />
+      </div>
+      <div>
+        <label class="popup-label">Fibre (g)</label>
+        <input type="number" id="m_fibre" placeholder="e.g. 0" min="0" step="0.1" class="popup-input" />
+      </div>
+      <div>
+        <label class="popup-label">Sugars (g)</label>
+        <input type="number" id="m_sugars" placeholder="e.g. 0" min="0" step="0.1" class="popup-input" />
+      </div>
+      <div>
+        <label class="popup-label">Sodium (mg)</label>
+        <input type="number" id="m_sodium" placeholder="e.g. 74" min="0" step="0.1" class="popup-input" />
+      </div>
+    </div>
 
-          loadLogs();
-        } catch (err) {
-          alert("Error saving entry. Is the server running?");
-        }
-      }
-
-      async function deleteLog(id) {
-        try {
-          await fetch("/api/calories/" + id, { method: "DELETE" });
-          loadLogs();
-        } catch (err) {
-          alert("Error deleting entry.");
-        }
-      }
-
-      async function loadLogs() {
-        try {
-          const res = await fetch("/api/calories");
-          logs = await res.json();
-
-          const total = logs.reduce((sum, l) => sum + l.calories, 0);
-          document.getElementById("totalCals").textContent = total + " kcal";
-
-          const listEl = document.getElementById("logList");
-          if (logs.length === 0) {
-            listEl.innerHTML =
-              '<div class="empty-state">No entries yet — add your first meal above.</div>';
-            return;
-          }
-
-          listEl.innerHTML = logs
-            .slice()
-            .reverse()
-            .map(
-              (log) => `
-                            <div class="log-entry">
-                                <div class="entry-left">
-                                    <span class="meal-tag">${log.meal}</span>
-                                    <span class="entry-desc">${log.description}</span>
-                                </div>
-                                <div class="entry-right">
-                                    <span class="entry-cals">${log.calories} <small>kcal</small></span>
-                                    <button class="delete-btn" onclick="deleteLog(${log.id})">&times;</button>
-                                </div>
-                            </div>
-                        `,
-            )
-            .join("");
-        } catch (err) {}
-      }
-
-      async function searchFood() {
-        const query = document.getElementById("foodSearch").value;
-        if (query.length < 2) return;
-        // This won't work until the database is connected
-        // For now it'll just fail silently
-        try {
-          const res = await fetch("/api/foods/search?q=" + query);
-          const foods = await res.json();
-          document.getElementById("searchResults").innerHTML = foods
-            .map(
-              (f) => `
-                            <div class="food-result" onclick="selectFood(${f.food_id}, '${f.food_name}', ${f.calories})">
-                                ${f.food_name} — ${f.calories} kcal
-                            </div>
-                        `,
-            )
-            .join("");
-        } catch (err) {}
-      }
-
-      loadLogs();
-    </script>
-  </body>
+    <hr style="margin:20px 0; border:none; border-top:1px solid #eee;" />
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; align-items:start;">
+      <div>
+        <label class="popup-label">Quantity (grams) *</label>
+        <input type="number" id="m_quantity" placeholder="e.g. 150" min="1" class="popup-input" />
+      </div>
+      <div style="display:flex; flex-direction:column;">
+        <label class="popup-label">Meal Type *</label>
+        <select id="m_meal_type" class="popup-input">
+          <option value="">Select meal type</option>
+          <option value="breakfast">Breakfast</option>
+          <option value="lunch">Lunch</option>
+          <option value="dinner">Dinner</option>
+          <option value="snack">Snack</option>
+        </select>
+      </div>
+    </div>
+    <button onclick="submitManual()" id="manualSubmitBtn" style="width:100%; padding:14px; background:#007bb8; color:white; border:none; border-radius:10px; font-size:15px; font-weight:700; cursor:pointer; margin-top:16px;">
+      + Save &amp; Log Food
+    </button>
+  </div>
+</div>
+<script src="logCalories.js"></script>
+</body>
 </html>

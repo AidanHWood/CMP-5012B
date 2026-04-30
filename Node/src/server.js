@@ -51,6 +51,8 @@ app.use(authRouter);
  
 // ——— Existing food JSON route ———
 const filePath = path.join(__dirname, 'data', 'food.json');
+const foodRoutes = require('./food');
+app.use('/', foodRoutes);
  
 app.post('/add-food', (req, res) => {
     try {

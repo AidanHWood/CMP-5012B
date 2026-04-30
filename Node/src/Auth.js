@@ -1,6 +1,6 @@
 // ═══════════════════════════════════════════════════════════════
 //  Auth.js — Authentication & Password Reset Routes
-//  
+//
 //  This file handles:
 //  1. CSRF protection (prevents cross-site request forgery)
 //  2. Registration (with PostgreSQL)
@@ -30,7 +30,7 @@ const SALT_ROUNDS = 12;
 //  A "pool" manages multiple database connections efficiently.
 //  Instead of opening/closing a connection for every query,
 //  the pool keeps a few connections alive and reuses them.
-//  
+//
 //  The credentials come from the .env file via process.env.
 // ═══════════════════════════════════════════════════════════════
 
@@ -67,8 +67,11 @@ pool.on('connect', (client) => {
 const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
-        user: process.env.EMAIL_USER,     // em5440k@gmail.com
-        pass: process.env.EMAIL_PASS      // The 16-char app password
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS
+    },
+    tls: {
+        rejectUnauthorized: false
     }
 });
 
@@ -88,6 +91,11 @@ transporter.verify()
  */
 function generateOTP() {
     return crypto.randomInt(100000, 999999).toString();
+}
+
+function validatePassword(password) {
+    const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/;
+    return regex.test(password);
 }
 
 /**
@@ -261,8 +269,8 @@ router.post('/register', registerLimiter, verifyCsrf, async (req, res) => {
     if (!email || !isValidEmail(email.trim())) {
         errors.push('Please enter a valid email address.');
     }
-    if (!password || password.length < 8) {
-        errors.push('Password must be at least 8 characters.');
+    if (!password || !validatePassword(password)) {
+        errors.push('Password must be at least 8 characters and contain an uppercase letter, lowercase letter, number, and special character.');
     }
     if (password !== confirm_password) {
         errors.push('Passwords do not match.');
