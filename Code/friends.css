@@ -1,0 +1,135 @@
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+    --green:  #1a6b3c;
+    --green2: #2d9156;
+    --lime:   #a8e063;
+    --cream:  #eef6f0;
+    --dark:   #0e1a12;
+    --muted:  #6b7c6e;
+}
+
+body {
+    font-family: 'DM Sans', -apple-system, sans-serif;
+    background: var(--cream);
+    background-image:
+            linear-gradient(rgba(0,0,0,0.025) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(0,0,0,0.025) 1px, transparent 1px);
+    background-size: 40px 40px;
+    min-height: 100vh;
+}
+
+.navbar {
+    position: fixed; top: 0; left: 0;
+    width: 100%; height: 60px;
+    display: flex; align-items: center; justify-content: center;
+    padding: 0 30px;
+    background: rgba(238, 246, 240, 0.85);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(0,0,0,0.06);
+    z-index: 1000;
+}
+
+.nav-links { list-style: none; display: flex; gap: 28px; }
+.nav-links a {
+    text-decoration: none; color: var(--dark);
+    font-size: 14px; font-weight: 500; opacity: 0.7; transition: opacity 0.2s;
+}
+.nav-links a:hover, .nav-links a.active { opacity: 1; }
+#menu-toggle { display: none; }
+.menu-icon { display: none; }
+
+.content { padding-top: 80px; padding-bottom: 60px; }
+
+.leaderboard-container { max-width: 560px; margin: 0 auto; padding: 0 20px; }
+
+.page-heading {
+    text-align: center; font-size: 32px; font-weight: 900;
+    letter-spacing: -1px; color: var(--dark); margin-bottom: 28px;
+}
+
+.section-card {
+    background: #fff;
+    border-radius: 16px;
+    border: 1px solid rgba(0,0,0,0.06);
+    padding: 24px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+}
+
+.section-title {
+    font-size: 14px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.05em; color: var(--muted); margin-bottom: 16px;
+    display: flex; align-items: center; gap: 8px;
+}
+
+.badge {
+    background: var(--green); color: #fff;
+    font-size: 11px; font-weight: 700;
+    padding: 2px 8px; border-radius: 100px;
+}
+
+.search-input {
+    width: 100%; padding: 12px 16px;
+    border: 1.5px solid rgba(0,0,0,0.1); border-radius: 10px;
+    font-size: 14px; font-family: inherit; color: var(--dark);
+    outline: none; transition: border-color 0.2s;
+    margin-bottom: 12px;
+}
+.search-input:focus { border-color: var(--green2); }
+
+.user-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 12px 0;
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+}
+.user-row:last-child { border-bottom: none; }
+
+.user-info { display: flex; align-items: center; gap: 12px; }
+
+.avatar {
+    width: 40px; height: 40px; border-radius: 50%;
+    background: rgba(26,107,60,0.12); color: var(--green);
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 16px; flex-shrink: 0;
+}
+
+.user-name { font-size: 14px; font-weight: 600; color: var(--dark); }
+.user-handle { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+.btn-add {
+    padding: 7px 16px; background: var(--dark); color: #fff;
+    border: none; border-radius: 100px; font-size: 13px; font-weight: 600;
+    cursor: pointer; transition: opacity 0.2s;
+}
+.btn-add:hover { opacity: 0.8; }
+
+.btn-sent {
+    padding: 7px 16px; background: #e8f5ec; color: var(--green);
+    border: none; border-radius: 100px; font-size: 13px; font-weight: 600;
+}
+
+.btn-accept {
+    padding: 7px 16px; background: var(--green); color: #fff;
+    border: none; border-radius: 100px; font-size: 13px; font-weight: 600;
+    cursor: pointer; transition: opacity 0.2s;
+}
+.btn-accept:hover { opacity: 0.8; }
+
+.btn-reject {
+    padding: 7px 16px; background: none; color: #c0392b;
+    border: 1.5px solid rgba(192,57,43,0.2); border-radius: 100px;
+    font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s;
+}
+.btn-reject:hover { background: #fdf0ef; border-color: #c0392b; }
+
+.status-badge {
+    padding: 6px 14px; border-radius: 100px; font-size: 12px; font-weight: 600;
+}
+.status-badge.accepted { background: #e8f5ec; color: var(--green); }
+.status-badge.pending  { background: #fff8e6; color: #b08000; }
+
+.empty-state {
+    text-align: center; padding: 24px; color: var(--muted);
+    font-size: 14px; font-weight: 500;
+}

@@ -1,0 +1,225 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Friends - Health Tracking System</title>
+    <link rel="stylesheet" href="homepage.css" />
+    <link rel="stylesheet" href="friends.css" />
+</head>
+<body>
+<header class="navbar">
+    <nav>
+        <input type="checkbox" id="menu-toggle" />
+        <label for="menu-toggle" class="menu-icon">&#9776;</label>
+        <ul class="nav-links">
+            <li><a href="homepage.html">Home</a></li>
+            <li><a href="dashboard.html">Dashboard</a></li>
+            <li><a href="logCalories.html">Log Calories</a></li>
+            <li><a href="logExercise.html">Log Exercise</a></li>
+            <li><a href="userSettings.html">User Settings</a></li>
+            <li><a href="friends.html" class="active">Friends</a></li>
+            <li><a href="login.html">Login</a></li>
+        </ul>
+    </nav>
+</header>
+
+<div class="content">
+    <div class="leaderboard-container">
+        <h1 class="page-heading">Friends</h1>
+
+        <!-- Search -->
+        <div class="section-card">
+            <h2 class="section-title">Add a Friend</h2>
+            <input type="text" id="friendSearch" class="search-input" placeholder="Search by username or name..." oninput="searchUsers()" />
+            <div id="searchResults"></div>
+        </div>
+
+        <!-- Pending requests -->
+        <div class="section-card" id="requestsSection" style="display:none">
+            <h2 class="section-title">Friend Requests <span id="requestCount" class="badge"></span></h2>
+            <div id="requestsList"></div>
+        </div>
+
+        <!-- Friends list -->
+        <div class="section-card">
+            <h2 class="section-title">Your Friends</h2>
+            <div id="friendsList">
+                <p class="empty-state">No friends yet — search for someone above.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let searchTimeout;
+
+    // ── Search users ──────────────────────────────────────────
+    async function searchUsers() {
+        const q = document.getElementById('friendSearch').value.trim();
+        const resultsEl = document.getElementById('searchResults');
+
+        if (q.length < 2) { resultsEl.innerHTML = ''; return; }
+
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(async () => {
+            try {
+                const res  = await fetch('/api/friends/search?q=' + encodeURIComponent(q));
+                const data = await res.json();
+
+                if (!data.users || data.users.length === 0) {
+                    resultsEl.innerHTML = '<p class="empty-state">No users found.</p>';
+                    return;
+                }
+
+                resultsEl.innerHTML = data.users.map(u => {
+                    let action = '';
+                    if (u.status === 'accepted') {
+                        action = `<span class="status-badge accepted">Friends</span>`;
+                    } else if (u.status === 'pending' && u.direction === 'sent') {
+                        action = `<span class="status-badge pending">Request Sent</span>`;
+                    } else if (u.status === 'pending' && u.direction === 'received') {
+                        action = `<button class="btn-accept" onclick="acceptRequest(${u.user_id})">Accept</button>`;
+                    } else {
+                        action = `<button class="btn-add" onclick="sendRequest(${u.user_id}, this)">+ Add</button>`;
+                    }
+
+                    return `
+                        <div class="user-row">
+                            <div class="user-info">
+                                <div class="avatar">${u.username[0].toUpperCase()}</div>
+                                <div>
+                                    <div class="user-name">${u.real_name || u.username}</div>
+                                    <div class="user-handle">@${u.username}</div>
+                                </div>
+                            </div>
+                            <div>${action}</div>
+                        </div>
+                    `;
+                }).join('');
+
+            } catch (err) {
+                resultsEl.innerHTML = '<p class="empty-state">Search failed.</p>';
+            }
+        }, 400);
+    }
+
+    // ── Send friend request ───────────────────────────────────
+    async function sendRequest(userId, btn) {
+        btn.disabled    = true;
+        btn.textContent = 'Sending...';
+
+        try {
+            const res  = await fetch('/api/friends/request', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ userId }),
+            });
+            const data = await res.json();
+
+            if (data.success) {
+                btn.textContent = 'Sent ✓';
+                btn.classList.replace('btn-add', 'btn-sent');
+            } else {
+                btn.textContent = data.error || 'Error';
+                btn.disabled = false;
+            }
+        } catch {
+            btn.textContent = 'Error';
+            btn.disabled = false;
+        }
+    }
+
+    // ── Accept friend request ─────────────────────────────────
+    async function acceptRequest(userId) {
+        try {
+            const res  = await fetch('/api/friends/accept', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ userId }),
+            });
+            const data = await res.json();
+            if (data.success) { loadRequests(); loadFriends(); }
+        } catch (err) { alert('Error accepting request.'); }
+    }
+
+    // ── Reject/remove friend ──────────────────────────────────
+    async function removeFriend(userId) {
+        if (!confirm('Remove this friend?')) return;
+        try {
+            const res  = await fetch('/api/friends/reject', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ userId }),
+            });
+            const data = await res.json();
+            if (data.success) { loadFriends(); loadRequests(); }
+        } catch (err) { alert('Error removing friend.'); }
+    }
+
+    // ── Load pending requests ─────────────────────────────────
+    async function loadRequests() {
+        try {
+            const res  = await fetch('/api/friends/requests');
+            const data = await res.json();
+            const requests = data.requests || [];
+
+            const section = document.getElementById('requestsSection');
+            const list    = document.getElementById('requestsList');
+            const count   = document.getElementById('requestCount');
+
+            if (requests.length === 0) { section.style.display = 'none'; return; }
+
+            section.style.display = 'block';
+            count.textContent = requests.length;
+
+            list.innerHTML = requests.map(r => `
+                <div class="user-row">
+                    <div class="user-info">
+                        <div class="avatar">${r.username[0].toUpperCase()}</div>
+                        <div>
+                            <div class="user-name">${r.real_name || r.username}</div>
+                            <div class="user-handle">@${r.username}</div>
+                        </div>
+                    </div>
+                    <div style="display:flex;gap:8px;">
+                        <button class="btn-accept" onclick="acceptRequest(${r.user_id})">Accept</button>
+                        <button class="btn-reject" onclick="removeFriend(${r.user_id})">Decline</button>
+                    </div>
+                </div>
+            `).join('');
+        } catch (err) { console.error('Load requests error:', err); }
+    }
+
+    // ── Load friends list ─────────────────────────────────────
+    async function loadFriends() {
+        try {
+            const res  = await fetch('/api/friends');
+            const data = await res.json();
+            const friends = data.friends || [];
+            const list    = document.getElementById('friendsList');
+
+            if (friends.length === 0) {
+                list.innerHTML = '<p class="empty-state">No friends yet — search for someone above.</p>';
+                return;
+            }
+
+            list.innerHTML = friends.map(f => `
+                <div class="user-row">
+                    <div class="user-info">
+                        <div class="avatar">${f.username[0].toUpperCase()}</div>
+                        <div>
+                            <div class="user-name">${f.real_name || f.username}</div>
+                            <div class="user-handle">@${f.username}</div>
+                        </div>
+                    </div>
+                    <button class="btn-reject" onclick="removeFriend(${f.user_id})">Remove</button>
+                </div>
+            `).join('');
+        } catch (err) { console.error('Load friends error:', err); }
+    }
+
+    loadRequests();
+    loadFriends();
+</script>
+</body>
+</html>

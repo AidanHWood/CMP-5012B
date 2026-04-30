@@ -35,6 +35,9 @@ app.use(express.static(path.join(__dirname, '../../Code')));
 // ——— Wire in the Auth router ———
 const authRouter = require('./Auth');
 app.use(authRouter);
+
+const friendRoutes = require('./friends');
+app.use('/', friendRoutes);
  
 // ——— Wire in Food routes ———
 const filePath = path.join(__dirname, 'data', 'food.json');
