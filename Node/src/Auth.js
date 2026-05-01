@@ -149,7 +149,7 @@ function generateCsrfToken(req) {
     req.session.csrfToken = token;
     return token;
 }
-
+//this is the function to verify the token
 function verifyCsrf(req, res, next) {
     const submitted = req.body._csrf || req.headers['x-csrf-token'];
     const sessionToken = req.session.csrfToken;

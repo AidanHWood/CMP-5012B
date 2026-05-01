@@ -4,8 +4,11 @@ async function getCsrfToken() {
     return data.csrfToken;
 }
 
+//getter
 function val(id) { return document.getElementById(id).value.trim(); }
 
+
+//function to handle the registration
 async function handleRegister() {
     const btn      = document.getElementById('registerBtn');
     const errorBox = document.getElementById('errorBox');
