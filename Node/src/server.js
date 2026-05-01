@@ -3,7 +3,8 @@
 //  This is the "brain" that starts Express, sets up middleware,
 //  and connects all the route files together.
 // --------------------------------------------------------------
- 
+
+console.log('=== SERVER FILE LOADED ===');
 const express = require('express');
 const fs = require('fs');
 const path = require('path');
@@ -142,8 +143,102 @@ app.delete('/api/exercise/:id', async (req, res) => {
         res.status(500).json({ error: 'Server error' });
     }
 });
+console.log('=== REGISTERING WEIGHT HISTORY ROUTE ===');
+
+// ——— Weight History Route ———
+app.get('/api/weight-history', async (req, res) => {
+    if (!req.session.userId) return res.status(401).json({ error: 'Not logged in' });
+
+    try {
+        let query;
+        let params;
+
+        if (req.query.from && req.query.to) {
+            query = `SELECT weight_log_id, weight_kg, log_date
+                     FROM weight_logs
+                     WHERE user_id = $1 AND log_date >= $2 AND log_date <= ($3::date + INTERVAL '1 day')
+                     ORDER BY log_date ASC`;
+            params = [req.session.userId, req.query.from, req.query.to];
+        } else {
+            const days = parseInt(req.query.days) || 7;
+            query = `SELECT weight_log_id, weight_kg, log_date
+                     FROM weight_logs
+                     WHERE user_id = $1 AND log_date >= NOW() - INTERVAL '${days} days'
+                     ORDER BY log_date ASC`;
+            params = [req.session.userId];
+        }
+
+        const result = await pool.query(query, params);
+        res.json({ entries: result.rows });
+
+    } catch (err) {
+        console.error('Weight history error:', err);
+        res.status(500).json({ error: 'Server error' });
+    }
+});
 
 
+// ——— UPDATED: POST /api/exercise — now includes weight_moved_kg ———
+// REPLACE your existing app.post('/api/exercise', ...) with this:
+
+app.post('/api/exercise', async (req, res) => {
+    if (!req.session.userId) return res.status(401).json({ error: 'Not logged in' });
+    const { exercise_type, duration_min, distance_km, calories_burned, weight_moved_kg } = req.body;
+    if (!exercise_type || !duration_min) return res.status(400).json({ error: 'Exercise type and duration are required' });
+    try {
+        const result = await pool.query(
+            `INSERT INTO exercise_logs (user_id, exercise_type, duration_min, distance_km, calories_burned, weight_moved_kg, log_date)
+             VALUES ($1, $2, $3, $4, $5, $6, NOW())
+             RETURNING exercise_log_id, exercise_type, duration_min, distance_km, calories_burned, weight_moved_kg, log_date`,
+            [req.session.userId, exercise_type, Number(duration_min), distance_km ? Number(distance_km) : null, Number(calories_burned) || 0, weight_moved_kg ? Number(weight_moved_kg) : null]
+        );
+        res.status(201).json(result.rows[0]);
+    } catch (err) {
+        console.error('Log exercise error:', err);
+        res.status(500).json({ error: 'Server error' });
+    }
+});
+
+
+// ——— NEW: GET /api/exercise-history — Exercise history for myHistory charts ———
+// Paste this BEFORE the homepage route
+
+app.get('/api/exercise-history', async (req, res) => {
+    if (!req.session.userId) return res.status(401).json({ error: 'Not logged in' });
+
+    const type = req.query.type || 'running';
+
+    try {
+        let query;
+        let params;
+
+        if (req.query.from && req.query.to) {
+            query = `SELECT exercise_log_id, exercise_type, duration_min, distance_km, 
+                            calories_burned, weight_moved_kg, log_date
+                     FROM exercise_logs
+                     WHERE user_id = $1 AND exercise_type = $2 
+                       AND log_date >= $3 AND log_date <= ($4::date + INTERVAL '1 day')
+                     ORDER BY log_date ASC`;
+            params = [req.session.userId, type, req.query.from, req.query.to];
+        } else {
+            const days = parseInt(req.query.days) || 7;
+            query = `SELECT exercise_log_id, exercise_type, duration_min, distance_km, 
+                            calories_burned, weight_moved_kg, log_date
+                     FROM exercise_logs
+                     WHERE user_id = $1 AND exercise_type = $2 
+                       AND log_date >= NOW() - INTERVAL '${days} days'
+                     ORDER BY log_date ASC`;
+            params = [req.session.userId, type];
+        }
+
+        const result = await pool.query(query, params);
+        res.json({ entries: result.rows });
+
+    } catch (err) {
+        console.error('Exercise history error:', err);
+        res.status(500).json({ error: 'Server error' });
+    }
+});
 
 // ——— Homepage route ———
 app.get('/', (req, res) => {

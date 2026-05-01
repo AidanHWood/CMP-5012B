@@ -1,0 +1,263 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>My History - Health Tracking System</title>
+    <link rel="stylesheet" href="homepage.css" />
+    <link rel="stylesheet" href="myHistory.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700;900&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
+  </head>
+  <body>
+    <header class="navbar">
+      <nav>
+        <input type="checkbox" id="menu-toggle" />
+        <label for="menu-toggle" class="menu-icon">☰</label>
+        <ul class="nav-links">
+          <li><a href="dashboard.html">Dashboard</a></li>
+          <li><a href="logCalories.html">Log Calories</a></li>
+          <li><a href="logExercise.html">Log Exercise</a></li>
+          <li><a href="userSettings.html">User Settings</a></li>
+          <li><a href="friends.html">Friends</a></li>
+          <li><a href="myHistory.html" class="active">My History</a></li>
+          <li><a href="login.html">Logout</a></li>
+        </ul>
+      </nav>
+    </header>
+
+    <div class="content">
+      <div class="history-container">
+        <h1 class="page-heading">My History</h1>
+
+        <!-- ════════════════════════════════════════════ -->
+        <!--  Section 1: Weight Over Time               -->
+        <!-- ════════════════════════════════════════════ -->
+        <div class="section-card">
+          <div class="section-header">
+            <h2 class="section-title">Weight Over Time</h2>
+            <div class="current-weight" id="currentWeight">--.- kg</div>
+          </div>
+
+          <div class="range-picker">
+            <button
+              class="range-btn active"
+              data-range="7"
+              data-section="weight"
+            >
+              7 Days
+            </button>
+            <button class="range-btn" data-range="14" data-section="weight">
+              2 Weeks
+            </button>
+            <button class="range-btn" data-range="30" data-section="weight">
+              1 Month
+            </button>
+            <button class="range-btn" data-range="90" data-section="weight">
+              3 Months
+            </button>
+            <button class="range-btn" data-range="180" data-section="weight">
+              6 Months
+            </button>
+            <button class="range-btn" data-range="custom" data-section="weight">
+              Custom
+            </button>
+          </div>
+
+          <div
+            class="custom-range"
+            id="weightCustomRange"
+            style="display: none"
+          >
+            <div class="date-inputs">
+              <div class="date-field">
+                <label>From</label>
+                <input type="date" id="weightDateFrom" />
+              </div>
+              <div class="date-field">
+                <label>To</label>
+                <input type="date" id="weightDateTo" />
+              </div>
+              <button class="apply-btn" onclick="applyWeightCustomRange()">
+                Apply
+              </button>
+            </div>
+          </div>
+
+          <div class="chart-wrapper">
+            <canvas id="weightChart"></canvas>
+          </div>
+
+          <div class="empty-state" id="weightEmptyState" style="display: none">
+            No weight data for this period.
+          </div>
+
+          <div class="stats-row" id="weightStatsRow">
+            <div class="stat-item">
+              <span class="stat-label">Starting</span>
+              <span class="stat-value" id="statStart">--.- kg</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">Current</span>
+              <span class="stat-value" id="statCurrent">--.- kg</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">Change</span>
+              <span class="stat-value" id="statChange">-- kg</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">Entries</span>
+              <span class="stat-value" id="statEntries">0</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- ════════════════════════════════════════════ -->
+        <!--  Section 2: Exercise & Physical Activity    -->
+        <!-- ════════════════════════════════════════════ -->
+        <div class="section-card">
+          <div class="section-header">
+            <h2 class="section-title">Exercise & Physical Activity</h2>
+          </div>
+
+          <!-- Exercise type selector -->
+          <div class="exercise-type-selector">
+            <button
+              class="exercise-type-btn active"
+              data-type="running"
+              onclick="selectExerciseType('running', this)"
+            >
+              <span class="type-icon">🏃</span>
+              <span class="type-label">Running</span>
+            </button>
+            <button
+              class="exercise-type-btn"
+              data-type="swimming"
+              onclick="selectExerciseType('swimming', this)"
+            >
+              <span class="type-icon">🏊</span>
+              <span class="type-label">Swimming</span>
+            </button>
+            <button
+              class="exercise-type-btn"
+              data-type="cycling"
+              onclick="selectExerciseType('cycling', this)"
+            >
+              <span class="type-icon">🚴</span>
+              <span class="type-label">Cycling</span>
+            </button>
+            <button
+              class="exercise-type-btn"
+              data-type="walking"
+              onclick="selectExerciseType('walking', this)"
+            >
+              <span class="type-icon">🚶</span>
+              <span class="type-label">Walking</span>
+            </button>
+            <button
+              class="exercise-type-btn"
+              data-type="gym"
+              onclick="selectExerciseType('gym', this)"
+            >
+              <span class="type-icon">🏋️</span>
+              <span class="type-label">Gym</span>
+            </button>
+          </div>
+
+          <!-- Exercise metric label (changes based on type) -->
+          <div class="exercise-metric-label" id="exerciseMetricLabel">
+            Distance (km) over time
+          </div>
+
+          <!-- Exercise date range -->
+          <div class="range-picker">
+            <button
+              class="range-btn active"
+              data-range="7"
+              data-section="exercise"
+            >
+              7 Days
+            </button>
+            <button class="range-btn" data-range="14" data-section="exercise">
+              2 Weeks
+            </button>
+            <button class="range-btn" data-range="30" data-section="exercise">
+              1 Month
+            </button>
+            <button class="range-btn" data-range="90" data-section="exercise">
+              3 Months
+            </button>
+            <button class="range-btn" data-range="180" data-section="exercise">
+              6 Months
+            </button>
+            <button
+              class="range-btn"
+              data-range="custom"
+              data-section="exercise"
+            >
+              Custom
+            </button>
+          </div>
+
+          <div
+            class="custom-range"
+            id="exerciseCustomRange"
+            style="display: none"
+          >
+            <div class="date-inputs">
+              <div class="date-field">
+                <label>From</label>
+                <input type="date" id="exerciseDateFrom" />
+              </div>
+              <div class="date-field">
+                <label>To</label>
+                <input type="date" id="exerciseDateTo" />
+              </div>
+              <button class="apply-btn" onclick="applyExerciseCustomRange()">
+                Apply
+              </button>
+            </div>
+          </div>
+
+          <div class="chart-wrapper">
+            <canvas id="exerciseChart"></canvas>
+          </div>
+
+          <div
+            class="empty-state"
+            id="exerciseEmptyState"
+            style="display: none"
+          >
+            No exercise data for this period.
+          </div>
+
+          <!-- Exercise stats -->
+          <div class="stats-row" id="exerciseStatsRow">
+            <div class="stat-item">
+              <span class="stat-label">Total</span>
+              <span class="stat-value" id="exStatTotal">--</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">Sessions</span>
+              <span class="stat-value" id="exStatSessions">0</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">Avg / Session</span>
+              <span class="stat-value" id="exStatAvg">--</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">Total Duration</span>
+              <span class="stat-value" id="exStatDuration">0 min</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="myHistory.js"></script>
+  </body>
+</html>

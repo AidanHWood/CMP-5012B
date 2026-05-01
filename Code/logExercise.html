@@ -14,12 +14,12 @@
         <label for="menu-toggle" class="menu-icon">☰</label>
 
         <ul class="nav-links">
-          <!-- <li><a href="homepage.html">Home</a></li> -->
           <li><a href="dashboard.html">Dashboard</a></li>
           <li><a href="logCalories.html">Log Calories</a></li>
           <li><a href="logExercise.html" class="active">Log Exercise</a></li>
           <li><a href="userSettings.html">User Settings</a></li>
           <li><a href="friends.html">Friends</a></li>
+          <li><a href="myHistory.html">My History</a></li>
           <li><a href="login.html">Logout</a></li>
         </ul>
       </nav>
@@ -47,7 +47,6 @@
               />
               <span>Running</span>
             </label>
-
             <label class="meal-option">
               <input
                 type="radio"
@@ -57,7 +56,6 @@
               />
               <span>Cycling</span>
             </label>
-
             <label class="meal-option">
               <input
                 type="radio"
@@ -67,7 +65,6 @@
               />
               <span>Walking</span>
             </label>
-
             <label class="meal-option">
               <input
                 type="radio"
@@ -77,7 +74,6 @@
               />
               <span>Swimming</span>
             </label>
-
             <label class="meal-option">
               <input
                 type="radio"
@@ -87,7 +83,6 @@
               />
               <span>Gym</span>
             </label>
-
             <label class="meal-option">
               <input
                 type="radio"
@@ -112,6 +107,18 @@
             />
           </div>
 
+          <!-- Weight moved field — only visible for gym -->
+          <div id="weightMovedSection" style="display: none">
+            <label>Total Weight Moved (kg)</label>
+            <input
+              type="number"
+              id="weightMoved"
+              placeholder="e.g. 2500"
+              min="0"
+              step="1"
+            />
+          </div>
+
           <label>Duration (minutes)</label>
           <input
             type="number"
@@ -132,7 +139,6 @@
               />
               <span>Low</span>
             </label>
-
             <label class="meal-option">
               <input
                 type="radio"
@@ -142,7 +148,6 @@
               />
               <span>Medium</span>
             </label>
-
             <label class="meal-option">
               <input
                 type="radio"
@@ -157,13 +162,11 @@
           <label>Exercise Notes</label>
           <input type="text" id="notes" placeholder="Optional notes..." />
 
-          <!-- Estimated burn — auto-calculated, but user can override -->
           <div class="total-banner estimate-banner">
             ESTIMATED BURN
             <span class="cal-number" id="estimatedBurn">0 kcal</span>
           </div>
 
-          <!-- Override field — lets the user manually set calories if they disagree with estimate -->
           <div id="overrideSection">
             <label>Override Calories (leave blank to use estimate)</label>
             <input
