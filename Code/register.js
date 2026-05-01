@@ -19,7 +19,7 @@ async function handleRegister() {
         confirm_password: document.getElementById('confirm_password').value,
         height_cm:        val('height_cm')        || null,
         weight_kg:        val('weight_kg')        || null,
-        age:              val('age')              || null,
+        DoB:              val('DoB')              || null,
         gender:           val('gender')           || null
     };
 

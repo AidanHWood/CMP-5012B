@@ -255,7 +255,7 @@ router.get('/login', (req, res) => {
 router.post('/register', registerLimiter, verifyCsrf, async (req, res) => {
     const {
         username, real_name, email, password, confirm_password,
-        height_cm, weight_kg, age, gender, target_weight_kg
+        height_cm, weight_kg, DoB, gender, target_weight_kg
     } = req.body;
 
     const errors = [];
@@ -305,7 +305,7 @@ router.post('/register', registerLimiter, verifyCsrf, async (req, res) => {
         // ——— Insert into PostgreSQL ———
         // RETURNING gives us back the new user's data without a second query
         const result = await pool.query(
-            `INSERT INTO users (username, real_name, email, password_hash, height_cm, weight_kg, age, gender, target_weight_kg)
+            `INSERT INTO users (username, real_name, email, password_hash, height_cm, weight_kg, DoB, gender, target_weight_kg)
              VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
              RETURNING user_id, username, email`,
             [
@@ -315,7 +315,7 @@ router.post('/register', registerLimiter, verifyCsrf, async (req, res) => {
                 hashedPassword,
                 height_cm || null,
                 weight_kg || null,
-                age || null,
+                DoB || null,
                 gender || null,
                 target_weight_kg || null
             ]
