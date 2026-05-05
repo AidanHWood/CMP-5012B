@@ -1,288 +1,178 @@
-:root {
-    --green:    #1a6b3c;
-    --green2:   #2d9156;
-    --lime:     #a8e063;
-    --cream:    #f7f4ef;
-    --dark:     #0e1a12;
-    --muted:    #6b7c6e;
+@import url("https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&display=swap");
+
+.content {
+  position: relative;
+  z-index: 1;
+  min-height: 100vh;
+  padding: 130px 24px 80px;
 }
 
 .log-container {
-    max-width: 520px;
-    margin: 0 auto;
+  max-width: 900px;
+  margin: 0 auto;
 }
 
-.page-heading {
-    text-align: center;
-    font-size: 32px;
-    font-weight: 900;
-    letter-spacing: -1px;
-    color: var(--dark);
-    margin-bottom: 30px;
-}
-
-/* Daily total banner */
-.total-banner {
-    background: var(--green);
-    color: #fff;
-    text-align: center;
-    padding: 20px;
-    border-radius: 14px;
-    margin-bottom: 24px;
-    font-size: 15px;
-    font-weight: 700;
-    letter-spacing: 0.5px;
-}
-
-.total-banner .cal-number {
-    font-size: 40px;
-    font-weight: 900;
-    letter-spacing: -1.5px;
-    display: block;
-    margin-top: 4px;
-}
-
-/* Form card — matches your homepage glass style */
+.total-banner,
 .form-card {
-    background: rgba(255, 255, 255, 0.75);
-    backdrop-filter: blur(8px);
-    border: 1px solid rgba(0, 0, 0, 0.05);
-    border-radius: 14px;
-    padding: 24px;
-    margin-bottom: 24px;
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  border-radius: 24px;
+  backdrop-filter: blur(12px);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.06);
+}
+
+.total-banner {
+  padding: 28px;
+  margin-bottom: 20px;
+  text-align: center;
+  color: var(--green);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.cal-number {
+  display: block;
+  margin-top: 8px;
+  font-family: "Instrument Serif", serif;
+  font-size: 52px;
+  line-height: 1;
+  color: var(--dark);
+  letter-spacing: -1px;
+  text-transform: none;
+}
+
+.form-card {
+  padding: 28px;
+  margin-bottom: 28px;
 }
 
 .form-card label {
-    display: block;
-    font-size: 13px;
-    font-weight: 700;
-    color: var(--dark);
-    margin-bottom: 8px;
-    letter-spacing: 0.3px;
-    text-transform: uppercase;
+  display: block;
+  margin-bottom: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--dark);
 }
 
-/* Meal type radio buttons */
 .meal-options {
-    display: flex;
-    gap: 8px;
-    margin-bottom: 18px;
-    flex-wrap: wrap;
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
 }
 
 .meal-option {
-    flex: 1;
-    min-width: 100px;
+  flex: 1;
+  min-width: 120px;
 }
 
 .meal-option input[type="radio"] {
-    display: none;
+  display: none;
 }
 
 .meal-option span {
-    display: block;
-    text-align: center;
-    padding: 12px 8px;
-    border: 2px solid rgba(0, 0, 0, 0.08);
-    border-radius: 10px;
-    font-size: 14px;
-    font-weight: 700;
-    color: var(--green);
-    cursor: pointer;
-    transition: all 0.2s ease;
-    background: #fff;
+  display: block;
+  width: 100%;
+  text-align: center;
+  padding: 14px 16px;
+  background: rgba(26, 107, 60, 0.1);
+  border: 1px solid rgba(26, 107, 60, 0.2);
+  border-radius: 18px;
+  color: var(--green);
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.2s, background 0.2s, color 0.2s;
 }
 
 .meal-option span:hover {
-    border-color: rgba(0, 0, 0, 0.2);
+  transform: translateY(-2px);
+  background: rgba(26, 107, 60, 0.16);
 }
 
 .meal-option input[type="radio"]:checked + span {
-    border-color: #fff;
-    background: var(--green);
-    color: #fff;
+  background: var(--green);
+  color: #fff;
 }
 
-/* Text and number inputs */
 .form-card input[type="text"],
 .form-card input[type="number"] {
-    width: 100%;
-    padding: 14px 16px;
-    border: 2px solid rgba(0, 0, 0, 0.08);
-    border-radius: 10px;
-    font-size: 15px;
-    font-family: inherit;
-    color: var(--dark);
-    background: #fff;
-    margin-bottom: 14px;
-    box-sizing: border-box;
-    transition: border-color 0.2s ease;
+  width: 100%;
+  padding: 14px 16px;
+  margin-bottom: 14px;
+  border: 1.5px solid rgba(0, 0, 0, 0.1);
+  border-radius: 14px;
+  background: #fff;
+  color: var(--dark);
+  font-family: "DM Sans", sans-serif;
+  font-size: 15px;
+  outline: none;
 }
 
 .form-card input:focus {
-    outline: none;
-    border-color: var(--dark);
+  border-color: var(--green);
 }
 
-.form-card input::placeholder {
-    color: rgba(107, 124, 110, 0.65);
+.submit-btn,
+.secondary-btn {
+  width: 100%;
+  padding: 14px 28px;
+  border-radius: 100px;
+  font-family: "DM Sans", sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.2s, opacity 0.2s;
 }
 
-/* Submit button */
 .submit-btn {
-    width: 100%;
-    padding: 14px;
-    background: var(--green);
-    color: #fff;
-    border: none;
-    border-radius: 10px;
-    font-size: 15px;
-    font-weight: 700;
-    font-family: inherit;
-    cursor: pointer;
-    transition: opacity 0.2s ease;
-}
-
-.submit-btn:hover {
-    opacity: 0.7;
-}
-
-/* Log list */
-.log-section-title {
-    font-size: 13px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    color: var(--muted);
-    margin-bottom: 12px;
-}
-
-.log-entry {
-    background: rgba(255, 255, 255, 0.75);
-    backdrop-filter: blur(8px);
-    border: 1px solid rgba(0, 0, 0, 0.05);
-    border-radius: 12px;
-    padding: 16px 20px;
-    margin-bottom: 8px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.entry-left {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-}
-
-.meal-tag {
-    font-size: 11px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    color: var(--muted);
-}
-
-.entry-desc {
-    font-size: 15px;
-    font-weight: 600;
-    color: var(--dark);
-}
-
-.entry-right {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-}
-
-.entry-cals {
-    font-size: 18px;
-    font-weight: 900;
-    color: var(--dark);
-    letter-spacing: -0.5px;
-}
-
-.entry-cals small {
-    font-size: 12px;
-    font-weight: 600;
-    color: var(--muted);
-}
-
-.delete-btn {
-    background: none;
-    border: none;
-    font-size: 18px;
-    color: rgba(107, 124, 110, 0.45);
-    cursor: pointer;
-    padding: 4px;
-    transition: color 0.2s ease;
-}
-
-.delete-btn:hover {
-    color: #e53935;
-}
-
-.empty-state {
-    text-align: center;
-    padding: 40px 20px;
-    color: rgba(107, 124, 110, 0.55);
-    font-size: 15px;
-    font-weight: 600;
-}
-.entry-mode-buttons {
-    display: flex;
-    gap: 8px;
-    margin-bottom: 18px;
-}
-
-.entry-mode-buttons button {
-    flex: 1;
-    padding: 12px 8px;
-    border: 2px solid rgba(0, 0, 0, 0.08);
-    border-radius: 10px;
-    font-size: 14px;
-    font-weight: 700;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    background: #fff;
-    color: var(--green);
-}
-
-.entry-mode-buttons button:hover {
-    border-color: rgba(0, 0, 0, 0.2);
-}
-
-.entry-mode-buttons button.active {
-    background: var(--green);
-    color: #fff;
-    border-color: var(--green);
-}
-.content {
-    padding-top: 80px;
-}
-
-.account-actions {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
+  background: var(--dark);
+  color: #fff;
+  border: none;
 }
 
 .secondary-btn {
-    width: 100%;
-    padding: 14px;
-    background: rgba(26, 107, 60, 0.08);
-    border: none;
-    border-radius: 10px;
-    font-size: 15px;
-    font-weight: 700;
-    cursor: pointer;
+  background: rgba(26, 107, 60, 0.1);
+  color: var(--green);
+  border: 1px solid rgba(26, 107, 60, 0.2);
 }
 
+.submit-btn:hover,
 .secondary-btn:hover {
-    opacity: 0.7;
+  transform: translateY(-2px);
+  opacity: 0.85;
+}
+
+.log-section-title {
+  margin-bottom: 12px;
+  color: var(--green);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.account-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
 .logout {
-    background: #ffe5e5;
-    color: #d11a2a;
+  background: rgba(192, 57, 43, 0.08);
+  color: #c0392b;
+  border: 1.5px solid rgba(192, 57, 43, 0.22);
+}
+
+@media (max-width: 768px) {
+  .content {
+    padding-top: 110px;
+  }
+
+  .form-card,
+  .total-banner {
+    padding: 22px;
+  }
 }
