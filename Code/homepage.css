@@ -343,7 +343,7 @@ body {
 /* ── Mobile ── */
 @media (max-width: 768px) {
     .menu-icon { display: block; position: absolute; right: 20px; top: 16px; font-size: 22px; cursor: pointer; }
-    .nav-links { display: none; position: absolute; top: 60px; right: 16px; background: white; padding: 16px 20px; border-radius: 12px; flex-direction: column; gap: 16px; box-shadow: 0 8px 24px rgba(0,0,0,0.1); }
+    .nav-links { display: none; position: absolute; top: 60px; right: 16px; left: auto; width: auto; background: white; padding: 16px 20px; border-radius: 12px; flex-direction: column; gap: 16px; box-shadow: 0 8px 24px rgba(0,0,0,0.1); }
     #menu-toggle:checked + .menu-icon + .nav-links { display: flex; }
     .features-grid { grid-template-columns: 1fr; }
     .cta-banner { padding: 40px 28px; text-align: center; justify-content: center; }
@@ -359,7 +359,11 @@ body {
     color: #1a6b3c;
 }
 
-.hero, .features, .cta-banner, .navbar, .content {
+.hero, .features, .cta-banner, .content {
     position: relative;
     z-index: 1;
+}
+
+.navbar {
+    z-index: 10;
 }
