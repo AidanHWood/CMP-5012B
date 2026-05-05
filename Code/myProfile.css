@@ -4,53 +4,55 @@
   position: relative;
   z-index: 1;
   min-height: 100vh;
-  max-width: 1000px;
+  max-width: 900px;
   margin: 0 auto;
   padding: 130px 24px 80px;
   text-align: center;
 }
 
 .profile-title {
-  margin-bottom: 36px;
+  margin-bottom: 34px;
 }
 
-.profile-card {
-  background: rgba(255, 255, 255, 0.72);
-  border: 1px solid rgba(0, 0, 0, 0.06);
-  border-radius: 24px;
-  padding: 24px;
-  backdrop-filter: blur(12px);
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.06);
-  animation: fadeUp 0.7s 0.3s forwards;
-  opacity: 0;
+.profile-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
 
-.profile-row {
+.profile-item {
   display: grid;
   grid-template-columns: 240px 1fr;
   gap: 16px;
   align-items: stretch;
   text-decoration: none;
-  margin-bottom: 16px;
-}
 
-.profile-row:last-child {
-  margin-bottom: 0;
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  border-radius: 24px;
+  backdrop-filter: blur(12px);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.06);
+
+  padding: 20px;
+  transition: transform 0.2s, box-shadow 0.2s;
 }
 
 .profile-button {
   background: rgba(26, 107, 60, 0.1);
   border: 1px solid rgba(26, 107, 60, 0.2);
   border-radius: 20px;
-  padding: 28px 22px;
+  padding: 24px 20px;
+
   color: var(--green);
   font-size: 15px;
   font-weight: 700;
+
   display: flex;
   gap: 10px;
   align-items: center;
   justify-content: center;
-  transition: transform 0.2s, background 0.2s, color 0.2s;
+
+  transition: background 0.2s, color 0.2s;
 }
 
 .profile-button span {
@@ -58,12 +60,11 @@
 }
 
 .profile-info {
-  background: #ffffff;
+  background: #fff;
   border: 1px solid rgba(0, 0, 0, 0.06);
   border-radius: 20px;
-  padding: 28px 32px;
+  padding: 24px 28px;
   text-align: left;
-  transition: transform 0.2s, box-shadow 0.2s;
 }
 
 .profile-info h2 {
@@ -79,15 +80,14 @@
   line-height: 1.6;
 }
 
-.profile-row:hover .profile-button {
-  background: var(--green);
-  color: #fff;
-  transform: translateY(-4px);
-}
-
-.profile-row:hover .profile-info {
+.profile-item:hover {
   transform: translateY(-4px);
   box-shadow: 0 12px 32px rgba(0, 0, 0, 0.08);
+}
+
+.profile-item:hover .profile-button {
+  background: var(--green);
+  color: #fff;
 }
 
 @media (max-width: 768px) {
@@ -95,8 +95,9 @@
     padding-top: 110px;
   }
 
-  .profile-row {
+  .profile-item {
     grid-template-columns: 1fr;
+    padding: 18px;
   }
 
   .profile-button {
