@@ -1,316 +1,250 @@
-:root {
-    --green:    #1a6b3c;
-    --green2:   #2d9156;
-    --lime:     #a8e063;
-    --cream:    #f7f4ef;
-    --dark:     #0e1a12;
-    --muted:    #6b7c6e;
-}
+@import url("https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&display=swap");
 
 .content {
-    padding-top: 80px;
-    padding-bottom: 60px;
+  position: relative;
+  z-index: 1;
+  min-height: 100vh;
+  padding: 130px 24px 80px;
 }
 
 .history-container {
-    max-width: 90%;
-    margin: 0 auto;
-    padding: 0 20px;
+  max-width: 900px;
+  margin: 0 auto;
 }
 
-.page-heading {
-    text-align: center;
-    font-size: 32px;
-    font-weight: 900;
-    letter-spacing: -1px;
-    color: var(--dark);
-    margin-bottom: 30px;
-}
-
-/* ── Section card ── */
+/* ── Cards ── */
 .section-card {
-    background: rgba(255, 255, 255, 0.75);
-    backdrop-filter: blur(8px);
-    border: 1px solid rgba(0, 0, 0, 0.05);
-    border-radius: 14px;
-    padding: 28px;
-    margin-bottom: 24px;
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  border-radius: 24px;
+  backdrop-filter: blur(12px);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.06);
+  padding: 28px;
+  margin-bottom: 28px;
 }
 
+/* ── Section header ── */
 .section-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
 }
 
 .section-title {
-    font-size: 18px;
-    font-weight: 800;
-    color: var(--dark);
-    margin: 0;
+  color: var(--green);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
 .current-weight {
-    font-size: 15px;
-    font-weight: 700;
-    color: var(--green);
-    background: rgba(26, 107, 60, 0.1);
-    padding: 6px 14px;
-    border-radius: 100px;
+  background: rgba(26, 107, 60, 0.1);
+  border: 1px solid rgba(26, 107, 60, 0.2);
+  padding: 6px 14px;
+  border-radius: 100px;
+  color: var(--green);
+  font-size: 13px;
+  font-weight: 700;
 }
 
-/* ── Range picker buttons ── */
+/* ── Range buttons ── */
 .range-picker {
-    display: flex;
-    gap: 6px;
-    margin-bottom: 20px;
-    flex-wrap: wrap;
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
 }
 
 .range-btn {
-    padding: 9px 16px;
-    border: 2px solid rgba(0, 0, 0, 0.08);
-    border-radius: 10px;
-    font-size: 13px;
-    font-weight: 700;
-    font-family: inherit;
-    color: var(--green);
-    background: #fff;
-    cursor: pointer;
-    transition: all 0.2s ease;
+  padding: 12px 16px;
+  background: rgba(26, 107, 60, 0.1);
+  border: 1px solid rgba(26, 107, 60, 0.2);
+  border-radius: 18px;
+  color: var(--green);
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.2s, background 0.2s;
 }
 
 .range-btn:hover {
-    border-color: rgba(0, 0, 0, 0.2);
+  transform: translateY(-2px);
+  background: rgba(26, 107, 60, 0.16);
 }
 
 .range-btn.active {
-    background: var(--green);
-    color: #fff;
-    border-color: var(--green);
+  background: var(--green);
+  color: #fff;
 }
 
-/* ── Custom date range ── */
+/* ── Custom range ── */
 .custom-range {
-    margin-bottom: 20px;
+  margin-bottom: 20px;
 }
 
 .date-inputs {
-    display: flex;
-    gap: 12px;
-    align-items: flex-end;
-    flex-wrap: wrap;
+  display: flex;
+  gap: 12px;
+  align-items: flex-end;
+  flex-wrap: wrap;
 }
 
 .date-field {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    flex: 1;
-    min-width: 140px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+  min-width: 140px;
 }
 
 .date-field label {
-    font-size: 12px;
-    font-weight: 700;
-    color: var(--muted);
-    text-transform: uppercase;
-    letter-spacing: 0.3px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--muted);
+  text-transform: uppercase;
 }
 
-.date-field input[type="date"] {
-    padding: 10px 14px;
-    border: 2px solid rgba(0, 0, 0, 0.08);
-    border-radius: 10px;
-    font-size: 14px;
-    font-family: inherit;
-    color: var(--dark);
-    background: #fff;
-    outline: none;
-    transition: border-color 0.2s ease;
+.date-field input {
+  padding: 12px 14px;
+  border: 1.5px solid rgba(0, 0, 0, 0.1);
+  border-radius: 14px;
+  font-size: 14px;
+  background: #fff;
 }
 
-.date-field input[type="date"]:focus {
-    border-color: var(--dark);
+.date-field input:focus {
+  border-color: var(--green);
 }
 
+/* Apply button */
 .apply-btn {
-    padding: 10px 24px;
-    background: var(--green);
-    color: #fff;
-    border: none;
-    border-radius: 10px;
-    font-size: 13px;
-    font-weight: 700;
-    font-family: inherit;
-    cursor: pointer;
-    transition: opacity 0.2s ease;
-    height: 42px;
+  padding: 12px 24px;
+  background: var(--dark);
+  color: #fff;
+  border: none;
+  border-radius: 100px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.2s, opacity 0.2s;
+  height: 46px;
 }
 
 .apply-btn:hover {
-    opacity: 0.8;
+  transform: translateY(-2px);
+  opacity: 0.85;
 }
 
 /* ── Chart ── */
 .chart-wrapper {
-    position: relative;
-    width: 100%;
-    margin-bottom: 20px;
+  position: relative;
+  width: 100%;
+  height: 320px;
+  margin-bottom: 20px;
 }
 
-/* ── Stats row ── */
+/* ── Stats ── */
 .stats-row {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 12px;
-    padding-top: 16px;
-    border-top: 1px solid rgba(0, 0, 0, 0.06);
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
 }
 
 .stat-item {
-    text-align: center;
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
+  text-align: center;
 }
 
 .stat-label {
-    font-size: 11px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    color: var(--muted);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--muted);
 }
 
 .stat-value {
-    font-size: 18px;
-    font-weight: 900;
-    color: var(--dark);
-    letter-spacing: -0.5px;
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--dark);
 }
 
 .stat-value.positive {
-    color: #e53935;
+  color: #e53935;
 }
 
 .stat-value.negative {
-    color: var(--green);
+  color: var(--green);
 }
 
-/* ── Empty state ── */
-.empty-state {
-    text-align: center;
-    padding: 40px 20px;
-    color: rgba(107, 124, 110, 0.55);
-    font-size: 15px;
-    font-weight: 600;
-}
-
-/* ── Exercise type selector (Section 2) ── */
+/* ── Exercise selector ── */
 .exercise-type-selector {
-    display: flex;
-    gap: 8px;
-    margin-bottom: 16px;
-    flex-wrap: wrap;
+  display: flex;
+  gap: 10px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
 }
 
 .exercise-type-btn {
-    flex: 1;
-    min-width: 90px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 4px;
-    padding: 14px 8px;
-    border: 2px solid rgba(0, 0, 0, 0.08);
-    border-radius: 12px;
-    background: #fff;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    font-family: inherit;
+  flex: 1;
+  min-width: 90px;
+  padding: 14px 10px;
+  border-radius: 18px;
+  background: rgba(26, 107, 60, 0.1);
+  border: 1px solid rgba(26, 107, 60, 0.2);
+  cursor: pointer;
+  transition: transform 0.2s, background 0.2s;
 }
 
 .exercise-type-btn:hover {
-    border-color: rgba(0, 0, 0, 0.2);
+  transform: translateY(-2px);
 }
 
 .exercise-type-btn.active {
-    background: var(--green);
-    border-color: var(--green);
-}
-
-.exercise-type-btn .type-icon {
-    font-size: 22px;
+  background: var(--green);
 }
 
 .exercise-type-btn .type-label {
-    font-size: 12px;
-    font-weight: 700;
-    color: var(--dark);
-    text-transform: uppercase;
-    letter-spacing: 0.3px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--green);
 }
 
 .exercise-type-btn.active .type-label {
-    color: #fff;
+  color: #fff;
 }
 
-.exercise-metric-label {
-    font-size: 13px;
-    font-weight: 600;
-    color: var(--muted);
-    margin-bottom: 16px;
-    text-transform: uppercase;
-    letter-spacing: 0.3px;
-}
-.chart-wrapper {
-    position: relative;
-    width: 100%;
-    height: 300px;
-    margin-bottom: 20px;
+/* ── Empty ── */
+.empty-state {
+  padding: 36px 20px;
+  text-align: center;
+  color: var(--muted);
+  font-size: 15px;
+  font-weight: 600;
 }
 
 /* ── Mobile ── */
 @media (max-width: 768px) {
-    .range-picker {
-        gap: 4px;
-    }
+  .content {
+    padding-top: 110px;
+  }
 
-    .range-btn {
-        padding: 8px 12px;
-        font-size: 12px;
-    }
+  .section-card {
+    padding: 22px;
+  }
 
-    .stats-row {
-        grid-template-columns: repeat(2, 1fr);
-    }
+  .stats-row {
+    grid-template-columns: repeat(2, 1fr);
+  }
 
-    .section-header {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 8px;
-    }
+  .section-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
 
-    .date-inputs {
-        flex-direction: column;
-    }
-
-    .exercise-type-selector {
-        gap: 4px;
-    }
-
-    .exercise-type-btn {
-        min-width: 60px;
-        padding: 10px 4px;
-    }
-
-    .exercise-type-btn .type-icon {
-        font-size: 18px;
-    }
-
-    .exercise-type-btn .type-label {
-        font-size: 10px;
-    }
+  .date-inputs {
+    flex-direction: column;
+  }
 }
