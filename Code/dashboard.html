@@ -1,37 +1,38 @@
+
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <title>Dashboard</title>
-    <link rel="stylesheet" href="dashboard.css" />
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  </head>
+<head>
+  <meta charset="UTF-8" />
+  <title>Dashboard</title>
+  <link rel="stylesheet" href="dashboard.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
 
-  <body>
-    <header class="navbar">
-      <nav>
-        <input type="checkbox" id="menu-toggle" />
-        <label for="menu-toggle" class="menu-icon">☰</label>
+<body>
+<header class="navbar">
+  <nav>
+    <input type="checkbox" id="menu-toggle" />
+    <label for="menu-toggle" class="menu-icon">☰</label>
 
-        <ul class="nav-links">
-          <li><a href="dashboard.html" class="active">Dashboard</a></li>
-          <li><a href="logCalories.html">Log Calories</a></li>
-          <li><a href="logExercise.html">Log Exercise</a></li>
-          <li><a href="userSettings.html">User Settings</a></li>
-          <li><a href="friends.html">Friends</a></li>
-          <li><a href="myHistory.html">My History</a></li>
-          <li><a href="login.html">Logout</a></li>
-        </ul>
-      </nav>
-    </header>
+    <ul class="nav-links">
+      <li><a href="dashboard.html" class="active">Dashboard</a></li>
+      <li><a href="logCalories.html">Log Calories</a></li>
+      <li><a href="logExercise.html">Log Exercise</a></li>
+      <li><a href="userSettings.html">User Settings</a></li>
+      <li><a href="friends.html">Friends</a></li>
+      <li><a href="myHistory.html">My History</a></li>
+      <li><a href="login.html">Logout</a></li>
+    </ul>
+  </nav>
+</header>
 
-    <canvas id="waveCanvas"></canvas>
+<canvas id="waveCanvas"></canvas>
 
-    <main class="content">
-      <div class="log-container">
-        <h1 class="page-heading">Dashboard</h1>
+<main class="content">
+  <div class="log-container">
+    <h1 class="page-heading">Dashboard</h1>
 
-      <div class="stats-grid">
+    <div class="stats-grid">
       <div class="stat-card">
         <span class="stat-label">Calories Eaten</span>
         <strong>1,500</strong>
@@ -71,287 +72,39 @@
       </div>
     </section>
 
-
-        <div class="dashboard">
-          <div class="card">
-            <h3>Calories Remaining</h3>
-            <div class="chart-box pie-chart">
-              <canvas id="caloriesPie"></canvas>
-            </div>
-          </div>
-
-          <div class="card">
-            <h3>Macronutrients</h3>
-            <div class="chart-box pie-chart">
-              <canvas id="macrosPie"></canvas>
-            </div>
-          </div>
-
-          <div class="card wide">
-            <h3>Calories Throughout the Day</h3>
-            <div class="chart-box line-chart">
-              <canvas id="caloriesLine"></canvas>
-            </div>
-          </div>
-          <div class="card wide">
-            <h3>Calories Burned This Week</h3>
-            <div class="chart-box line-chart">
-              <canvas id="weeklyExerciseChart"></canvas>
-            </div>
-          </div>
+    <div class="dashboard">
+      <div class="card">
+        <h3>Calories Remaining</h3>
+        <div class="chart-box pie-chart">
+          <canvas id="caloriesPie"></canvas>
+        </div>
       </div>
+
+      <div class="card">
+        <h3>Macronutrients</h3>
+        <div class="chart-box pie-chart">
+          <canvas id="macrosPie"></canvas>
+        </div>
       </div>
-    </main>
-    <script id="chartjs-setup">
-      let caloriesPieChart, macrosPieChart, caloriesLineChart, weeklyBarChart;
 
-      function pct(actual, goal) {
-          if (!goal || goal === 0) return 0;
-          return Math.min(100, Math.round((actual / goal) * 100));
-      }
+      <div class="card wide">
+        <h3>Calories Throughout the Day</h3>
+        <div class="chart-box line-chart">
+          <canvas id="caloriesLine"></canvas>
+        </div>
+      </div>
 
-      function timeToSeconds(str) {
-          if (!str) return 0;
-          const parts = str.split(':').map(Number);
-          return parts.length === 2 ? parts[0] * 60 + parts[1] : 0;
-      }
+      <div class="card wide">
+        <h3>Calories Burned This Week</h3>
+        <div class="chart-box line-chart">
+          <canvas id="weeklyExerciseChart"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
 
-      function secondsToTime(s) {
-          const m = Math.floor(s / 60), sec = Math.round(s % 60);
-          return `${m}:${String(sec).padStart(2, '0')}`;
-      }
-
-      function initCharts() {
-          caloriesPieChart = new Chart(document.getElementById("caloriesPie"), {
-              type: "doughnut",
-              data: {
-                  labels: ["Consumed", "Remaining"],
-                  datasets: [{
-                      data: [0, 2000],
-                      backgroundColor: ["#1a6b3c", "rgba(168, 224, 99, 0.45)"],
-                      borderColor: ["rgba(247,244,239,0.9)", "rgba(247,244,239,0.9)"],
-                      borderWidth: 3, hoverOffset: 6,
-                  }],
-              },
-              options: {
-                  responsive: true, maintainAspectRatio: false, cutout: "70%",
-                  plugins: { legend: { display: true, position: "bottom",
-                      labels: { color: "#6b7c6e", boxWidth: 12, padding: 16,
-                          font: { size: 12, weight: "600" } } } },
-              },
-          });
-
-          macrosPieChart = new Chart(document.getElementById("macrosPie"), {
-              type: "doughnut",
-              data: {
-                  labels: ["Protein", "Carbs", "Fibre"],
-                  datasets: [{
-                      data: [0, 0, 0],
-                      backgroundColor: ["#1a6b3c", "#2d9156", "#a8e063"],
-                      borderColor: ["rgba(247,244,239,0.9)","rgba(247,244,239,0.9)","rgba(247,244,239,0.9)"],
-                      borderWidth: 3, hoverOffset: 6,
-                  }],
-              },
-              options: {
-                  responsive: true, maintainAspectRatio: false, cutout: "70%",
-                  plugins: { legend: { display: true, position: "bottom",
-                      labels: { color: "#6b7c6e", boxWidth: 12, padding: 16,
-                          font: { size: 12, weight: "600" } } } },
-              },
-          });
-
-          caloriesLineChart = new Chart(document.getElementById("caloriesLine"), {
-              type: "line",
-              data: {
-                  labels: [],
-                  datasets: [{
-                      label: "Calories",
-                      data: [],
-                      borderColor: "#1a6b3c",
-                      backgroundColor: "rgba(26,107,60,0.12)",
-                      pointBackgroundColor: "#2d9156",
-                      pointBorderColor: "#f7f4ef",
-                      pointHoverBackgroundColor: "#a8e063",
-                      pointHoverBorderColor: "#1a6b3c",
-                      borderWidth: 3, pointRadius: 4, pointHoverRadius: 6,
-                      fill: true, tension: 0.35,
-                  }],
-              },
-              options: {
-                  responsive: true, maintainAspectRatio: false,
-                  plugins: { legend: { display: false } },
-                  scales: {
-                      x: { ticks: { color: "#6b7c6e" }, grid: { color: "rgba(26,107,60,0.08)" } },
-                      y: { ticks: { color: "#6b7c6e" }, grid: { color: "rgba(26,107,60,0.08)" } },
-                  },
-              },
-          });
-
-          weeklyBarChart = new Chart(document.getElementById("weeklyExerciseChart"), {
-              type: "bar",
-              data: {
-                  labels: [],
-                  datasets: [{
-                      label: "Calories Burned",
-                      data: [],
-                      backgroundColor: "rgba(26,107,60,0.75)",
-                      borderColor: "#1a6b3c",
-                      borderWidth: 1, borderRadius: 10, borderSkipped: false,
-                  }],
-              },
-              options: {
-                  responsive: true, maintainAspectRatio: false,
-                  plugins: {
-                      legend: { display: false },
-                      tooltip: {
-                          backgroundColor: "#0e1a12", titleColor: "#f7f4ef",
-                          bodyColor: "#f7f4ef", padding: 12, displayColors: false,
-                          callbacks: { label: ctx => ctx.parsed.y + " calories burned" },
-                      },
-                  },
-                  scales: {
-                      x: { ticks: { color: "#6b7c6e", font: { weight: "600" } }, grid: { display: false } },
-                      y: { beginAtZero: true, ticks: { color: "#6b7c6e" }, grid: { color: "rgba(26,107,60,0.08)" } },
-                  },
-              },
-          });
-      }
-
-      function populateStats(stats) {
-          const remaining = stats.calorie_goal - stats.calories_eaten;
-          document.querySelectorAll('.stat-card')[0].querySelector('strong').textContent =
-              stats.calories_eaten.toLocaleString();
-          document.querySelectorAll('.stat-card')[0].querySelector('.stat-sub').textContent =
-              `of ${stats.calorie_goal.toLocaleString()} goal`;
-          document.querySelectorAll('.stat-card')[1].querySelector('strong').textContent =
-              stats.calories_burned.toLocaleString();
-          document.querySelectorAll('.stat-card')[2].querySelector('strong').textContent =
-              stats.net_calories.toLocaleString();
-          document.querySelectorAll('.stat-card')[3].querySelector('strong').textContent =
-              stats.streak + (stats.streak === 1 ? ' day' : ' days');
-
-          caloriesPieChart.data.datasets[0].data = [
-              stats.calories_eaten,
-              Math.max(0, remaining)
-          ];
-          caloriesPieChart.update();
-
-          macrosPieChart.data.datasets[0].data = [
-              stats.macros.protein,
-              stats.macros.carbs,
-              stats.macros.fibre
-          ];
-          macrosPieChart.update();
-      }
-
-      const GOAL_DEFAULTS = {
-        gym_weight:  { goal: 8000, actual: 0, unit: 'kg', isTime: false },
-        '5k_run':    { goal: 1500, actual: 0, unit: '',   isTime: true  },
-        '10k_run':   { goal: 3300, actual: 0, unit: '',   isTime: true  },
-        weight_loss: { goal: 10,   actual: 0, unit: 'kg', isTime: false },
-        steps:       { goal: 10000,actual: 0, unit: 'steps', isTime: false },
-        calories:    { goal: 2000, actual: 0, unit: 'kcal',  isTime: false },
-        water:       { goal: 2000, actual: 0, unit: 'ml',    isTime: false },
-        custom:      { goal: 100,  actual: 0, unit: '',      isTime: false },
-      };
-
-      function populateGoals(goalsArr) {
-          const map = {};
-          goalsArr.forEach(g => { map[g.goal_type] = g; });
-
-          const cards = document.querySelectorAll('.goal-card');
-          const types = ['gym_weight', '5k_run', '10k_run', 'weight_loss'];
-
-          cards.forEach((card, i) => {
-              const type = types[i];
-              const def  = GOAL_DEFAULTS[type];
-              const data = map[type];
-
-              const goalVal   = data?.goal_value   ?? def.goal;
-              const actualVal = data?.actual_value ?? def.actual;
-
-              const goalStr   = def.isTime ? secondsToTime(goalVal)   : `${goalVal} ${def.unit}`;
-              const actualStr = def.isTime ? secondsToTime(actualVal) : `${actualVal} ${def.unit}`;
-
-              let progress;
-              if (def.isTime) {
-                  progress = actualVal > 0 ? pct(goalVal, actualVal) : 0;
-              } else {
-                  progress = pct(actualVal, goalVal);
-              }
-
-              const vals = card.querySelectorAll('.goal-values strong');
-              if (vals[0]) vals[0].textContent = goalStr;
-              if (vals[1]) vals[1].textContent = actualStr;
-
-              const fill = card.querySelector('.goal-fill');
-              if (fill) fill.style.width = progress + '%';
-
-              const btn   = card.querySelector('button');
-              const input = card.querySelector('input');
-              if (btn && input) {
-                  btn.onclick = async () => {
-                    const raw = input.value.trim();
-                    if (!raw) return;
-                    const newActual = def.isTime ? timeToSeconds(raw) : parseFloat(raw);
-                    if (isNaN(newActual)) return alert('Invalid value');
-                    const goalId = goalsArr.find(g => g.goal_type === type)?.goal_id;
-                    if (!goalId) return alert('No goal found — add it in User Settings first.');
-                    const res = await fetch(`/api/goals/${goalId}`, {
-                        method: 'PATCH',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ actual_value: newActual })
-                    });
-                    if (res.ok) { input.value = ''; loadDashboard(); }
-                };
-              }
-          });
-      }
-
-      function populateMealChart(meals) {
-          if (!meals.length) return;
-          let cumulative = 0;
-          const labels = [], data = [];
-          meals.forEach(m => {
-              const label = m.meal_type.charAt(0).toUpperCase() + m.meal_type.slice(1);
-              cumulative += parseFloat(m.meal_calories);
-              labels.push(label);
-              data.push(Math.round(cumulative));
-          });
-          caloriesLineChart.data.labels   = labels;
-          caloriesLineChart.data.datasets[0].data = data;
-          caloriesLineChart.update();
-      }
-
-      function populateWeeklyChart(days) {
-          weeklyBarChart.data.labels = days.map(d => d.label);
-          weeklyBarChart.data.datasets[0].data = days.map(d => d.calories_burned);
-          weeklyBarChart.update();
-      }
-
-      async function loadDashboard() {
-          try {
-              const [statsRes, goalsRes, mealsRes, weeklyRes] = await Promise.all([
-                  fetch('/api/dashboard-stats'),
-                  fetch('/api/goals'),
-                  fetch('/api/food-log/today-by-meal'),
-                  fetch('/api/weekly-exercise'),
-              ]);
-
-              if (statsRes.ok)  populateStats(await statsRes.json());
-              if (goalsRes.ok)  populateGoals((await goalsRes.json()).goals);
-              if (mealsRes.ok)  populateMealChart((await mealsRes.json()).meals);
-              if (weeklyRes.ok) populateWeeklyChart((await weeklyRes.json()).days);
-          } catch (err) {
-              console.error('Dashboard load error:', err);
-          }
-      }
-
-      initCharts();
-      loadDashboard();
-      </script>
-
-    <script src="wave.js"></script>
-    <script src="dashboard.js"></script>
-  </body>
+<script src="wave.js"></script>
+<script src="dashboard.js"></script>
+</body>
 </html>

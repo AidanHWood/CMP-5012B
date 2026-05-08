@@ -18,11 +18,15 @@ require('dotenv').config({ path: path.join(__dirname, '../.env') });
 const app = express();
  
 // ——— Middleware ———
+
+
 app.use(helmet({
     contentSecurityPolicy: {
         directives: {
             ...helmet.contentSecurityPolicy.getDefaultDirectives(),
-            "script-src-attr": ["'unsafe-hashes'", "'unsafe-inline'"]
+            "script-src":  ["'self'", "https://cdn.jsdelivr.net", "'unsafe-inline'"],
+            "script-src-attr": ["'unsafe-hashes'", "'unsafe-inline'"],
+            "connect-src": ["'self'", "https://cdn.jsdelivr.net"],
         }
     }
 }));
