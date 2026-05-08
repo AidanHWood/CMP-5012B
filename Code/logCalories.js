@@ -114,12 +114,24 @@ async function searchFood() {
                 return;
             }
 
-            resultsEl.innerHTML = foods.map(f => `
-              <div class="food-result" onclick="selectFood(${f.food_id}, '${f.food_name.replace(/'/g, "\\'")}', ${f.calories || 0})">
-                <span>${f.food_name}</span>
-                <span style="float:right;color:#888;font-weight:400;">${f.calories || '?'} kcal/100g</span>
-              </div>
-            `).join('');
+            resultsEl.innerHTML = '';
+            foods.forEach(f => {
+                const div = document.createElement('div');
+                div.className = 'food-result'
+
+                const name = document.createElement('span');
+                name.textContent = f.food_name;
+
+                const cals = document.createElement('span');
+
+                cals.style.cssText = 'float:right;color:#888;font-weight:400;';
+                cals.textContent = `${f.calories || '?'} kcal/100g`;
+
+                div.appendChild(name);
+                div.appendChild(cals);
+                div.addEventListener('click', () => selectFood(f.food_id, f.food_name, f.calories || 0));
+                resultsEl.appendChild(div)
+            })
         } catch (err) {
             resultsEl.innerHTML = '<div style="padding:8px 16px;color:red;font-size:13px;">Search failed.</div>';
         }
@@ -190,18 +202,41 @@ async function loadLogs() {
             return;
         }
 
-        listEl.innerHTML = entries.map(log => `
-            <div class="log-entry">
-              <div class="entry-left">
-                <span class="meal-tag">${log.meal_type}</span>
-                <span class="entry-desc">${log.food_name} (${log.quantity_grams}g)</span>
-              </div>
-              <div class="entry-right">
-                <span class="entry-cals">${log.calories} <small>kcal</small></span>
-                <button class="delete-btn" onclick="deleteLog(${log.f_log_id})">&times;</button>
-              </div>
-            </div>
-          `).join('');
+        listEl.innerHTML = '';
+        entries.forEach(log => {
+            const div = document.createElement('div');
+            div.className = "log-entry";
+            const left = document.createElement('div');
+            left.className = 'entry-left';
+            const mealTag = document.createElement('span');
+            mealTag.className = 'meal-tag';
+            mealTag.textContent = log.meal_type;
+            const desc = document.createElement('span');
+            desc.className = 'entry-desc';
+            desc.textContent = `${log.food_name} (${log.quantity_grams}g)`;
+
+            left.appendChild(mealTag);
+            left.appendChild(desc);
+
+            const right = document.createElement('div');
+            right.className = 'entry-right';
+
+            const cals = document.createElement('span');
+            cals.className = 'entry-cals';
+            cals.textContent = `${log.calories} kcal`;
+
+
+            const btn = document.createElement('button');
+            btn.className = 'delete-btn';
+            btn.textContent = 'x';
+            btn.addEventListener('click', () => deleteLog(log.f_log_id));
+
+            right.appendChild(cals);
+            right.appendChild(btn);
+            div.appendChild(left);
+            div.appendChild(right);
+            listEl.appendChild(div);
+        });
     } catch (err) { console.error('Load logs error:', err); }
 }
 

@@ -12,6 +12,7 @@ function val(id) { return document.getElementById(id).value.trim(); }
 async function handleRegister() {
     const btn      = document.getElementById('registerBtn');
     const errorBox = document.getElementById('errorBox');
+    const successBox = document.getElementById('successBox');
     errorBox.style.display = 'none';
 
     const payload = {

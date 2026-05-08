@@ -9,6 +9,7 @@ const express = require('express');
 const fs = require('fs');
 const path = require('path');
 const session = require('express-session');
+const helmet = require('helmet')
  
 // Load environment variables from .env file
 require('dotenv').config({ path: path.join(__dirname, '../.env') });
@@ -18,18 +19,48 @@ const app = express();
 // ——— Middleware ———
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(helmet());
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
  
 // ——— Session Setup ———
+
+if (!process.env.SESSION_SECRET) throw new Error('Session Secret not set in .env')
 app.use(session({
-    secret: process.env.SESSION_SECRET || 'change-this-to-something-random',
+    secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
     cookie: {
         maxAge: 1000 * 60 * 60 * 24,
-        httpOnly: true
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'strict'
     }
 }));
- 
+
+// ——— Protected page routes (must be before static middleware) ———
+const CODE_DIR = path.join(__dirname, '../../Code');
+
+app.get('/dashboard.html', (req, res) => {
+    if (!req.session.userId) return res.redirect('/login.html');
+    res.sendFile(path.join(CODE_DIR, 'dashboard.html'));
+});
+app.get('/logCalories.html', (req, res) => {
+    if (!req.session.userId) return res.redirect('/login.html');
+    res.sendFile(path.join(CODE_DIR, 'logCalories.html'));
+});
+app.get('/logExercise.html', (req, res) => {
+    if (!req.session.userId) return res.redirect('/login.html');
+    res.sendFile(path.join(CODE_DIR, 'logExercise.html'));
+});
+app.get('/myHistory.html', (req, res) => {
+    if (!req.session.userId) return res.redirect('/login.html');
+    res.sendFile(path.join(CODE_DIR, 'myHistory.html'));
+});
+app.get('/friends.html', (req, res) => {
+    if (!req.session.userId) return res.redirect('/login.html');
+    res.sendFile(path.join(CODE_DIR, 'friends.html'));
+});
 // Serve static files (HTML, CSS, JS) from the Code folder
 app.use(express.static(path.join(__dirname, '../../Code')));
  
@@ -88,7 +119,6 @@ app.delete('/api/calories/:id', (req, res) => {
 
 // ——— Exercise Logging Routes (PostgreSQL) ———
 const pool = require('./db');
-
 app.get('/api/user-weight', async (req, res) => {
     if (!req.session.userId) return res.status(401).json({ error: 'Not logged in' });
     try {
@@ -114,25 +144,6 @@ app.get('/api/exercise', async (req, res) => {
         res.status(500).json({ error: 'Server error' });
     }
 });
-
-app.post('/api/exercise', async (req, res) => {
-    if (!req.session.userId) return res.status(401).json({ error: 'Not logged in' });
-    const { exercise_type, duration_min, distance_km, calories_burned } = req.body;
-    if (!exercise_type || !duration_min) return res.status(400).json({ error: 'Exercise type and duration are required' });
-    try {
-        const result = await pool.query(
-            `INSERT INTO exercise_logs (user_id, exercise_type, duration_min, distance_km, calories_burned, log_date)
-             VALUES ($1, $2, $3, $4, $5, NOW())
-             RETURNING exercise_log_id, exercise_type, duration_min, distance_km, calories_burned, log_date`,
-            [req.session.userId, exercise_type, Number(duration_min), distance_km ? Number(distance_km) : null, Number(calories_burned) || 0]
-        );
-        res.status(201).json(result.rows[0]);
-    } catch (err) {
-        console.error('Log exercise error:', err);
-        res.status(500).json({ error: 'Server error' });
-    }
-});
-
 app.delete('/api/exercise/:id', async (req, res) => {
     if (!req.session.userId) return res.status(401).json({ error: 'Not logged in' });
     try {
@@ -154,6 +165,9 @@ app.get('/api/weight-history', async (req, res) => {
         let params;
 
         if (req.query.from && req.query.to) {
+            const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+            if (!dateRegex.test(req.query.from) || !dateRegex.test(req.query.to))
+                return res.status(400).json({error: 'Invalid date format: Dates must be in the YYYY-MM-DD format'})
             query = `SELECT weight_log_id, weight_kg, log_date
                      FROM weight_logs
                      WHERE user_id = $1 AND log_date >= $2 AND log_date <= ($3::date + INTERVAL '1 day')
@@ -161,11 +175,13 @@ app.get('/api/weight-history', async (req, res) => {
             params = [req.session.userId, req.query.from, req.query.to];
         } else {
             const days = parseInt(req.query.days) || 7;
+            if (days < 1 || days > 365)
+                return res.status(400).json({error: 'Days must be a valid range:(1-365)'})
             query = `SELECT weight_log_id, weight_kg, log_date
                      FROM weight_logs
-                     WHERE user_id = $1 AND log_date >= NOW() - INTERVAL '${days} days'
+                     WHERE user_id = $1 AND log_date >= NOW() - ($2 * INTERVAL '1 day')
                      ORDER BY log_date ASC`;
-            params = [req.session.userId];
+            params = [req.session.userId, days];
         }
 
         const result = await pool.query(query, params);
@@ -178,13 +194,28 @@ app.get('/api/weight-history', async (req, res) => {
 });
 
 
-// ——— UPDATED: POST /api/exercise — now includes weight_moved_kg ———
-// REPLACE your existing app.post('/api/exercise', ...) with this:
 
 app.post('/api/exercise', async (req, res) => {
     if (!req.session.userId) return res.status(401).json({ error: 'Not logged in' });
     const { exercise_type, duration_min, distance_km, calories_burned, weight_moved_kg } = req.body;
     if (!exercise_type || !duration_min) return res.status(400).json({ error: 'Exercise type and duration are required' });
+
+    const validTypes =['running', 'cycling', 'walking', 'swimming', 'gym', 'sport']
+    if (!validTypes.includes(exercise_type))
+        return res.status(400).json({error: 'Invalid Exercise type'})
+
+    const numericFields = [
+        { name: 'Duration', value: duration_min, min: 1, max: 1440, required: true},
+        { name: 'Calories Burned', value: calories_burned, min: 0, max: 10000, required: true },
+        { name: 'Distance', value: distance_km, min: 0, max: 10000, required: false},
+        { name: 'Weight Moved', value: weight_moved_kg, min: 0, max: 10000, required: false}];
+
+    for (const field of numericFields) {
+        if (!field.required && !field.value) continue;
+        const num = Number(field.value);
+        if (isNaN(num) || num < field.min || num > field.max)
+            return res.status(400).json({error:`${field.name} must be between ${field.min} and ${field.max}`});
+    }
     try {
         const result = await pool.query(
             `INSERT INTO exercise_logs (user_id, exercise_type, duration_min, distance_km, calories_burned, weight_moved_kg, log_date)
@@ -200,19 +231,24 @@ app.post('/api/exercise', async (req, res) => {
 });
 
 
-// ——— NEW: GET /api/exercise-history — Exercise history for myHistory charts ———
-// Paste this BEFORE the homepage route
 
 app.get('/api/exercise-history', async (req, res) => {
     if (!req.session.userId) return res.status(401).json({ error: 'Not logged in' });
 
+
+
+    const validTypes =['running', 'cycling', 'walking', 'swimming', 'gym', 'sport']
     const type = req.query.type || 'running';
 
-    try {
-        let query;
-        let params;
+    if (!validTypes.includes(type))
+        return res.status(400).json({error: 'Invalid Exercise type'})
 
+    try {
+        let query, params;
         if (req.query.from && req.query.to) {
+            const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+            if (!dateRegex.test(req.query.from) || !dateRegex.test(req.query.to))
+                return res.status(400).json({error: 'Invalid date format: Dates must be in the YYYY-MM-DD format'})
             query = `SELECT exercise_log_id, exercise_type, duration_min, distance_km, 
                             calories_burned, weight_moved_kg, log_date
                      FROM exercise_logs
@@ -222,13 +258,15 @@ app.get('/api/exercise-history', async (req, res) => {
             params = [req.session.userId, type, req.query.from, req.query.to];
         } else {
             const days = parseInt(req.query.days) || 7;
+            if (days < 1 || days > 365)
+                return res.status(400).json({error: 'Days must be a valid range:(1-365)'})
             query = `SELECT exercise_log_id, exercise_type, duration_min, distance_km, 
                             calories_burned, weight_moved_kg, log_date
                      FROM exercise_logs
                      WHERE user_id = $1 AND exercise_type = $2 
-                       AND log_date >= NOW() - INTERVAL '${days} days'
+                       AND log_date >= NOW() - ($3 * INTERVAL '1 day')
                      ORDER BY log_date ASC`;
-            params = [req.session.userId, type];
+            params = [req.session.userId, type, days];
         }
 
         const result = await pool.query(query, params);

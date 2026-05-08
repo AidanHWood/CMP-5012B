@@ -616,24 +616,19 @@ router.post('/api/reset-password', async (req, res) => {
             });
         }
 
-        if (!password || !confirm_password) {
+
+
+        if (!password || !validatePassword(password)){
             return res.status(400).json({
-                success: false,
-                errors: ['Both password fields are required.']
-            });
+                success:false,
+                errors: ['Invalid Password format :Password must be at least 8 characters and contain an uppercase letter, lowercase letter, number, and special character.']
+            })
         }
 
         if (password !== confirm_password) {
             return res.status(400).json({
                 success: false,
                 errors: ['Passwords do not match.']
-            });
-        }
-
-        if (password.length < 8) {
-            return res.status(400).json({
-                success: false,
-                errors: ['Password must be at least 8 characters.']
             });
         }
 

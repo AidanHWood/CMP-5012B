@@ -78,9 +78,11 @@ async function addExercise() {
     }
 
     try {
+        const csrfRes = await fetch('/api/csrf-token');
+        const { csrfToken } = await  csrfRes.json();
         const res = await fetch('/api/exercise', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 'Content-Type': 'application/json','X-CSRF-Token':csrfToken },
             body: JSON.stringify({
                 exercise_type: exerciseEl.value,
                 duration_min: Number(duration),
@@ -142,32 +144,50 @@ async function loadExerciseLogs() {
             listEl.innerHTML = '<div class="empty-state">No exercise logged yet.</div>';
             return;
         }
-
-        listEl.innerHTML = logs.map(log => {
+        // Replace innerHTML template with:
+        listEl.innerHTML = '';
+        logs.forEach(log => {
             const typeName = log.exercise_type.charAt(0).toUpperCase() + log.exercise_type.slice(1);
 
-            // Show distance or weight moved depending on type
             let detailText = '';
-            if (log.distance_km) {
-                detailText = `${log.distance_km} km · `;
-            }
-            if (log.weight_moved_kg) {
-                detailText = `${log.weight_moved_kg} kg moved · `;
-            }
+            if (log.distance_km) detailText = `${log.distance_km} km · `;
+            if (log.weight_moved_kg) detailText = `${log.weight_moved_kg} kg moved · `;
 
-            return `
-                <div class="log-entry">
-                    <div class="entry-left">
-                        <span class="meal-tag">${typeName}</span>
-                        <span class="entry-desc">${detailText}${log.duration_min} min</span>
-                    </div>
-                    <div class="entry-right">
-                        <span class="entry-cals">${log.calories_burned} <small>kcal</small></span>
-                        <button class="delete-btn" onclick="deleteExercise(${log.exercise_log_id})">&times;</button>
-                    </div>
-                </div>
-            `;
-        }).join('');
+            const div = document.createElement('div');
+            div.className = 'log-entry';
+
+            const left = document.createElement('div');
+            left.className = 'entry-left';
+
+            const tag = document.createElement('span');
+            tag.className = 'meal-tag';
+            tag.textContent = typeName;
+
+            const desc = document.createElement('span');
+            desc.className = 'entry-desc';
+            desc.textContent = `${detailText}${log.duration_min} min`;
+
+            left.appendChild(tag);
+            left.appendChild(desc);
+
+            const right = document.createElement('div');
+            right.className = 'entry-right';
+
+            const cals = document.createElement('span');
+            cals.className = 'entry-cals';
+            cals.textContent = `${log.calories_burned} kcal`;
+
+            const btn = document.createElement('button');
+            btn.className = 'delete-btn';
+            btn.textContent = '×';
+            btn.addEventListener('click', () => deleteExercise(log.exercise_log_id));
+
+            right.appendChild(cals);
+            right.appendChild(btn);
+            div.appendChild(left);
+            div.appendChild(right);
+            listEl.appendChild(div);
+        });
 
     } catch (err) {
         console.error('Error loading exercises:', err);

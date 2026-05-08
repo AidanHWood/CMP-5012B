@@ -234,6 +234,7 @@ router.delete('/api/food-log/:id', requireAuth, async (req, res) => {
 router.post('/api/foods/manual', requireAuth, async (req, res) => {
     const { food_name, calories, energy, protein, fat, carbs, fibre, sugars, sodium, quantity_grams, meal_type } = req.body;
 
+
     if (!food_name || !calories || !quantity_grams || !meal_type)
         return res.status(400).json({ error: 'food_name, calories, quantity_grams and meal_type are required.' });
 
@@ -242,6 +243,24 @@ router.post('/api/foods/manual', requireAuth, async (req, res) => {
         return res.status(400).json({ error: 'Invalid meal type.' });
 
     try {
+        const numericFields = [
+            { name: 'Food Name', value: food_name.trim().length, min: 2, max: 150, required: true},
+            { name: 'Calories', value: calories, min: 0, max: 10000, required: true },
+            { name: 'Quantity', value: quantity_grams, min: 1, max: 10000, required: true},
+            { name: 'Protein', value: protein, min: 0, max: 1000, required: false},
+            { name: 'Fat', value: fat, min: 0, max: 1000, required: false},
+            { name: 'Carbs', value: carbs, min: 0, max: 1000, required: false},
+            { name: 'Fibre', value: fibre, min: 0, max: 1000, required: false},
+            { name: 'Sugars', value: sugars, min: 0, max: 1000, required: false},
+            { name: 'Sodium', value: sodium, min: 0, max: 100000, required: false}
+        ];
+
+        for (const field of numericFields) {
+            if (!field.required && !field.value) continue;
+            const num = Number(field.value);
+            if (isNaN(num) || num < field.min || num > field.max)
+                return res.status(400).json({error:`${field.name} must be between ${field.min} and ${field.max}`});
+        }
         const foodResult = await pool.query(
             `INSERT INTO foods (food_name, "Energy", calories, protein, fat, carbs, fibre, sugars, sodium)
              VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)

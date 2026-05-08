@@ -109,6 +109,7 @@ body {
   transform: translateY(-4px);
   box-shadow: 0 10px 30px rgba(14, 26, 18, 0.1);
   border-color: rgba(26, 107, 60, 0.24);
+
 }
 
 .stat-label {
