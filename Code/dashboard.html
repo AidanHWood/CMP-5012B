@@ -1,14 +1,14 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <title>Dashboard</title>
-    <link rel="stylesheet" href="dashboard.css" />
-    <link rel="stylesheet" href="homepage.css" />
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  </head>
+<head>
+  <meta charset="UTF-8" />
+  <title>Dashboard</title>
+  <link rel="stylesheet" href="dashboard.css" />
+  <link rel="stylesheet" href="homepage.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
 
-  <body>
+<body>
 <header class="navbar">
   <nav>
     <input type="checkbox" id="menu-toggle" />
@@ -30,13 +30,13 @@
   </nav>
 </header>
 
-    <canvas id="waveCanvas"></canvas>
+<canvas id="waveCanvas"></canvas>
 
-    <main class="content">
-      <div class="log-container">
-          <h1 class="page-heading">My <em>Dashboard</em></h1>
+<main class="content">
+  <div class="log-container">
+    <h1 class="page-heading">My <em>Dashboard</em></h1>
 
-      <div class="stats-grid">
+    <div class="stats-grid">
       <div class="stat-card">
         <span class="stat-label">Calories Eaten</span>
         <strong>1,500</strong>
@@ -62,243 +62,244 @@
       </div>
     </div>
 
-        <div class="dashboard">
-          <div class="card">
-            <h3>Calories Remaining</h3>
-            <div class="chart-box pie-chart">
-              <canvas id="caloriesPie"></canvas>
-            </div>
-          </div>
-
-          <div class="card">
-            <h3>Macronutrients</h3>
-            <div class="chart-box pie-chart">
-              <canvas id="macrosPie"></canvas>
-            </div>
-          </div>
-
-          <div class="card wide">
-            <h3>Calories Throughout the Day</h3>
-            <div class="chart-box line-chart">
-              <canvas id="caloriesLine"></canvas>
-            </div>
-          </div>
-          <div class="card wide">
-            <h3>Calories Burned This Week</h3>
-            <div class="chart-box line-chart">
-            <canvas id="weeklyExerciseChart"></canvas>
-          </div>
+    <div class="dashboard">
+      <div class="card">
+        <h3>Calories Remaining</h3>
+        <div class="chart-box pie-chart">
+          <canvas id="caloriesPie"></canvas>
+        </div>
       </div>
+
+      <div class="card">
+        <h3>Macronutrients</h3>
+        <div class="chart-box pie-chart">
+          <canvas id="macrosPie"></canvas>
+        </div>
       </div>
-    </main>
 
-    <script id="chartjs-setup">
-      new Chart(document.getElementById("caloriesPie"), {
-        type: "doughnut",
-        data: {
-          labels: ["Consumed", "Remaining"],
-          datasets: [
-            {
-              data: [1500, 500],
-              backgroundColor: [
-                "#1a6b3c",
-                "rgba(168, 224, 99, 0.45)"
-              ],
-              borderColor: [
-                "rgba(247, 244, 239, 0.9)",
-                "rgba(247, 244, 239, 0.9)"
-              ],
-              borderWidth: 3,
-              hoverOffset: 6,
-            },
+      <div class="card wide">
+        <h3>Calories Throughout the Day</h3>
+        <div class="chart-box line-chart">
+          <canvas id="caloriesLine"></canvas>
+        </div>
+      </div>
+      <div class="card wide">
+        <h3>Calories Burned This Week</h3>
+        <div class="chart-box line-chart">
+          <canvas id="weeklyExerciseChart"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script id="chartjs-setup">
+  new Chart(document.getElementById("caloriesPie"), {
+    type: "doughnut",
+    data: {
+      labels: ["Consumed", "Remaining"],
+      datasets: [
+        {
+          data: [1500, 500],
+          backgroundColor: [
+            "#1a6b3c",
+            "rgba(168, 224, 99, 0.45)"
           ],
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          cutout: "70%",
-          plugins: {
-            legend: {
-              display: true,
-              position: "bottom",
-              labels: {
-                color: "#6b7c6e",
-                boxWidth: 12,
-                padding: 16,
-                font: {
-                  size: 12,
-                  weight: "600",
-                },
-              },
-            },
-          },
-        },
-      });
-
-      new Chart(document.getElementById("macrosPie"), {
-        type: "doughnut",
-        data: {
-          labels: ["Protein", "Carbs", "Fibre"],
-          datasets: [
-            {
-              data: [120, 200, 30],
-              backgroundColor: [
-                "#1a6b3c",
-                "#2d9156",
-                "#a8e063"
-              ],
-              borderColor: [
-                "rgba(247, 244, 239, 0.9)",
-                "rgba(247, 244, 239, 0.9)",
-                "rgba(247, 244, 239, 0.9)"
-              ],
-              borderWidth: 3,
-              hoverOffset: 6,
-            },
+          borderColor: [
+            "rgba(247, 244, 239, 0.9)",
+            "rgba(247, 244, 239, 0.9)"
           ],
+          borderWidth: 3,
+          hoverOffset: 6,
         },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          cutout: "70%",
-          plugins: {
-            legend: {
-              display: true,
-              position: "bottom",
-              labels: {
-                color: "#6b7c6e",
-                boxWidth: 12,
-                padding: 16,
-                font: {
-                  size: 12,
-                  weight: "600",
-                },
-              },
+      ],
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      cutout: "70%",
+      plugins: {
+        legend: {
+          display: true,
+          position: "bottom",
+          labels: {
+            color: "#6b7c6e",
+            boxWidth: 12,
+            padding: 16,
+            font: {
+              size: 12,
+              weight: "600",
             },
           },
         },
-      });
+      },
+    },
+  });
 
-      new Chart(document.getElementById("caloriesLine"), {
-        type: "line",
-        data: {
-          labels: ["Breakfast", "Snack", "Lunch", "Snack", "Dinner"],
-          datasets: [
-            {
-              label: "Calories",
-              data: [300, 500, 900, 1100, 1500],
-              borderColor: "#1a6b3c",
-              backgroundColor: "rgba(26, 107, 60, 0.12)",
-              pointBackgroundColor: "#2d9156",
-              pointBorderColor: "#f7f4ef",
-              pointHoverBackgroundColor: "#a8e063",
-              pointHoverBorderColor: "#1a6b3c",
-              borderWidth: 3,
-              pointRadius: 4,
-              pointHoverRadius: 6,
-              fill: true,
-              tension: 0.35,
-            },
+  new Chart(document.getElementById("macrosPie"), {
+    type: "doughnut",
+    data: {
+      labels: ["Protein", "Carbs", "Fibre"],
+      datasets: [
+        {
+          data: [120, 200, 30],
+          backgroundColor: [
+            "#1a6b3c",
+            "#2d9156",
+            "#a8e063"
           ],
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: { display: false },
-          },
-          scales: {
-            x: {
-              ticks: {
-                color: "#6b7c6e",
-              },
-              grid: {
-                color: "rgba(26, 107, 60, 0.08)",
-              },
-            },
-            y: {
-              ticks: {
-                color: "#6b7c6e",
-              },
-              grid: {
-                color: "rgba(26, 107, 60, 0.08)",
-              },
-            },
-          },
-        },
-      });
-
-      new Chart(document.getElementById("weeklyExerciseChart"), {
-        type: "bar",
-        data: {
-          labels: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
-          datasets: [
-            {
-              label: "Calories Burned",
-              data: [320, 450, 280, 520, 390, 610, 430],
-              backgroundColor: [
-                "rgba(26, 107, 60, 0.75)",
-                "rgba(26, 107, 60, 0.75)",
-                "rgba(26, 107, 60, 0.75)",
-                "rgba(45, 145, 86, 0.8)",
-                "rgba(26, 107, 60, 0.75)",
-                "rgba(168, 224, 99, 0.85)",
-                "rgba(45, 145, 86, 0.8)"
-              ],
-              borderColor: "#1a6b3c",
-              borderWidth: 1,
-              borderRadius: 10,
-              borderSkipped: false,
-            },
+          borderColor: [
+            "rgba(247, 244, 239, 0.9)",
+            "rgba(247, 244, 239, 0.9)",
+            "rgba(247, 244, 239, 0.9)"
           ],
+          borderWidth: 3,
+          hoverOffset: 6,
         },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: {
-              display: false,
-            },
-            tooltip: {
-              backgroundColor: "#0e1a12",
-              titleColor: "#f7f4ef",
-              bodyColor: "#f7f4ef",
-              padding: 12,
-              displayColors: false,
-              callbacks: {
-                label: function (context) {
-                  return context.parsed.y + " calories burned";
-                },
-              },
-            },
-          },
-          scales: {
-            x: {
-              ticks: {
-                color: "#6b7c6e",
-                font: {
-                  weight: "600",
-                },
-              },
-              grid: {
-                display: false,
-              },
-            },
-            y: {
-              beginAtZero: true,
-              ticks: {
-                color: "#6b7c6e",
-              },
-              grid: {
-                color: "rgba(26, 107, 60, 0.08)",
-              },
+      ],
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      cutout: "70%",
+      plugins: {
+        legend: {
+          display: true,
+          position: "bottom",
+          labels: {
+            color: "#6b7c6e",
+            boxWidth: 12,
+            padding: 16,
+            font: {
+              size: 12,
+              weight: "600",
             },
           },
         },
-      });
+      },
+    },
+  });
 
-    </script>
+  new Chart(document.getElementById("caloriesLine"), {
+    type: "line",
+    data: {
+      labels: ["Breakfast", "Snack", "Lunch", "Snack", "Dinner"],
+      datasets: [
+        {
+          label: "Calories",
+          data: [300, 500, 900, 1100, 1500],
+          borderColor: "#1a6b3c",
+          backgroundColor: "rgba(26, 107, 60, 0.12)",
+          pointBackgroundColor: "#2d9156",
+          pointBorderColor: "#f7f4ef",
+          pointHoverBackgroundColor: "#a8e063",
+          pointHoverBorderColor: "#1a6b3c",
+          borderWidth: 3,
+          pointRadius: 4,
+          pointHoverRadius: 6,
+          fill: true,
+          tension: 0.35,
+        },
+      ],
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+      },
+      scales: {
+        x: {
+          ticks: {
+            color: "#6b7c6e",
+          },
+          grid: {
+            color: "rgba(26, 107, 60, 0.08)",
+          },
+        },
+        y: {
+          ticks: {
+            color: "#6b7c6e",
+          },
+          grid: {
+            color: "rgba(26, 107, 60, 0.08)",
+          },
+        },
+      },
+    },
+  });
 
-    <script src="wave.js"></script>
-  </body>
+  new Chart(document.getElementById("weeklyExerciseChart"), {
+    type: "bar",
+    data: {
+      labels: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+      datasets: [
+        {
+          label: "Calories Burned",
+          data: [320, 450, 280, 520, 390, 610, 430],
+          backgroundColor: [
+            "rgba(26, 107, 60, 0.75)",
+            "rgba(26, 107, 60, 0.75)",
+            "rgba(26, 107, 60, 0.75)",
+            "rgba(45, 145, 86, 0.8)",
+            "rgba(26, 107, 60, 0.75)",
+            "rgba(168, 224, 99, 0.85)",
+            "rgba(45, 145, 86, 0.8)"
+          ],
+          borderColor: "#1a6b3c",
+          borderWidth: 1,
+          borderRadius: 10,
+          borderSkipped: false,
+        },
+      ],
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          display: false,
+        },
+        tooltip: {
+          backgroundColor: "#0e1a12",
+          titleColor: "#f7f4ef",
+          bodyColor: "#f7f4ef",
+          padding: 12,
+          displayColors: false,
+          callbacks: {
+            label: function (context) {
+              return context.parsed.y + " calories burned";
+            },
+          },
+        },
+      },
+      scales: {
+        x: {
+          ticks: {
+            color: "#6b7c6e",
+            font: {
+              weight: "600",
+            },
+          },
+          grid: {
+            display: false,
+          },
+        },
+        y: {
+          beginAtZero: true,
+          ticks: {
+            color: "#6b7c6e",
+          },
+          grid: {
+            color: "rgba(26, 107, 60, 0.08)",
+          },
+        },
+      },
+    },
+  });
+
+</script>
+
+<script src="wave.js"></script>
+</body>
 </html>

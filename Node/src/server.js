@@ -9,7 +9,8 @@ const express = require('express');
 const fs = require('fs');
 const path = require('path');
 const session = require('express-session');
-const helmet = require('helmet')
+const helmet = require('helmet');
+
  
 // Load environment variables from .env file
 require('dotenv').config({ path: path.join(__dirname, '../.env') });
@@ -17,11 +18,17 @@ require('dotenv').config({ path: path.join(__dirname, '../.env') });
 const app = express();
  
 // ——— Middleware ———
+app.use(helmet({
+    contentSecurityPolicy: {
+        directives: {
+            ...helmet.contentSecurityPolicy.getDefaultDirectives(),
+            "script-src-attr": ["'unsafe-hashes'", "'unsafe-inline'"]
+        }
+    }
+}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(helmet());
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+
  
 // ——— Session Setup ———
 

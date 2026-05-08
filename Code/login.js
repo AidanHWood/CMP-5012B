@@ -61,5 +61,4 @@ async function handleLogin() {
         btn.textContent = 'Sign In';
     }
 }
-
 document.addEventListener('keydown', (e)=> {if (e.key === 'Enter') handleLogin()});
