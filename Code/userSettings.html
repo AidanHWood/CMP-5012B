@@ -1,162 +1,224 @@
 <!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <title>User Settings - Health Tracking System</title>
-  <link rel="stylesheet" href="homepage.css" />
-  <link rel="stylesheet" href="userSettings.css" />
-</head>
+  <head>
+    <meta charset="UTF-8" />
+    <title>User Settings - Health Tracking System</title>
+    <link rel="stylesheet" href="homepage.css" />
+    <link rel="stylesheet" href="userSettings.css" />
+  </head>
 
-<body>
-  <header class="navbar">
-    <nav>
-      <input type="checkbox" id="menu-toggle" />
-      <label for="menu-toggle" class="menu-icon">☰</label>
+  <body>
+    <header class="navbar">
+      <nav>
+        <input type="checkbox" id="menu-toggle" />
+        <label for="menu-toggle" class="menu-icon">☰</label>
+        <ul class="nav-links">
+          <li><a href="dashboard.html">Dashboard</a></li>
+          <li><a href="logCalories.html">Log Calories</a></li>
+          <li><a href="logExercise.html">Log Exercise</a></li>
+          <li><a href="friends.html">Friends</a></li>
+          <li class="push-right">
+            <a href="myProfile.html" class="active">My Profile</a>
+          </li>
+          <li><a href="#" class="logoutBtn">Logout</a></li>
+        </ul>
+      </nav>
+    </header>
 
-      <ul class="nav-links">
-        <li><a href="dashboard.html">Dashboard</a></li>
-        <li><a href="logCalories.html">Log Calories</a></li>
-        <li><a href="logExercise.html">Log Exercise</a></li>
-        <li><a href="friends.html">Friends</a></li>
-        <li class="push-right">
-          <a href="myProfile.html" class="active">My Profile</a>
-        </li>
-        <li><a href="#" class="logoutBtn">Logout</a></li>
-      </ul>
-    </nav>
-  </header>
+    <div class="content">
+      <div class="log-container">
+        <h1 class="page-heading">User <em>Settings</em></h1>
 
-<div class="content">
-  <div class="log-container">
-    <h1 class="page-heading">User <em>Settings</em></h1>
+        <div class="total-banner">
+          PROFILE
+          <span class="cal-number" id="banner-username">Loading…</span>
+        </div>
 
-    <div class="total-banner">
-      PROFILE
-      <span class="cal-number" id="banner-username">Loading…</span>
-    </div>
+        <!-- Personal Details -->
+        <div class="form-card">
+          <label>Full Name</label>
+          <input type="text" id="real_name" />
+          <label>Username</label>
+          <input type="text" id="username" />
+          <label>Email Address</label>
+          <input type="text" id="email" />
+          <label>Age</label>
+          <input type="number" id="age" />
+          <label>Height</label>
+          <input type="number" id="height_cm" />
+          <label>Weight</label>
+          <input type="number" id="weight_kg" />
 
-    <!-- Personal Details -->
-    <div class="form-card">
-      <label>Full Name</label>
-      <input type="text" id="real_name" />
+          <label>Biological Sex</label>
+          <div class="meal-options">
+            <label class="meal-option"
+              ><input type="radio" name="sex" value="male" /><span
+                >Male</span
+              ></label
+            >
+            <label class="meal-option"
+              ><input type="radio" name="sex" value="female" /><span
+                >Female</span
+              ></label
+            >
+            <label class="meal-option"
+              ><input type="radio" name="sex" value="other" /><span
+                >Other</span
+              ></label
+            >
+          </div>
+          <button class="submit-btn" id="save-profile-btn">
+            Save Personal Details
+          </button>
+          <div id="profile-msg"></div>
+        </div>
 
-      <label>Username</label>
-      <input type="text" id="username" />
+        <!-- Preferences -->
+        <div class="form-card">
+          <label>Daily Calorie Goal</label>
+          <input type="number" id="calorie_goal" />
+          <label>Weekly Exercise Goal</label>
+          <input type="number" id="weekly_exercise_goal" />
 
-      <label>Email Address</label>
-      <input type="text" id="email" />
+          <label>Units</label>
+          <div class="meal-options">
+            <label class="meal-option"
+              ><input type="radio" name="units" value="metric" /><span
+                >Metric</span
+              ></label
+            >
+            <label class="meal-option"
+              ><input type="radio" name="units" value="imperial" /><span
+                >Imperial</span
+              ></label
+            >
+          </div>
 
-      <label>Age</label>
-      <input type="number" id="age" />
+          <label>Notifications</label>
+          <div class="meal-options">
+            <label class="meal-option"
+              ><input type="radio" name="notifications" /><span
+                >Enabled</span
+              ></label
+            >
+            <label class="meal-option"
+              ><input type="radio" name="notifications" /><span
+                >Disabled</span
+              ></label
+            >
+          </div>
 
-      <label>Height</label>
-      <input type="number" id="height_cm" />
+          <button class="submit-btn" id="save-prefs-btn">
+            Save Preferences
+          </button>
+          <div id="prefs-msg"></div>
+        </div>
 
-      <label>Weight</label>
-      <input type="number" id="weight_kg" />
+        <!-- ════════════════════════════════════════ -->
+        <!--  Goals Section — registration style     -->
+        <!-- ════════════════════════════════════════ -->
+        <section class="goals-manager">
+          <div class="goals-section-header">
+            <div>
+              <span class="goals-eyebrow">Your Goals</span>
+              <h2 class="goals-title">Active Goals</h2>
+            </div>
+          </div>
 
-      <label>Biological Sex</label>
-      <div class="meal-options">
-        <label class="meal-option">
-          <input type="radio" name="sex" value="male" />
-          <span>Male</span>
-        </label>
-        <label class="meal-option">
-          <input type="radio" name="sex" value="female" />
-          <span>Female</span>
-        </label>
-        <label class="meal-option">
-          <input type="radio" name="sex" value="other" />
-          <span>Other</span>
-        </label>
-      </div>
-      <button class="submit-btn" id="save-profile-btn">Save Personal Details</button>
-      <div id="profile-msg"></div>
-    </div>
+          <!-- Active goals list -->
+          <div class="goal-list" id="goal-list">
+            <div class="empty-state">Loading your goals…</div>
+          </div>
 
-    <!-- Preferences -->
-    <div class="form-card">
-      <label>Daily Calorie Goal</label>
-      <input type="number" id="calorie_goal" />
+          <!-- Add new goal -->
+          <div class="goals-section-header" style="margin-top: 32px">
+            <div>
+              <span class="goals-eyebrow">Add a goal</span>
+              <h2 class="goals-title">New Goal</h2>
+            </div>
+          </div>
 
-      <label>Weekly Exercise Goal</label>
-      <input type="number" id="weekly_exercise_goal" />
+          <div class="add-goal-section">
+            <p class="goal-section-label">Select goal type</p>
 
-      <label>Units</label>
-      <div class="meal-options">
-        <label class="meal-option">
-          <input type="radio" name="units" value="metric" />
-          <span>Metric</span>
-        </label>
-        <label class="meal-option">
-          <input type="radio" name="units" value="imperial" />
-          <span>Imperial</span>
-        </label>
-      </div>
+            <div class="goal-type-grid" id="goalTypeGrid">
+              <div
+                class="goal-type-card"
+                onclick="selectGoalType(this, 'water')"
+              >
+                <span class="goal-type-icon">💧</span>
+                <span class="goal-type-name">Water</span>
+                <span class="goal-type-desc">Daily intake</span>
+              </div>
+              <div
+                class="goal-type-card"
+                onclick="selectGoalType(this, 'steps')"
+              >
+                <span class="goal-type-icon">👟</span>
+                <span class="goal-type-name">Steps</span>
+                <span class="goal-type-desc">Daily steps</span>
+              </div>
+              <div
+                class="goal-type-card"
+                onclick="selectGoalType(this, 'weight_loss')"
+              >
+                <span class="goal-type-icon">⚖️</span>
+                <span class="goal-type-name">Weight</span>
+                <span class="goal-type-desc">Weight loss</span>
+              </div>
+              <div
+                class="goal-type-card"
+                onclick="selectGoalType(this, 'custom')"
+              >
+                <span class="goal-type-icon">🎯</span>
+                <span class="goal-type-name">Custom</span>
+                <span class="goal-type-desc">Anything</span>
+              </div>
+            </div>
 
-      <label>Notifications</label>
-      <div class="meal-options">
-        <label class="meal-option">
-          <input type="radio" name="notifications" />
-          <span>Enabled</span>
-        </label>
-        <label class="meal-option">
-          <input type="radio" name="notifications" />
-          <span>Disabled</span>
-        </label>
-      </div>
+            <!-- Goal details form (shown after selecting type) -->
+            <div
+              class="goal-details-form"
+              id="goalDetailsForm"
+              style="display: none"
+            >
+              <div class="goal-detail-row">
+                <label>Goal Name</label>
+                <input
+                  type="text"
+                  id="goal-name"
+                  placeholder="e.g. Drink 2L water daily"
+                />
+              </div>
+              <div class="goal-detail-row">
+                <label id="goal-target-label">Target</label>
+                <input type="text" id="goal-target" placeholder="e.g. 2000" />
+              </div>
+              <div class="goal-detail-row">
+                <label id="goal-current-label">Current Progress</label>
+                <input type="text" id="goal-current" placeholder="e.g. 1200" />
+              </div>
+              <div class="goal-detail-row">
+                <label>Deadline (optional)</label>
+                <input type="date" id="goal-deadline" />
+              </div>
+              <div id="goal-add-msg"></div>
+              <button type="button" class="goal-save-btn" id="add-goal-btn">
+                Save Goal
+              </button>
+            </div>
+          </div>
+        </section>
 
-      <button class="submit-btn" id="save-prefs-btn">Save Preferences</button>
-      <div id="prefs-msg"></div>
-    </div>
-
-    <section class="goals-manager">
-      <h2 class="log-section-title">Your Goals</h2>
-
-      <div class="form-card">
-        <label for="goal-type">Goal Type</label>
-        <select id="goal-type" class="goal-select">
-          <option value="">Choose a goal type</option>
-          <option value="weight_loss">Weight Loss</option>
-          <option value="calories">Daily Calories</option>
-          <option value="steps">Daily Steps</option>
-          <option value="gym_weight">Gym Weight Lifted</option>
-          <option value="5k_run">5K Run Time</option>
-          <option value="10k_run">10K Run Time</option>
-          <option value="water">Water Intake</option>
-          <option value="custom">Custom Goal</option>
-        </select>
-
-        <label for="goal-name">Goal Name</label>
-        <input type="text" id="goal-name" placeholder="e.g. Run 5K under 25 minutes" />
-
-        <label for="goal-target" id="goal-target-label">Target</label>
-        <input type="text" id="goal-target" placeholder="e.g. 25:00, 10 kg, 8000 steps" />
-
-        <label for="goal-current" id="goal-current-label">Current Progress</label>
-        <input type="text" id="goal-current" placeholder="e.g. 27:30, 4.5 kg, 5200 steps" />
-
-        <label for="goal-deadline">Deadline</label>
-        <input type="date" id="goal-deadline" />
-
-        <button type="button" class="submit-btn" id="add-goal-btn">Add Goal</button>
-        <div id="goal-add-msg"></div>
-
-        <h2 class="log-section-title">Active Goals</h2>
-        <div class="goal-list" id="goal-list">
-          <div class="empty-state">Loading your goals…</div>
+        <!-- Account -->
+        <div class="account-actions">
+          <button class="secondary-btn">Change Password</button>
+          <button class="secondary-btn logout logoutBtn">Log Out</button>
         </div>
       </div>
-    </section>
-  </div>
+    </div>
 
-  <div class="account-actions">
-    <button class="secondary-btn">Change Password</button>
-    <button class="secondary-btn logout logoutBtn">Log Out</button>
-  </div>
-</div>
-
-<script src="nav.js"></script>
-<script src="userSettings.js"></script>
-</body>
+    <script src="nav.js"></script>
+    <script src="userSettings.js"></script>
+  </body>
 </html>
