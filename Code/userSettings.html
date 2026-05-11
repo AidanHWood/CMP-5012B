@@ -8,26 +8,27 @@
 </head>
 
 <body>
-<header class="navbar">
-  <nav>
-    <input type="checkbox" id="menu-toggle" />
-    <label for="menu-toggle" class="menu-icon">☰</label>
+  <header class="navbar">
+    <nav>
+      <input type="checkbox" id="menu-toggle" />
+      <label for="menu-toggle" class="menu-icon">☰</label>
 
-    <ul class="nav-links">
-      <li><a href="dashboard.html">Dashboard</a></li>
-      <li><a href="logCalories.html">Log Calories</a></li>
-      <li><a href="logExercise.html">Log Exercise</a></li>
-      <li><a href="userSettings.html" class="active">User Settings</a></li>
-      <li><a href="friends.html">Friends</a></li>
-      <li><a href="myHistory.html">My History</a></li>
-      <li><a href="login.html">Logout</a></li>
-    </ul>
-  </nav>
-</header>
+      <ul class="nav-links">
+        <li><a href="dashboard.html">Dashboard</a></li>
+        <li><a href="logCalories.html">Log Calories</a></li>
+        <li><a href="logExercise.html">Log Exercise</a></li>
+        <li><a href="friends.html">Friends</a></li>
+        <li class="push-right">
+          <a href="myProfile.html" class="active">My Profile</a>
+        </li>
+        <li><a href="#" class="logoutBtn">Logout</a></li>
+      </ul>
+    </nav>
+  </header>
 
 <div class="content">
   <div class="log-container">
-    <h1 class="page-heading">User Settings</h1>
+    <h1 class="page-heading">User <em>Settings</em></h1>
 
     <div class="total-banner">
       PROFILE
@@ -69,9 +70,8 @@
           <span>Other</span>
         </label>
       </div>
-
-      <div id="profile-msg" class="feedback-msg" style="display:none;"></div>
       <button class="submit-btn" id="save-profile-btn">Save Personal Details</button>
+      <div id="profile-msg"></div>
     </div>
 
     <!-- Preferences -->
@@ -97,67 +97,66 @@
       <label>Notifications</label>
       <div class="meal-options">
         <label class="meal-option">
-          <input type="radio" name="notifications" value="enabled" />
+          <input type="radio" name="notifications" />
           <span>Enabled</span>
         </label>
         <label class="meal-option">
-          <input type="radio" name="notifications" value="disabled" />
+          <input type="radio" name="notifications" />
           <span>Disabled</span>
         </label>
       </div>
 
-      <div id="prefs-msg" class="feedback-msg" style="display:none;"></div>
       <button class="submit-btn" id="save-prefs-btn">Save Preferences</button>
+      <div id="prefs-msg"></div>
     </div>
 
-    <!-- Account Section -->
-    <p class="log-section-title">Account</p>
-    <div class="account-actions">
-      <button class="secondary-btn">Change Password</button>
-      <button class="secondary-btn logout" id="logout-btn">Log Out</button>
-    </div>
+    <section class="goals-manager">
+      <h2 class="log-section-title">Your Goals</h2>
+
+      <div class="form-card">
+        <label for="goal-type">Goal Type</label>
+        <select id="goal-type" class="goal-select">
+          <option value="">Choose a goal type</option>
+          <option value="weight_loss">Weight Loss</option>
+          <option value="calories">Daily Calories</option>
+          <option value="steps">Daily Steps</option>
+          <option value="gym_weight">Gym Weight Lifted</option>
+          <option value="5k_run">5K Run Time</option>
+          <option value="10k_run">10K Run Time</option>
+          <option value="water">Water Intake</option>
+          <option value="custom">Custom Goal</option>
+        </select>
+
+        <label for="goal-name">Goal Name</label>
+        <input type="text" id="goal-name" placeholder="e.g. Run 5K under 25 minutes" />
+
+        <label for="goal-target" id="goal-target-label">Target</label>
+        <input type="text" id="goal-target" placeholder="e.g. 25:00, 10 kg, 8000 steps" />
+
+        <label for="goal-current" id="goal-current-label">Current Progress</label>
+        <input type="text" id="goal-current" placeholder="e.g. 27:30, 4.5 kg, 5200 steps" />
+
+        <label for="goal-deadline">Deadline</label>
+        <input type="date" id="goal-deadline" />
+
+        <button type="button" class="submit-btn" id="add-goal-btn">Add Goal</button>
+        <div id="goal-add-msg"></div>
+
+        <h2 class="log-section-title">Active Goals</h2>
+        <div class="goal-list" id="goal-list">
+          <div class="empty-state">Loading your goals…</div>
+        </div>
+      </div>
+    </section>
   </div>
 
-  <section class="goals-manager">
-    <h2 class="log-section-title">Your Goals</h2>
-
-    <div class="form-card">
-      <label for="goal-type">Goal Type</label>
-      <select id="goal-type" class="goal-select">
-        <option value="">Choose a goal type</option>
-        <option value="weight_loss">Weight Loss</option>
-        <option value="calories">Daily Calories</option>
-        <option value="steps">Daily Steps</option>
-        <option value="gym_weight">Gym Weight Lifted</option>
-        <option value="5k_run">5K Run Time</option>
-        <option value="10k_run">10K Run Time</option>
-        <option value="water">Water Intake</option>
-        <option value="custom">Custom Goal</option>
-      </select>
-
-      <label for="goal-name">Goal Name</label>
-      <input type="text" id="goal-name" placeholder="e.g. Run 5K under 25 minutes" />
-
-      <label for="goal-target" id="goal-target-label">Target</label>
-      <input type="text" id="goal-target" placeholder="e.g. 25:00, 10 kg, 8000 steps" />
-
-      <label for="goal-current" id="goal-current-label">Current Progress</label>
-      <input type="text" id="goal-current" placeholder="e.g. 27:30, 4.5 kg, 5200 steps" />
-
-      <label for="goal-deadline">Deadline</label>
-      <input type="date" id="goal-deadline" />
-
-      <div id="goal-add-msg" class="feedback-msg" style="display:none;"></div>
-      <button type="button" class="submit-btn" id="add-goal-btn">Add Goal</button>
-    </div>
-
-    <h2 class="log-section-title">Active Goals</h2>
-    <div class="goal-list" id="goal-list">
-      <div class="empty-state">Loading your goals…</div>
-    </div>
-  </section>
+  <div class="account-actions">
+    <button class="secondary-btn">Change Password</button>
+    <button class="secondary-btn logout logoutBtn">Log Out</button>
+  </div>
 </div>
 
+<script src="nav.js"></script>
 <script src="userSettings.js"></script>
 </body>
 </html>

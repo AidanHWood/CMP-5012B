@@ -72,15 +72,24 @@ app.get('/friends.html', (req, res) => {
     if (!req.session.userId) return res.redirect('/login.html');
     res.sendFile(path.join(CODE_DIR, 'friends.html'));
 });
+// With the other protected page routes (~line 74):
+app.get('/healthProfile.html', (req, res) => {
+    if (!req.session.userId) return res.redirect('/login.html');
+    res.sendFile(path.join(CODE_DIR, 'healthProfile.html'));
+});
 // Serve static files (HTML, CSS, JS) from the Code folder
 app.use(express.static(path.join(__dirname, '../../Code')));
  
 // ——— Wire in the Auth router ———
-const authRouter = require('./Auth');
+const { router: authRouter } = require('./Auth');
 app.use(authRouter);
 
 const friendRoutes = require('./friends');
 app.use('/', friendRoutes);
+
+// With the other router registrations (~line 88):
+const healthProfileRoutes = require('./healthProfile');
+app.use('/', healthProfileRoutes);
  
 // ——— Wire in Food routes ———
 const filePath = path.join(__dirname, 'data', 'food.json');
@@ -662,6 +671,7 @@ app.get('/api/goals-with-progress', async (req, res) => {
         res.status(500).json({ error: 'Server error' });
     }
 });
+
 
 // ——— Homepage route ———
 app.get('/', (req, res) => {

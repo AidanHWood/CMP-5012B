@@ -447,6 +447,7 @@ async function loadDashboard() {
     } catch (err) { console.error('Weekly exercise fetch error:', err); }
 }
 
+
 // ─────────────────────────────────────────────
 //  INIT
 // ─────────────────────────────────────────────

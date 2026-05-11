@@ -4,6 +4,7 @@
 <head>
   <meta charset="UTF-8" />
   <title>Dashboard</title>
+    <link rel="stylesheet" href="homepage.css" />
   <link rel="stylesheet" href="dashboard.css" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
@@ -18,10 +19,12 @@
       <li><a href="dashboard.html" class="active">Dashboard</a></li>
       <li><a href="logCalories.html">Log Calories</a></li>
       <li><a href="logExercise.html">Log Exercise</a></li>
-      <li><a href="userSettings.html">User Settings</a></li>
       <li><a href="friends.html">Friends</a></li>
-      <li><a href="myHistory.html">My History</a></li>
-      <li><a href="login.html">Logout</a></li>
+
+      <li class="push-right">
+        <a href="myProfile.html">My Profile</a>
+      </li>
+      <li><a href="#" id="logoutBtn">Logout</a></li>
     </ul>
   </nav>
 </header>
@@ -30,7 +33,7 @@
 
 <main class="content">
   <div class="log-container">
-    <h1 class="page-heading">Dashboard</h1>
+        <h1 class="page-heading">My <em>Dashboard</em></h1>
 
     <div class="stats-grid">
       <div class="stat-card">
@@ -106,5 +109,6 @@
 
 <script src="wave.js"></script>
 <script src="dashboard.js"></script>
+<script src="nav.js"></script>
 </body>
 </html>
