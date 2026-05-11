@@ -56,14 +56,38 @@
         </div>
 
         <!-- BMI banner -->
-        <div class="bmi-banner">
-          <div class="bmi-left">
-            <div class="bmi-label">Body Mass Index</div>
-            <div class="bmi-value" id="bmiValue">—</div>
-          </div>
-          <div class="bmi-right">
+        <div class="bmi-card">
+          <div class="bmi-card-header">
+            <div>
+              <div class="bmi-label">Body Mass Index</div>
+              <div class="bmi-value">Your BMI is <span id="bmiValue">—</span></div>
+            </div>
             <div class="bmi-badge" id="bmiCategory">—</div>
-            <div class="bmi-scale">weight ÷ height²</div>
+          </div>
+
+          <p class="bmi-message" id="bmiMessage">Add height and weight to calculate your BMI.</p>
+
+          <div class="bmi-bar-wrap">
+            <div class="bmi-bar">
+              <div class="bmi-section underweight"></div>
+              <div class="bmi-section healthy"></div>
+              <div class="bmi-section overweight"></div>
+              <div class="bmi-section obese"></div>
+              <div class="bmi-marker" id="bmiMarker">×</div>
+            </div>
+
+            <div class="bmi-ticks">
+              <span>18.5</span>
+              <span>25</span>
+              <span>30</span>
+            </div>
+          </div>
+
+          <div class="bmi-legend">
+            <span><i class="legend-underweight"></i> Underweight</span>
+            <span><i class="legend-healthy"></i> Healthy</span>
+            <span><i class="legend-overweight"></i> Overweight</span>
+            <span><i class="legend-obese"></i> Obese</span>
           </div>
         </div>
 
@@ -161,24 +185,36 @@
       function updateBMI() {
         const bmiEl  = document.getElementById('bmiValue');
         const catEl  = document.getElementById('bmiCategory');
+        const msgEl = document.getElementById('bmiMessage');
+        const markerEl = document.getElementById('bmiMarker');
 
         if (!profile.height || !profile.weight) {
           bmiEl.textContent = '—';
           catEl.textContent = 'Add height & weight';
+          msgEl.textContent = 'Add height and weight to calculate your BMI.';
+          markerEl.style.left = '0%';
           return;
         }
 
         const h = profile.height / 100;
-        const bmi = (profile.weight / (h * h)).toFixed(1);
+        const bmi = Number((profile.weight / (h * h)).toFixed(1));
         bmiEl.textContent = bmi;
 
-        let cat, color;
-        if      (bmi < 18.5) { cat = 'Underweight'; }
-        else if (bmi < 25.0) { cat = 'Healthy';     }
-        else if (bmi < 30.0) { cat = 'Overweight';  }
-        else                 { cat = 'Obese';        }
+        let cat;
+        if (bmi < 18.5) cat = 'Underweight';
+        else if (bmi < 25) cat = 'Healthy';
+        else if (bmi < 30) cat = 'Overweight';
+        else cat = 'Obese';
 
         catEl.textContent = cat;
+        msgEl.textContent = `Your BMI is in the ${cat.toLowerCase()} category.`;
+
+        const minBMI = 10;
+        const maxBMI = 40;
+        const clampedBMI = Math.min(Math.max(bmi, minBMI), maxBMI);
+        const markerPercent = ((clampedBMI - minBMI) / (maxBMI - minBMI)) * 100;
+
+        markerEl.style.left = `${markerPercent}%`;
       }
 
       // ── Inline edit ──

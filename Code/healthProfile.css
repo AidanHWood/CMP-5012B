@@ -79,50 +79,198 @@
 }
 
 /* ── BMI banner ── */
-.bmi-banner {
-    background: var(--green);
-    color: #fff;
-    border-radius: 14px;
-    padding: 18px 24px;
+/* ── BMI Scale Card ── */
+.bmi-card {
+    background: rgba(255, 255, 255, 0.75);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    border-radius: 20px;
+    padding: 24px;
     margin-bottom: 24px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
     opacity: 0;
     animation: fadeUp 0.6s 0.4s forwards;
 }
 
-.bmi-left .bmi-label {
+.bmi-card-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 10px;
+}
+
+.bmi-label {
     font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 0.8px;
+    font-weight: 800;
+    letter-spacing: 0.08em;
     text-transform: uppercase;
-    opacity: 0.7;
-    margin-bottom: 4px;
+    color: var(--muted);
+    margin-bottom: 6px;
 }
 
-.bmi-left .bmi-value {
-    font-family: 'Instrument Serif', serif;
-    font-size: 36px;
-    letter-spacing: -1px;
+.bmi-value {
+    font-family: "Instrument Serif", serif;
+    font-size: 34px;
     line-height: 1;
+    letter-spacing: -1px;
+    color: var(--dark);
 }
 
-.bmi-right { text-align: right; }
+.bmi-value span {
+    color: var(--green);
+    font-style: italic;
+}
 
 .bmi-badge {
-    display: inline-block;
-    background: rgba(255,255,255,0.2);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(26, 107, 60, 0.1);
+    color: var(--green);
+    border: 1px solid rgba(26, 107, 60, 0.18);
     border-radius: 100px;
-    padding: 6px 14px;
-    font-size: 13px;
-    font-weight: 700;
-    margin-bottom: 4px;
+    padding: 7px 14px;
+    font-size: 12px;
+    font-weight: 800;
+    white-space: nowrap;
 }
 
-.bmi-scale {
-    font-size: 11px;
-    opacity: 0.6;
+.bmi-message {
+    color: var(--muted);
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 22px;
+}
+
+.bmi-bar-wrap {
+    margin-bottom: 20px;
+}
+
+.bmi-bar {
+    position: relative;
+    display: grid;
+    grid-template-columns: 18.5fr 6.5fr 5fr 10fr;
+    height: 30px;
+    border-radius: 999px;
+    overflow: visible;
+    background: rgba(0, 0, 0, 0.05);
+}
+
+.bmi-section {
+    height: 100%;
+}
+
+.bmi-section:first-child {
+    border-radius: 999px 0 0 999px;
+}
+
+.bmi-section:nth-child(4) {
+    border-radius: 0 999px 999px 0;
+}
+
+.underweight {
+    background: #3b0a6d;
+}
+
+.healthy {
+    background: repeating-linear-gradient(
+        -45deg,
+        var(--green),
+        var(--green) 8px,
+        var(--green2) 8px,
+        var(--green2) 16px
+    );
+}
+
+.overweight {
+    background: #f3b71b;
+}
+
+.obese {
+    background: repeating-linear-gradient(
+        -45deg,
+        #d9362b,
+        #d9362b 8px,
+        #ef4a3d 8px,
+        #ef4a3d 16px
+    );
+}
+
+.bmi-marker {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    transform: translate(-50%, -52%);
+    color: #fff;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.45);
+    font-size: 42px;
+    font-weight: 900;
+    line-height: 1;
+    transition: left 0.45s ease;
+}
+
+.bmi-ticks {
+    position: relative;
+    height: 24px;
+    margin-top: 8px;
+    color: var(--dark);
+    font-size: 13px;
+    font-weight: 800;
+}
+
+.bmi-ticks span {
+    position: absolute;
+    transform: translateX(-50%);
+}
+
+.bmi-ticks span:nth-child(1) {
+    left: 46.25%;
+}
+
+.bmi-ticks span:nth-child(2) {
+    left: 62.5%;
+}
+
+.bmi-ticks span:nth-child(3) {
+    left: 75%;
+}
+
+.bmi-legend {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px 14px;
+    color: var(--dark);
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.bmi-legend span {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.bmi-legend i {
+    width: 18px;
+    height: 18px;
+    border-radius: 5px;
+    display: inline-block;
+}
+
+.legend-underweight {
+    background: #3b0a6d;
+}
+
+.legend-healthy {
+    background: var(--green);
+}
+
+.legend-overweight {
+    background: #f3b71b;
+}
+
+.legend-obese {
+    background: #d9362b;
 }
 
 /* ── Form card overrides (auth.css has the base) ── */
