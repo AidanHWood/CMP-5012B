@@ -1,5 +1,4 @@
 <!--register page -->
-
 <!doctype html>
 <html lang="en">
   <head>
@@ -12,6 +11,394 @@
       href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap"
       rel="stylesheet"
     />
+    <style>
+      /* ── Shared popup styles ── */
+      .goal-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 2000;
+        overflow-y: auto;
+        backdrop-filter: blur(4px);
+      }
+      .goal-popup {
+        background: #fff;
+        max-width: 520px;
+        margin: 40px auto;
+        border-radius: 20px;
+        padding: 36px 32px;
+        box-shadow: 0 24px 60px rgba(0, 0, 0, 0.15);
+      }
+      .goal-popup h2 {
+        font-family: "Instrument Serif", serif;
+        font-size: 32px;
+        color: var(--dark);
+        margin: 0 0 6px 0;
+        text-align: center;
+        letter-spacing: -1px;
+      }
+      .goal-popup .subtitle {
+        text-align: center;
+        color: var(--muted);
+        font-size: 14px;
+        margin-bottom: 28px;
+      }
+      .goal-section-title {
+        font-size: 12px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--muted);
+        margin-bottom: 12px;
+        margin-top: 20px;
+      }
+      .goal-btn {
+        width: 100%;
+        padding: 14px;
+        border: none;
+        border-radius: 100px;
+        font-size: 15px;
+        font-weight: 700;
+        font-family: inherit;
+        cursor: pointer;
+        transition: all 0.2s ease;
+      }
+      .goal-btn-primary {
+        background: var(--dark);
+        color: #fff;
+        margin-bottom: 10px;
+      }
+      .goal-btn-primary:hover {
+        transform: translateY(-2px);
+        opacity: 0.85;
+      }
+      .goal-btn-primary:disabled {
+        opacity: 0.4;
+        transform: none;
+        cursor: not-allowed;
+      }
+      .goal-btn-skip {
+        background: transparent;
+        color: var(--muted);
+        font-size: 14px;
+      }
+      .goal-btn-skip:hover {
+        color: var(--dark);
+      }
+      .goal-error {
+        background: rgba(220, 38, 38, 0.08);
+        border: 1px solid rgba(220, 38, 38, 0.2);
+        border-radius: 10px;
+        padding: 10px 14px;
+        font-size: 13px;
+        color: #c0392b;
+        text-align: center;
+        margin-bottom: 16px;
+        display: none;
+      }
+      .bmr-info {
+        text-align: center;
+        font-size: 13px;
+        color: var(--muted);
+        margin-bottom: 20px;
+        padding: 10px 14px;
+        background: rgba(26, 107, 60, 0.06);
+        border-radius: 10px;
+      }
+      .bmr-info strong {
+        color: var(--dark);
+      }
+
+      /* ── Phase 1: Activity + Calorie cards ── */
+      .activity-options {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        margin-bottom: 24px;
+      }
+      .activity-option {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 14px 16px;
+        border: 2px solid rgba(0, 0, 0, 0.08);
+        border-radius: 12px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        background: #fff;
+      }
+      .activity-option:hover {
+        border-color: rgba(0, 0, 0, 0.2);
+      }
+      .activity-option.selected {
+        border-color: var(--green);
+        background: rgba(26, 107, 60, 0.06);
+      }
+      .activity-option input[type="radio"] {
+        display: none;
+      }
+      .activity-dot {
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        border: 2px solid rgba(0, 0, 0, 0.15);
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s ease;
+      }
+      .activity-option.selected .activity-dot {
+        border-color: var(--green);
+        background: var(--green);
+      }
+      .activity-option.selected .activity-dot::after {
+        content: "";
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: #fff;
+      }
+      .activity-text {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+      }
+      .activity-name {
+        font-size: 14px;
+        font-weight: 700;
+        color: var(--dark);
+      }
+      .activity-desc {
+        font-size: 12px;
+        color: var(--muted);
+      }
+      .calorie-goals {
+        display: none;
+        flex-direction: column;
+        gap: 8px;
+        margin-bottom: 24px;
+      }
+      .calorie-goals.visible {
+        display: flex;
+      }
+      .calorie-card {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 16px 18px;
+        border: 2px solid rgba(0, 0, 0, 0.08);
+        border-radius: 12px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        background: #fff;
+      }
+      .calorie-card:hover {
+        border-color: rgba(0, 0, 0, 0.2);
+      }
+      .calorie-card.selected {
+        border-color: var(--green);
+        background: rgba(26, 107, 60, 0.06);
+      }
+      .calorie-card-left {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+      }
+      .calorie-card-name {
+        font-size: 14px;
+        font-weight: 700;
+        color: var(--dark);
+      }
+      .calorie-card-desc {
+        font-size: 12px;
+        color: var(--muted);
+      }
+      .calorie-card-value {
+        font-size: 22px;
+        font-weight: 900;
+        color: var(--green);
+        letter-spacing: -0.5px;
+      }
+      .calorie-card-unit {
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--muted);
+      }
+
+      /* ── Phase 2: Exercise goal styles ── */
+      .exercise-toggle-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-bottom: 20px;
+      }
+      .exercise-toggle {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 12px 16px;
+        border: 2px solid rgba(0, 0, 0, 0.08);
+        border-radius: 12px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        background: #fff;
+        flex: 1;
+        min-width: 90px;
+        justify-content: center;
+        flex-direction: column;
+      }
+      .exercise-toggle:hover {
+        border-color: rgba(0, 0, 0, 0.2);
+      }
+      .exercise-toggle.selected {
+        border-color: var(--green);
+        background: rgba(26, 107, 60, 0.06);
+      }
+      .exercise-toggle .toggle-icon {
+        font-size: 20px;
+      }
+      .exercise-toggle .toggle-name {
+        font-size: 12px;
+        font-weight: 700;
+        color: var(--dark);
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+      }
+      .exercise-toggle.selected .toggle-name {
+        color: var(--green);
+      }
+
+      .exercise-goal-config {
+        border: 1px solid rgba(0, 0, 0, 0.06);
+        border-radius: 14px;
+        padding: 20px;
+        margin-bottom: 14px;
+        background: rgba(26, 107, 60, 0.02);
+      }
+      .exercise-goal-config h4 {
+        font-size: 15px;
+        font-weight: 800;
+        color: var(--dark);
+        margin: 0 0 14px 0;
+      }
+      .goal-type-tabs {
+        display: flex;
+        gap: 6px;
+        margin-bottom: 16px;
+        flex-wrap: wrap;
+      }
+      .goal-type-tab {
+        padding: 8px 14px;
+        border: 2px solid rgba(0, 0, 0, 0.08);
+        border-radius: 10px;
+        font-size: 12px;
+        font-weight: 700;
+        cursor: pointer;
+        background: #fff;
+        color: var(--dark);
+        transition: all 0.2s ease;
+        font-family: inherit;
+      }
+      .goal-type-tab:hover {
+        border-color: rgba(0, 0, 0, 0.2);
+      }
+      .goal-type-tab.active {
+        background: var(--green);
+        color: #fff;
+        border-color: var(--green);
+      }
+
+      .goal-input-row {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        margin-bottom: 10px;
+      }
+      .goal-input-row label {
+        font-size: 12px;
+        font-weight: 700;
+        color: var(--muted);
+        min-width: 60px;
+      }
+      .goal-input-row input,
+      .goal-input-row select {
+        padding: 10px 12px;
+        border: 1.5px solid rgba(0, 0, 0, 0.1);
+        border-radius: 10px;
+        font-size: 14px;
+        font-family: inherit;
+        color: var(--dark);
+        background: #fff;
+        outline: none;
+        transition: border-color 0.2s;
+      }
+      .goal-input-row input:focus,
+      .goal-input-row select:focus {
+        border-color: var(--green);
+      }
+      .goal-input-row input[type="number"] {
+        width: 80px;
+      }
+      .goal-input-row input[type="text"] {
+        width: 100px;
+      }
+
+      .time-goal-group {
+        border-top: 1px solid rgba(0, 0, 0, 0.06);
+        padding-top: 12px;
+        margin-top: 8px;
+      }
+      .time-goal-entry {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        margin-bottom: 8px;
+        flex-wrap: wrap;
+      }
+      .time-goal-entry label {
+        font-size: 12px;
+        font-weight: 700;
+        color: var(--muted);
+      }
+      .add-distance-btn {
+        padding: 6px 14px;
+        border: 1.5px dashed rgba(0, 0, 0, 0.15);
+        border-radius: 8px;
+        background: transparent;
+        color: var(--muted);
+        font-size: 12px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.2s;
+        font-family: inherit;
+      }
+      .add-distance-btn:hover {
+        border-color: var(--green);
+        color: var(--green);
+      }
+      .remove-distance-btn {
+        padding: 4px 8px;
+        border: none;
+        background: rgba(220, 38, 38, 0.08);
+        color: #c0392b;
+        border-radius: 6px;
+        font-size: 12px;
+        font-weight: 700;
+        cursor: pointer;
+      }
+
+      .no-exercises-selected {
+        text-align: center;
+        padding: 20px;
+        color: var(--muted);
+        font-size: 14px;
+      }
+    </style>
   </head>
 
   <body>
@@ -19,7 +406,6 @@
       <nav>
         <input type="checkbox" id="menu-toggle" />
         <label for="menu-toggle" class="menu-icon">☰</label>
-
         <ul class="nav-links">
           <li><a href="homepage.html">Home</a></li>
           <li><a href="login.html" class="active">Login</a></li>
@@ -32,80 +418,51 @@
     <div class="content form-page">
       <form class="form-card">
         <h1 class="page-heading">Create <em>Account</em></h1>
-
         <div id="errorBox" style="display: none; color: red"></div>
         <div id="successBox" style="display: none; color: green"></div>
 
         <label for="username">Username</label>
         <input
           id="username"
-          name="username"
           type="text"
           placeholder="Enter username"
           required
         />
-
         <label for="real_name">Full Name</label>
         <input
           id="real_name"
-          name="real_name"
           type="text"
           placeholder="Enter full name"
           required
         />
-
         <label for="email">Email</label>
-        <input
-          id="email"
-          name="email"
-          type="email"
-          placeholder="Enter email"
-          required
-        />
-
+        <input id="email" type="email" placeholder="Enter email" required />
         <label for="password">Password</label>
         <input
           id="password"
-          name="password"
           type="password"
           placeholder="Enter password"
           required
         />
-        <p style="font-size: 12px; color: #888; margin: 0px 0 12px 0">
+        <p style="font-size: 12px; color: #888; margin: 0 0 12px 0">
           Must be at least 8 characters and include an uppercase letter,
-          lowercase letter, number, and special character (e.g. !@#$%).
+          lowercase letter, number, and special character.
         </p>
-
         <label for="confirm_password">Confirm Password</label>
         <input
           id="confirm_password"
-          name="confirm_password"
           type="password"
           placeholder="Confirm password"
           required
         />
-
         <label for="height_cm">Height (cm)</label>
-        <input
-          id="height_cm"
-          name="height_cm"
-          type="number"
-          placeholder="Enter height"
-        />
-
+        <input id="height_cm" type="number" placeholder="Enter height" />
         <label for="weight_kg">Weight (kg)</label>
-        <input
-          id="weight_kg"
-          name="weight_kg"
-          type="number"
-          placeholder="Enter weight"
-        />
-
+        <input id="weight_kg" type="number" placeholder="Enter weight" />
         <label for="DoB">Date of Birth</label>
-        <input id="DoB" name="DoB" type="date" placeholder="Enter date of birth" />
-
+        <input id="DoB" type="date" />
         <label for="gender">Gender</label>
-        <select id="gender" name="gender">
+        <select id="gender">
           <option value="">Prefer not to say</option>
           <option value="male">Male</option>
           <option value="female">Female</option>
@@ -114,16 +471,251 @@
         <button type="button" id="registerBtn" onclick="handleRegister()">
           Create Account
         </button>
-
         <p class="form-link">
-          Already have an account?
-          <a href="login.html">Login</a>
+          Already have an account? <a href="login.html">Login</a>
         </p>
       </form>
     </div>
 
+    <!-- ════════════════════════════════════════ -->
+    <!--  Phase 1: Calorie Goal Popup           -->
+    <!-- ════════════════════════════════════════ -->
+    <div class="goal-overlay" id="goalOverlay">
+      <div class="goal-popup">
+        <h2>Set Your Goals</h2>
+        <p class="subtitle">
+          Based on your body stats, let's figure out your daily calorie target.
+        </p>
+        <div class="goal-error" id="goalError"></div>
+
+        <p class="goal-section-title">How active are you?</p>
+        <div class="activity-options">
+          <label class="activity-option" onclick="selectActivity(this, 1.2)"
+            ><input type="radio" name="activity" value="1.2" />
+            <div class="activity-dot"></div>
+            <div class="activity-text">
+              <span class="activity-name">Sedentary</span
+              ><span class="activity-desc"
+                >Little or no exercise, desk job</span
+              >
+            </div></label
+          >
+          <label class="activity-option" onclick="selectActivity(this, 1.375)"
+            ><input type="radio" name="activity" value="1.375" />
+            <div class="activity-dot"></div>
+            <div class="activity-text">
+              <span class="activity-name">Lightly Active</span
+              ><span class="activity-desc">Light exercise 1–3 hours/week</span>
+            </div></label
+          >
+          <label class="activity-option" onclick="selectActivity(this, 1.55)"
+            ><input type="radio" name="activity" value="1.55" />
+            <div class="activity-dot"></div>
+            <div class="activity-text">
+              <span class="activity-name">Moderately Active</span
+              ><span class="activity-desc"
+                >Moderate exercise 3–5 hours/week</span
+              >
+            </div></label
+          >
+          <label class="activity-option" onclick="selectActivity(this, 1.725)"
+            ><input type="radio" name="activity" value="1.725" />
+            <div class="activity-dot"></div>
+            <div class="activity-text">
+              <span class="activity-name">Very Active</span
+              ><span class="activity-desc">Hard exercise 6–7 hours/week</span>
+            </div></label
+          >
+          <label class="activity-option" onclick="selectActivity(this, 1.9)"
+            ><input type="radio" name="activity" value="1.9" />
+            <div class="activity-dot"></div>
+            <div class="activity-text">
+              <span class="activity-name">Extremely Active</span
+              ><span class="activity-desc"
+                >Very hard exercise, physical job, 10+ hours/week</span
+              >
+            </div></label
+          >
+        </div>
+
+        <div class="bmr-info" id="bmrInfo" style="display: none">
+          Your estimated maintenance calories:
+          <strong id="maintenanceCals">--</strong> kcal/day
+        </div>
+
+        <p class="goal-section-title" id="calorieTitle" style="display: none">
+          Choose your calorie goal
+        </p>
+        <div class="calorie-goals" id="calorieGoals">
+          <div
+            class="calorie-card"
+            onclick="selectCalorieGoal(this, 'cut_extreme')"
+          >
+            <div class="calorie-card-left">
+              <span class="calorie-card-name">Cut — Extreme</span
+              ><span class="calorie-card-desc"
+                >Aggressive fat loss (~1 kg/week)</span
+              >
+            </div>
+            <div>
+              <span class="calorie-card-value" id="cutExtremeCals">--</span>
+              <span class="calorie-card-unit">kcal/day</span>
+            </div>
+          </div>
+          <div
+            class="calorie-card"
+            onclick="selectCalorieGoal(this, 'cut_moderate')"
+          >
+            <div class="calorie-card-left">
+              <span class="calorie-card-name">Cut — Moderate</span
+              ><span class="calorie-card-desc"
+                >Steady fat loss (~0.5 kg/week)</span
+              >
+            </div>
+            <div>
+              <span class="calorie-card-value" id="cutModerateCals">--</span>
+              <span class="calorie-card-unit">kcal/day</span>
+            </div>
+          </div>
+          <div
+            class="calorie-card"
+            onclick="selectCalorieGoal(this, 'maintain')"
+          >
+            <div class="calorie-card-left">
+              <span class="calorie-card-name">Maintain</span
+              ><span class="calorie-card-desc">Keep your current weight</span>
+            </div>
+            <div>
+              <span class="calorie-card-value" id="maintainCals">--</span>
+              <span class="calorie-card-unit">kcal/day</span>
+            </div>
+          </div>
+          <div
+            class="calorie-card"
+            onclick="selectCalorieGoal(this, 'bulk_moderate')"
+          >
+            <div class="calorie-card-left">
+              <span class="calorie-card-name">Bulk — Moderate</span
+              ><span class="calorie-card-desc"
+                >Lean muscle gain (~0.25 kg/week)</span
+              >
+            </div>
+            <div>
+              <span class="calorie-card-value" id="bulkModerateCals">--</span>
+              <span class="calorie-card-unit">kcal/day</span>
+            </div>
+          </div>
+          <div
+            class="calorie-card"
+            onclick="selectCalorieGoal(this, 'bulk_extreme')"
+          >
+            <div class="calorie-card-left">
+              <span class="calorie-card-name">Bulk — Extreme</span
+              ><span class="calorie-card-desc"
+                >Maximum muscle gain (~0.5 kg/week)</span
+              >
+            </div>
+            <div>
+              <span class="calorie-card-value" id="bulkExtremeCals">--</span>
+              <span class="calorie-card-unit">kcal/day</span>
+            </div>
+          </div>
+        </div>
+
+        <button
+          type="button"
+          class="goal-btn goal-btn-primary"
+          id="saveGoalBtn"
+          onclick="saveCalorieGoal()"
+          disabled
+        >
+          Save Calorie Goal
+        </button>
+        <button
+          type="button"
+          class="goal-btn goal-btn-skip"
+          onclick="goToPhase2()"
+        >
+          Skip for now →
+        </button>
+      </div>
+    </div>
+
+    <!-- ════════════════════════════════════════ -->
+    <!--  Phase 2: Exercise Goals Popup         -->
+    <!-- ════════════════════════════════════════ -->
+    <div class="goal-overlay" id="exerciseGoalOverlay">
+      <div class="goal-popup">
+        <h2>Exercise Goals</h2>
+        <p class="subtitle">
+          Select which exercises you'd like to set goals for. You can skip any
+          you don't want.
+        </p>
+        <div class="goal-error" id="exerciseGoalError"></div>
+
+        <p class="goal-section-title">Select exercise types</p>
+        <div class="exercise-toggle-list" id="exerciseToggleList">
+          <div
+            class="exercise-toggle"
+            onclick="toggleExercise(this, 'swimming')"
+          >
+            <span class="toggle-icon">🏊</span
+            ><span class="toggle-name">Swim</span>
+          </div>
+          <div
+            class="exercise-toggle"
+            onclick="toggleExercise(this, 'running')"
+          >
+            <span class="toggle-icon">🏃</span
+            ><span class="toggle-name">Run</span>
+          </div>
+          <div
+            class="exercise-toggle"
+            onclick="toggleExercise(this, 'cycling')"
+          >
+            <span class="toggle-icon">🚴</span
+            ><span class="toggle-name">Cycle</span>
+          </div>
+          <div
+            class="exercise-toggle"
+            onclick="toggleExercise(this, 'walking')"
+          >
+            <span class="toggle-icon">🚶</span
+            ><span class="toggle-name">Walk</span>
+          </div>
+          <div class="exercise-toggle" onclick="toggleExercise(this, 'gym')">
+            <span class="toggle-icon">🏋️</span
+            ><span class="toggle-name">Gym</span>
+          </div>
+        </div>
+
+        <!-- Dynamic goal configs appear here -->
+        <div id="exerciseGoalConfigs">
+          <p class="no-exercises-selected" id="noExercisesMsg">
+            Select an exercise above to set a goal.
+          </p>
+        </div>
+
+        <button
+          type="button"
+          class="goal-btn goal-btn-primary"
+          id="saveExerciseGoalsBtn"
+          onclick="saveExerciseGoals()"
+          disabled
+        >
+          Save Exercise Goals
+        </button>
+        <button
+          type="button"
+          class="goal-btn goal-btn-skip"
+          onclick="skipToFinish()"
+        >
+          Skip for now →
+        </button>
+      </div>
+    </div>
+
     <script src="/register.js"></script>
     <script src="wave.js"></script>
-
   </body>
 </html>

@@ -741,3 +741,20 @@ body {
     grid-template-columns: 1fr;
   }
 }
+
+/* Add this at the bottom of your dashboard.css */
+
+.expand-arrow {
+    font-size: 12px;
+    color: var(--muted);
+    transition: transform 0.2s ease;
+}
+
+.goal-subgoals {
+    animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-8px); }
+    to   { opacity: 1; transform: translateY(0); }
+}

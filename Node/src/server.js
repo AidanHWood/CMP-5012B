@@ -413,14 +413,22 @@ app.get('/api/food-log/today-by-meal', async (req, res) => {
     }
 });
 
+// ═══════════════════════════════════════════════════════════════
+//  GOALS ROUTES — uses the 'goals' table
+//  Columns: goal_id, user_id, goal_type, target_val, target_date,
+//           status, goal_name, actual_value
+// ═══════════════════════════════════════════════════════════════
+
+// --- Get all goals for the logged-in user ---
 app.get('/api/goals', async (req, res) => {
     if (!req.session.userId) return res.status(401).json({ error: 'Not logged in' });
     try {
         const result = await pool.query(
-            `SELECT goal_id, goal_type, goal_name, goal_value, actual_value, deadline, updated_at
-             FROM user_goals
+            `SELECT goal_id, goal_type, goal_name, target_val AS goal_value,
+                    actual_value, target_date AS deadline, status
+             FROM goals
              WHERE user_id = $1
-             ORDER BY updated_at DESC`,
+             ORDER BY goal_id DESC`,
             [req.session.userId]
         );
         res.json({ goals: result.rows });
@@ -429,81 +437,126 @@ app.get('/api/goals', async (req, res) => {
         res.status(500).json({ error: 'Server error' });
     }
 });
- 
- 
-// --- goal name and deadline ---
+
+// --- Create a single goal ---
+// Accepts both formats:
+//   Phase 1/2 registration: { goal_type, target_val }
+//   Dashboard/Settings:     { goal_type, goal_name, goal_value, actual_value, deadline }
 app.post('/api/goals', async (req, res) => {
-    console.log('Goals POST body:', req.body);
     if (!req.session.userId) return res.status(401).json({ error: 'Not logged in' });
-    const { goal_type, goal_name, goal_value, actual_value, deadline } = req.body;
-    const valid = ['gym_weight', '5k_run', '10k_run', 'weight_loss',
-                   'calories', 'steps', 'water', 'custom'];
-    if (!goal_type || !valid.includes(goal_type))
-        return res.status(400).json({ error: 'Invalid goal_type' });
+
+    const { goal_type, goal_name, goal_value, target_val, actual_value, deadline } = req.body;
+
+    if (!goal_type) return res.status(400).json({ error: 'goal_type is required.' });
+
+    // Accept target_val (from registration popup) or goal_value (from dashboard)
+    const value = target_val || goal_value;
+    if (!value && value !== 0) return res.status(400).json({ error: 'A target value is required.' });
+
     try {
-        const result = await pool.query(
-            `INSERT INTO user_goals
-               (user_id, goal_type, goal_name, goal_value, actual_value, deadline, updated_at)
-             VALUES ($1, $2, $3, $4, $5, $6, NOW())
-             RETURNING *`,
-            [
-                req.session.userId,
-                goal_type,
-                goal_name    || null,
-                goal_value   ?? null,
-                actual_value ?? null,
-                deadline     || null,
-            ]
+        // Upsert — if goal_type already exists for user, update it
+        const existing = await pool.query(
+            'SELECT goal_id FROM goals WHERE user_id = $1 AND goal_type = $2',
+            [req.session.userId, goal_type]
         );
+
+        let result;
+        if (existing.rows.length > 0) {
+            result = await pool.query(
+                `UPDATE goals SET target_val = $1, goal_name = COALESCE($2, goal_name),
+                    actual_value = COALESCE($3, actual_value), target_date = COALESCE($4, target_date),
+                    status = TRUE
+                 WHERE goal_id = $5 RETURNING *`,
+                [value, goal_name || null, actual_value || 0, deadline || null, existing.rows[0].goal_id]
+            );
+        } else {
+            result = await pool.query(
+                `INSERT INTO goals (user_id, goal_type, goal_name, target_val, actual_value, target_date, status)
+                 VALUES ($1, $2, $3, $4, $5, $6, TRUE) RETURNING *`,
+                [req.session.userId, goal_type, goal_name || goal_type.replace(/_/g, ' '), value, actual_value || 0, deadline || null]
+            );
+        }
+
         res.json({ success: true, goal: result.rows[0] });
     } catch (err) {
         console.error('Add goal error:', err);
         res.status(500).json({ error: 'Server error' });
     }
 });
- 
- 
-// --- Update goals ---
+
+// --- Save multiple goals at once (Phase 2 exercise goals) ---
+app.post('/api/goals/batch', async (req, res) => {
+    if (!req.session.userId) return res.status(401).json({ error: 'Not logged in' });
+    const { goals } = req.body;
+    if (!goals || !Array.isArray(goals) || goals.length === 0) {
+        return res.status(400).json({ error: 'No goals provided.' });
+    }
+
+    try {
+        for (const goal of goals) {
+            if (!goal.goal_type || !goal.target_val) continue;
+
+            const existing = await pool.query(
+                'SELECT goal_id FROM goals WHERE user_id = $1 AND goal_type = $2',
+                [req.session.userId, goal.goal_type]
+            );
+
+            if (existing.rows.length > 0) {
+                await pool.query(
+                    'UPDATE goals SET target_val = $1, goal_name = COALESCE($2, goal_name), status = TRUE WHERE goal_id = $3',
+                    [goal.target_val, goal.goal_type.replace(/_/g, ' '), existing.rows[0].goal_id]
+                );
+            } else {
+                await pool.query(
+                    'INSERT INTO goals (user_id, goal_type, goal_name, target_val, actual_value, status) VALUES ($1, $2, $3, $4, 0, TRUE)',
+                    [req.session.userId, goal.goal_type, goal.goal_type.replace(/_/g, ' '), goal.target_val]
+                );
+            }
+        }
+        res.json({ success: true });
+    } catch (err) {
+        console.error('Batch save goals error:', err);
+        res.status(500).json({ error: 'Server error' });
+    }
+});
+
+// --- Update a goal (progress or target) ---
 app.patch('/api/goals/:id', async (req, res) => {
     if (!req.session.userId) return res.status(401).json({ error: 'Not logged in' });
-    const { actual_value, goal_value } = req.body;
+    const { actual_value, goal_value, target_val } = req.body;
+    const newTarget = target_val || goal_value;
+
     try {
         const result = await pool.query(
-            `UPDATE user_goals SET
+            `UPDATE goals SET
                actual_value = COALESCE($1, actual_value),
-               goal_value   = COALESCE($2, goal_value),
-               updated_at   = NOW()
+               target_val   = COALESCE($2, target_val)
              WHERE goal_id = $3 AND user_id = $4
              RETURNING *`,
             [
                 actual_value !== undefined ? actual_value : null,
-                goal_value   !== undefined ? goal_value   : null,
+                newTarget !== undefined ? newTarget : null,
                 req.params.id,
                 req.session.userId,
             ]
         );
-        if (!result.rows.length)
-            return res.status(404).json({ error: 'Goal not found' });
+        if (!result.rows.length) return res.status(404).json({ error: 'Goal not found' });
         res.json({ success: true, goal: result.rows[0] });
     } catch (err) {
         console.error('Update goal error:', err);
         res.status(500).json({ error: 'Server error' });
     }
 });
- 
- 
-// --- Delete goals ---
+
+// --- Delete a goal ---
 app.delete('/api/goals/:id', async (req, res) => {
     if (!req.session.userId) return res.status(401).json({ error: 'Not logged in' });
     try {
         const result = await pool.query(
-            `DELETE FROM user_goals
-             WHERE goal_id = $1 AND user_id = $2
-             RETURNING goal_id`,
+            'DELETE FROM goals WHERE goal_id = $1 AND user_id = $2 RETURNING goal_id',
             [req.params.id, req.session.userId]
         );
-        if (!result.rows.length)
-            return res.status(404).json({ error: 'Goal not found' });
+        if (!result.rows.length) return res.status(404).json({ error: 'Goal not found' });
         res.json({ success: true });
     } catch (err) {
         console.error('Delete goal error:', err);
@@ -511,45 +564,101 @@ app.delete('/api/goals/:id', async (req, res) => {
     }
 });
 
-app.get('/api/user-profile', async (req, res) => {
+// ——— Auto-compute goal progress from exercise_logs and food_log ———
+// This route returns goals with actual values computed from real data
+// instead of requiring manual updates for exercise-based goals
+app.get('/api/goals-with-progress', async (req, res) => {
     if (!req.session.userId) return res.status(401).json({ error: 'Not logged in' });
+
     try {
-        const result = await pool.query(
-            `SELECT username, real_name, email, age, height_cm, weight_kg,
-                    calorie_goal
-             FROM users WHERE user_id = $1`,
+        // Get all goals
+        const goalsResult = await pool.query(
+            `SELECT goal_id, goal_type, goal_name, target_val, actual_value, target_date, status
+             FROM goals WHERE user_id = $1 ORDER BY goal_id DESC`,
             [req.session.userId]
         );
-        res.json(result.rows[0] || {});
-    } catch (err) {
-        console.error('Profile fetch error:', err);
-        res.status(500).json({ error: 'Server error' });
-    }
-});
 
-app.patch('/api/user-profile', async (req, res) => {
-    if (!req.session.userId) return res.status(401).json({ error: 'Not logged in' });
-    const { real_name, email, age, height_cm, weight_kg, calorie_goal } = req.body;
-    try {
-        await pool.query(
-            `UPDATE users SET
-               real_name   = COALESCE($1, real_name),
-               email       = COALESCE($2, email),
-               age         = COALESCE($3, age),
-               height_cm   = COALESCE($4, height_cm),
-               weight_kg   = COALESCE($5, weight_kg),
-               calorie_goal = COALESCE($6, calorie_goal)
-             WHERE user_id = $7`,
-            [real_name||null, email||null,
-             age ? parseInt(age) : null,
-             height_cm ? parseFloat(height_cm) : null,
-             weight_kg ? parseFloat(weight_kg) : null,
-             calorie_goal ? parseInt(calorie_goal) : null,
-             req.session.userId]
+        const goals = goalsResult.rows;
+
+        // Get this week's exercise summary (Monday to now)
+        const exerciseResult = await pool.query(
+            `SELECT exercise_type,
+                    COUNT(*) AS session_count,
+                    COALESCE(SUM(distance_km), 0) AS total_distance,
+                    COALESCE(SUM(weight_moved_kg), 0) AS total_weight_moved,
+                    COALESCE(SUM(duration_min), 0) AS total_duration
+             FROM exercise_logs
+             WHERE user_id = $1
+               AND log_date >= DATE_TRUNC('week', CURRENT_DATE)
+             GROUP BY exercise_type`,
+            [req.session.userId]
         );
-        res.json({ success: true });
+
+        // Build a lookup: { running: { sessions: 3, distance: 15.5, weight: 0 }, ... }
+        const exerciseData = {};
+        for (const row of exerciseResult.rows) {
+            exerciseData[row.exercise_type] = {
+                sessions: parseInt(row.session_count) || 0,
+                distance: parseFloat(row.total_distance) || 0,
+                weight_moved: parseFloat(row.total_weight_moved) || 0,
+                duration: parseInt(row.total_duration) || 0
+            };
+        }
+
+        // Get today's calorie intake
+        const foodResult = await pool.query(
+            `SELECT COALESCE(SUM(f.calories * fl.quantity_grams / 100), 0) AS total_calories
+             FROM food_log fl
+             JOIN foods f ON fl.food_id = f.food_id
+             WHERE fl.user_id = $1 AND fl.log_date::date = CURRENT_DATE`,
+            [req.session.userId]
+        );
+        const todayCalories = Math.round(parseFloat(foodResult.rows[0]?.total_calories) || 0);
+
+        // Auto-fill actual values based on goal_type
+        const enrichedGoals = goals.map(g => {
+            let autoActual = g.actual_value || 0;
+            const type = g.goal_type;
+
+            // Calorie intake — today's food total
+            if (type === 'calorie_intake') {
+                autoActual = todayCalories;
+            }
+
+            // Sessions per week — count from exercise_logs this week
+            if (type.endsWith('_sessions_week')) {
+                const exerciseType = type.replace('_sessions_week', '');
+                autoActual = exerciseData[exerciseType]?.sessions || 0;
+            }
+
+            // Distance per week — sum from exercise_logs this week
+            // Stored as value×10, so actual needs same scale
+            if (type.endsWith('_distance_week')) {
+                const exerciseType = type.replace('_distance_week', '');
+                const distKm = exerciseData[exerciseType]?.distance || 0;
+                autoActual = Math.round(distKm * 10); // match storage scale
+            }
+
+            // Gym weight moved per week
+            if (type === 'gym_weight_moved_week') {
+                autoActual = Math.round(exerciseData['gym']?.weight_moved || 0);
+            }
+
+            return {
+                goal_id: g.goal_id,
+                goal_type: g.goal_type,
+                goal_name: g.goal_name,
+                goal_value: g.target_val,
+                actual_value: autoActual,
+                deadline: g.target_date,
+                status: g.status
+            };
+        });
+
+        res.json({ goals: enrichedGoals });
+
     } catch (err) {
-        console.error('Profile update error:', err);
+        console.error('Goals with progress error:', err);
         res.status(500).json({ error: 'Server error' });
     }
 });
