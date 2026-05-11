@@ -1,0 +1,250 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Health Profile - Health Tracking System</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500;600;700;900&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="homepage.css" />
+    <link rel="stylesheet" href="auth.css" />
+    <link rel="stylesheet" href="healthProfile.css" />
+  </head>
+
+  <body>
+    <header class="navbar">
+      <nav>
+        <input type="checkbox" id="menu-toggle" />
+        <label for="menu-toggle" class="menu-icon">☰</label>
+        <ul class="nav-links">
+          <li><a href="dashboard.html">Dashboard</a></li>
+          <li><a href="logCalories.html">Log Calories</a></li>
+          <li><a href="logExercise.html">Log Exercise</a></li>
+          <li><a href="userSettings.html">User Settings</a></li>
+          <li><a href="healthProfile.html" class="active">Health Profile</a></li>
+          <li><a href="login.html">Logout</a></li>
+        </ul>
+      </nav>
+    </header>
+
+    <canvas id="waveCanvas"></canvas>
+
+    <div class="content">
+      <div class="log-container">
+
+        <h1 class="page-heading">Your <em>Health</em> Profile</h1>
+        <p class="page-subheading">View and update your personal stats</p>
+
+        <!-- Quick-glance stat tiles -->
+        <div class="stats-banner stats-banner--two">
+          <div class="stat-tile">
+            <div class="stat-label">Height</div>
+            <div class="stat-value" id="tileHeight">—</div>
+            <div class="stat-unit">cm</div>
+          </div>
+          <div class="stat-tile">
+            <div class="stat-label">Weight</div>
+            <div class="stat-value" id="tileWeight">—</div>
+            <div class="stat-unit">kg</div>
+          </div>
+        </div>
+
+        <!-- BMI banner -->
+        <div class="bmi-banner">
+          <div class="bmi-left">
+            <div class="bmi-label">Body Mass Index</div>
+            <div class="bmi-value" id="bmiValue">—</div>
+          </div>
+          <div class="bmi-right">
+            <div class="bmi-badge" id="bmiCategory">—</div>
+            <div class="bmi-scale">weight ÷ height²</div>
+          </div>
+        </div>
+
+        <!-- Body metrics -->
+        <div class="form-card">
+          <div class="card-title">Body Measurements</div>
+
+          <!-- Height -->
+          <div class="metric-row">
+            <div class="metric-info">
+              <div class="metric-icon">📏</div>
+              <div>
+                <div class="metric-name">Height</div>
+                <div class="metric-desc">Used for BMI calculation</div>
+              </div>
+            </div>
+            <div class="metric-right">
+              <div class="metric-display" id="heightDisplay">
+                <div class="val" id="heightVal">—</div>
+                <div class="unit">cm</div>
+              </div>
+              <div class="metric-edit-wrap" id="heightEdit">
+                <input type="number" id="heightInput" placeholder="e.g. 175" min="50" max="250" step="0.5" />
+                <button class="save-btn" onclick="saveMetric('height')">Save</button>
+                <button class="cancel-btn" onclick="cancelEdit('height')">✕</button>
+              </div>
+              <button class="edit-btn" id="heightEditBtn" onclick="startEdit('height')" title="Edit">✏️</button>
+            </div>
+          </div>
+
+          <!-- Weight -->
+          <div class="metric-row">
+            <div class="metric-info">
+              <div class="metric-icon">⚖️</div>
+              <div>
+                <div class="metric-name">Weight</div>
+                <div class="metric-desc">Used for calorie burn estimates</div>
+              </div>
+            </div>
+            <div class="metric-right">
+              <div class="metric-display" id="weightDisplay">
+                <div class="val" id="weightVal">—</div>
+                <div class="unit">kg</div>
+              </div>
+              <div class="metric-edit-wrap" id="weightEdit">
+                <input type="number" id="weightInput" placeholder="e.g. 70" min="20" max="300" step="0.5" />
+                <button class="save-btn" onclick="saveMetric('weight')">Save</button>
+                <button class="cancel-btn" onclick="cancelEdit('weight')">✕</button>
+              </div>
+              <button class="edit-btn" id="weightEditBtn" onclick="startEdit('weight')" title="Edit">✏️</button>
+            </div>
+          </div>
+
+        </div>
+
+        <p class="log-section-title">Actions</p>
+
+        <button class="save-all-btn" onclick="saveAll()">Save All Changes →</button>
+
+      </div>
+    </div>
+
+    <div class="toast" id="toast">✓ Profile updated</div>
+
+    <script src="wave.js"></script>
+    <script>
+      let profile = { height: null, weight: null };
+
+      // ── Load profile from server ──
+      async function loadProfile() {
+        try {
+          const res = await fetch('/api/health-profile', { credentials: 'same-origin' });
+          if (res.status === 401) { window.location.href = 'login.html'; return; }
+          if (res.ok) {
+            const data = await res.json();
+            profile.height = data.height_cm || null;
+            profile.weight = data.weight_kg || null;
+          }
+        } catch (err) {
+          console.error('Could not fetch profile:', err);
+        }
+        renderProfile();
+      }
+
+      // ── Render all display values ──
+      function renderProfile() {
+        document.getElementById('heightVal').textContent  = profile.height ?? '—';
+        document.getElementById('weightVal').textContent  = profile.weight ?? '—';
+        document.getElementById('tileHeight').textContent = profile.height ?? '—';
+        document.getElementById('tileWeight').textContent = profile.weight ?? '—';
+        updateBMI();
+      }
+
+      // ── BMI calculation ──
+      function updateBMI() {
+        const bmiEl  = document.getElementById('bmiValue');
+        const catEl  = document.getElementById('bmiCategory');
+
+        if (!profile.height || !profile.weight) {
+          bmiEl.textContent = '—';
+          catEl.textContent = 'Add height & weight';
+          return;
+        }
+
+        const h = profile.height / 100;
+        const bmi = (profile.weight / (h * h)).toFixed(1);
+        bmiEl.textContent = bmi;
+
+        let cat, color;
+        if      (bmi < 18.5) { cat = 'Underweight'; }
+        else if (bmi < 25.0) { cat = 'Healthy';     }
+        else if (bmi < 30.0) { cat = 'Overweight';  }
+        else                 { cat = 'Obese';        }
+
+        catEl.textContent = cat;
+      }
+
+      // ── Inline edit ──
+      function startEdit(metric) {
+        document.getElementById(`${metric}Display`).style.display = 'none';
+        document.getElementById(`${metric}EditBtn`).style.display = 'none';
+        document.getElementById(`${metric}Edit`).classList.add('active');
+        const input = document.getElementById(`${metric}Input`);
+        input.value = profile[metric] ?? '';
+        input.focus();
+      }
+
+      function cancelEdit(metric) {
+        document.getElementById(`${metric}Display`).style.display = '';
+        document.getElementById(`${metric}EditBtn`).style.display = '';
+        document.getElementById(`${metric}Edit`).classList.remove('active');
+      }
+
+      function saveMetric(metric) {
+        const val = parseFloat(document.getElementById(`${metric}Input`).value);
+        if (isNaN(val) || val <= 0) {
+          alert('Please enter a valid value.');
+          return;
+        }
+        profile[metric] = val;
+        cancelEdit(metric);
+        renderProfile();
+        persistProfile();
+      }
+
+      // ── Persist profile to server ──
+      async function persistProfile() {
+        try {
+          const res = await fetch('/api/health-profile', {
+            method: 'POST',
+            credentials: 'same-origin',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              height_cm: profile.height,
+              weight_kg: profile.weight,
+            }),
+          });
+
+          if (res.status === 401) { window.location.href = 'login.html'; return; }
+
+          const data = await res.json();
+          if (!data.success) {
+            alert(data.error || 'Failed to save profile.');
+          }
+        } catch (err) {
+          alert('Error saving profile. Please try again.');
+        }
+      }
+
+      // ── Save All button ──
+      async function saveAll() {
+        await persistProfile();
+        showToast('✓ Profile saved');
+      }
+
+      // ── Toast notification ──
+      function showToast(msg) {
+        const toast = document.getElementById('toast');
+        toast.textContent = msg;
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 2800);
+      }
+
+      // Load on page open
+      loadProfile();
+    </script>
+  </body>
+</html>
