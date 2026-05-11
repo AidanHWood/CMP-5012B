@@ -14,27 +14,31 @@
   </head>
 
   <body>
-    <header class="navbar">
-      <nav>
-        <input type="checkbox" id="menu-toggle" />
-        <label for="menu-toggle" class="menu-icon">☰</label>
-        <ul class="nav-links">
-          <li><a href="dashboard.html">Dashboard</a></li>
-          <li><a href="logCalories.html">Log Calories</a></li>
-          <li><a href="logExercise.html">Log Exercise</a></li>
-          <li><a href="userSettings.html">User Settings</a></li>
-          <li><a href="healthProfile.html" class="active">Health Profile</a></li>
-          <li><a href="login.html">Logout</a></li>
-        </ul>
-      </nav>
-    </header>
+<header class="navbar">
+  <nav>
+    <input type="checkbox" id="menu-toggle" />
+    <label for="menu-toggle" class="menu-icon">☰</label>
+
+    <ul class="nav-links">
+      <li><a href="dashboard.html">Dashboard</a></li>
+      <li><a href="logCalories.html">Log Calories</a></li>
+      <li><a href="logExercise.html">Log Exercise</a></li>
+      <li><a href="friends.html">Friends</a></li>
+
+      <li class="push-right">
+        <a href="myProfile.html" class="active">My Profile</a>
+      </li>
+      <li><a href="#" class="logoutBtn">Logout</a></li>
+    </ul>
+  </nav>
+</header>
 
     <canvas id="waveCanvas"></canvas>
 
     <div class="content">
       <div class="log-container">
 
-        <h1 class="page-heading">Your <em>Health</em> Profile</h1>
+        <h1 class="page-heading">Health <em>Profile</em></h1>
         <p class="page-subheading">View and update your personal stats</p>
 
         <!-- Quick-glance stat tiles -->

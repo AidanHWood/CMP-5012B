@@ -23,21 +23,6 @@
 }
 
 /* ── Page heading ── */
-.page-heading {
-    font-family: 'Instrument Serif', serif;
-    text-align: center;
-    font-size: 42px;
-    letter-spacing: -1.5px;
-    color: var(--dark);
-    margin-bottom: 6px;
-    opacity: 0;
-    animation: fadeUp 0.6s 0.1s forwards;
-}
-
-.page-heading em {
-    font-style: italic;
-    color: var(--green);
-}
 
 .page-subheading {
     text-align: center;
