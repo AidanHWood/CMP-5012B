@@ -36,6 +36,11 @@
 
         <label for="password">Password</label>
         <input type="password" id="password" name="password" required />
+        <label>
+          Show Password
+          <input type="checkbox" onclick="togglePassword()"/>
+
+        </label>
 
         <button type="button" id="loginBtn" onclick="handleLogin()">
           Login
@@ -50,6 +55,7 @@
         </p>
 
         <div id="errorBox" style="display: none; color: red"></div>
+        <div id="recentLogoutBanner" style="display:none; background:#e6f4ea; color:#1a6b3c; padding:10px 14px; border-radius:8px; margin-bottom:12px; font-size:14px;"></div>
       </form>
     </main>
 

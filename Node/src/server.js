@@ -76,7 +76,7 @@ app.get('/friends.html', (req, res) => {
 app.use(express.static(path.join(__dirname, '../../Code')));
  
 // ——— Wire in the Auth router ———
-const authRouter = require('./Auth');
+const { router: authRouter } = require('./Auth');
 app.use(authRouter);
 
 const friendRoutes = require('./friends');
@@ -553,6 +553,7 @@ app.patch('/api/user-profile', async (req, res) => {
         res.status(500).json({ error: 'Server error' });
     }
 });
+
 
 // ——— Homepage route ———
 app.get('/', (req, res) => {

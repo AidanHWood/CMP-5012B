@@ -21,9 +21,7 @@
       <li class="push-right">
         <a href="myProfile.html">My Profile</a>
       </li>
-      <li>
-        <a href="homepage.html">Logout</a>
-      </li>
+      <li><a href="#" id="logoutBtn">Logout</a></li>
     </ul>
   </nav>
 </header>
@@ -135,10 +133,13 @@
         btn.textContent = "Sending...";
 
         try {
+          const csrfRes = await fetch('/api/csrf-token');
+          const { csrfToken } = await csrfRes.json();
+
           const res = await fetch("/api/friends/request", {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ userId }),
+            headers: { "Content-Type": "application/json", "X-CSRF-Token": csrfToken },
+            body: JSON.stringify({ userId, _csrf: csrfToken }),
           });
           const data = await res.json();
 
@@ -155,13 +156,15 @@
         }
       }
 
-      // ── Accept friend request ─────────────────────────────────
       async function acceptRequest(userId) {
         try {
+          const csrfRes = await fetch('/api/csrf-token');
+          const { csrfToken } = await csrfRes.json();
+
           const res = await fetch("/api/friends/accept", {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ userId }),
+            headers: { "Content-Type": "application/json", "X-CSRF-Token": csrfToken },
+            body: JSON.stringify({ userId, _csrf: csrfToken }),
           });
           const data = await res.json();
           if (data.success) {
@@ -173,14 +176,16 @@
         }
       }
 
-      // ── Reject/remove friend ──────────────────────────────────
       async function removeFriend(userId) {
         if (!confirm("Remove this friend?")) return;
         try {
+          const csrfRes = await fetch('/api/csrf-token');
+          const { csrfToken } = await csrfRes.json();
+
           const res = await fetch("/api/friends/reject", {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ userId }),
+            headers: { "Content-Type": "application/json", "X-CSRF-Token": csrfToken },
+            body: JSON.stringify({ userId, _csrf: csrfToken }),
           });
           const data = await res.json();
           if (data.success) {
@@ -273,8 +278,9 @@
       loadRequests();
       loadFriends();
     </script>
-
+    <script src="friends.js"></script>
     <script src="wave.js"></script>
+    <script src="nav.js"></script>
 
   </body>
 </html>

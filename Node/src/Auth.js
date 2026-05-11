@@ -237,6 +237,17 @@ router.get('/register', (req, res) => {
 });
 
 router.get('/login', (req, res) => {
+    const TEN_MINUTES = 10 * 60 * 1000;
+    const logout = req.session.recentLogout;
+
+    if (logout && (Date.now() - logout.at) < TEN_MINUTES && logout.userId) {
+        req.session.userId = logout.userId;
+        req.session.username = logout.username;
+        req.session.recentLogout = null;
+        generateCsrfToken(req);
+        return res.redirect('/dashboard');
+    }
+
     res.sendFile(path.join(__dirname, '../../Code/login.html'));
 });
 
@@ -406,11 +417,20 @@ router.post('/login', loginLimiter, verifyCsrf, async (req, res) => {
 // ═══════════════════════════════════════════════════════════════
 
 router.post('/logout', (req, res) => {
-    req.session.destroy((err) => {
-        if (err) console.error('Session destroy error:', err);
-        res.clearCookie('connect.sid');
-        res.redirect('/login');
-    });
+    const username = req.session.username || null;
+    const userId = req.session.userId || null;
+
+    req.session.userId    = null;
+    req.session.username  = null;
+    req.session.csrfToken = null;
+
+    req.session.recentLogout = {
+        username,
+        userId,
+        at: Date.now()
+    };
+
+    res.redirect('/');  // ← send them to homepage, not /login
 });
 
 // ═══════════════════════════════════════════════════════════════
@@ -660,4 +680,16 @@ router.post('/api/reset-password', async (req, res) => {
     }
 });
 
-module.exports = router;
+// Auth.js — paste this before module.exports = router;
+router.get('/api/recent-logout', (req, res) => {
+    const TEN_MINUTES = 10 * 60 * 1000;
+    const logout = req.session.recentLogout;
+
+    if (logout && (Date.now() - logout.at) < TEN_MINUTES) {
+        return res.json({ available: true, username: logout.username });
+    }
+
+    res.json({ available: false });
+});
+
+module.exports = { router, verifyCsrf };
