@@ -501,7 +501,7 @@ app.post('/api/goals/batch', async (req, res) => {
         return res.status(400).json({ error: 'No goals provided.' });
     }
 
-    try {
+     try {
         for (const goal of goals) {
             if (!goal.goal_type || !goal.target_val) continue;
 
@@ -668,6 +668,132 @@ app.get('/api/goals-with-progress', async (req, res) => {
 
     } catch (err) {
         console.error('Goals with progress error:', err);
+        res.status(500).json({ error: 'Server error' });
+    }
+});
+
+app.get('/api/user-profile', async (req, res) => {
+    if (!req.session.userId) return res.status(401).json({ error: 'Not logged in' });
+    try {
+        const result = await pool.query(
+            `SELECT username, real_name, email, age, height_cm, weight_kg, calorie_goal
+             FROM users WHERE user_id = $1`,
+            [req.session.userId]
+        );
+        res.json(result.rows[0] || {});
+    } catch (err) {
+        console.error('Profile fetch error:', err);
+        res.status(500).json({ error: 'Server error' });
+    }
+});
+
+app.patch('/api/user-profile', async (req, res) => {
+    if (!req.session.userId) return res.status(401).json({ error: 'Not logged in' });
+    const { real_name, email, age, height_cm, weight_kg, calorie_goal } = req.body;
+    try {
+        await pool.query(
+            `UPDATE users SET
+               real_name    = COALESCE($1, real_name),
+               email        = COALESCE($2, email),
+               age          = COALESCE($3, age),
+               height_cm    = COALESCE($4, height_cm),
+               weight_kg    = COALESCE($5, weight_kg),
+               calorie_goal = COALESCE($6, calorie_goal)
+             WHERE user_id = $7`,
+            [
+                real_name    || null,
+                email        || null,
+                age          ? parseInt(age)         : null,
+                height_cm    ? parseFloat(height_cm) : null,
+                weight_kg    ? parseFloat(weight_kg) : null,
+                calorie_goal ? parseInt(calorie_goal): null,
+                req.session.userId
+            ]
+        );
+        res.json({ success: true });
+    } catch (err) {
+        console.error('Profile update error:', err);
+        res.status(500).json({ error: 'Server error' });
+    }
+});
+// ——— Leaderboard Route ———
+app.get('/api/leaderboard', async (req, res) => {
+    if (!req.session.userId) return res.status(401).json({ error: 'Not logged in' });
+
+    const type = req.query.type || 'overall';
+    const validTypes = ['overall', 'running', 'cycling', 'walking', 'swimming', 'gym', 'sport'];
+    if (!validTypes.includes(type))
+        return res.status(400).json({ error: 'Invalid type' });
+
+    try {
+        // Get friends + self
+        const friendsResult = await pool.query(
+            `SELECT u.user_id, u.username, u.real_name
+             FROM users u
+             WHERE u.user_id = $1
+             UNION
+             SELECT u.user_id, u.username, u.real_name
+             FROM friendships f
+             JOIN users u ON (
+                 CASE WHEN f.user_id = $1 THEN f.f_user_id ELSE f.user_id END = u.user_id
+             )
+             WHERE (f.user_id = $1 OR f.f_user_id = $1) AND f.status = 'accepted'`,
+            [req.session.userId]
+        );
+
+        const users = friendsResult.rows;
+        if (!users.length) return res.json({ leaderboard: [], currentUserId: req.session.userId });
+
+        const userIds = users.map(u => u.user_id);
+
+        // Build exercise query based on type
+        const typeFilter = type === 'overall' ? '' : `AND exercise_type = '${type}'`;
+
+        const calResult = await pool.query(
+            `SELECT user_id, COALESCE(SUM(calories_burned), 0) AS total_calories
+             FROM exercise_logs
+             WHERE user_id = ANY($1)
+               AND log_date >= DATE_TRUNC('week', CURRENT_DATE)
+               AND log_date < DATE_TRUNC('week', CURRENT_DATE) + INTERVAL '7 days'
+               ${typeFilter}
+             GROUP BY user_id`,
+            [userIds]
+        );
+
+        // Map calories to users
+        const calMap = {};
+        calResult.rows.forEach(r => { calMap[r.user_id] = Math.round(parseFloat(r.total_calories)); });
+
+        // Build leaderboard array
+        const leaderboard = users.map(u => ({
+            user_id: u.user_id,
+            username: u.username,
+            display_name: u.real_name || u.username,
+            calories: calMap[u.user_id] || 0,
+            is_current_user: u.user_id === req.session.userId
+        }));
+
+        // Sort by calories desc, then alphabetically for ties
+        leaderboard.sort((a, b) => {
+            if (b.calories !== a.calories) return b.calories - a.calories;
+            return a.display_name.localeCompare(b.display_name);
+        });
+
+        // Assign ranks (tied users share rank, next rank skips)
+        let rank = 1;
+        for (let i = 0; i < leaderboard.length; i++) {
+            if (i > 0 && leaderboard[i].calories === leaderboard[i - 1].calories) {
+                leaderboard[i].rank = leaderboard[i - 1].rank;
+            } else {
+                leaderboard[i].rank = rank;
+            }
+            rank++;
+        }
+
+        res.json({ leaderboard, currentUserId: req.session.userId });
+
+    } catch (err) {
+        console.error('Leaderboard error:', err);
         res.status(500).json({ error: 'Server error' });
     }
 });

@@ -21,7 +21,7 @@
       <li class="push-right">
         <a href="myProfile.html">My Profile</a>
       </li>
-      <li><a href="#" id="logoutBtn">Logout</a></li>
+      <li><a href="/" class="logoutBtn">Logout</a></li>
     </ul>
   </nav>
 </header>
@@ -59,6 +59,30 @@
             <p class="empty-state">
               No friends yet — search for someone above.
             </p>
+          </div>
+        </div>
+        <!-- Leaderboard -->
+        <div class="section-card" id="leaderboardSection">
+          <h2 class="section-title">Leaderboard</h2>
+
+          <!-- Top-level toggles -->
+          <div class="lb-top-toggles">
+            <button class="lb-top-btn active" onclick="setLeaderboardMode('overall')">🏆 Overall</button>
+            <button class="lb-top-btn" onclick="setLeaderboardMode('activity')">🏃 By Activity</button>
+          </div>
+
+          <!-- Activity tabs (hidden until By Activity selected) -->
+          <div class="lb-activity-tabs" id="lbActivityTabs" style="display:none;">
+            <button class="lb-tab active" data-type="running" onclick="setActivityType('running', this)">Running</button>
+            <button class="lb-tab" data-type="cycling" onclick="setActivityType('cycling', this)">Cycling</button>
+            <button class="lb-tab" data-type="walking" onclick="setActivityType('walking', this)">Walking</button>
+            <button class="lb-tab" data-type="swimming" onclick="setActivityType('swimming', this)">Swimming</button>
+            <button class="lb-tab" data-type="gym" onclick="setActivityType('gym', this)">Gym</button>
+            <button class="lb-tab" data-type="sport" onclick="setActivityType('sport', this)">Sport</button>
+          </div>
+
+          <div id="leaderboardList">
+            <div class="empty-state">Loading leaderboard...</div>
           </div>
         </div>
       </div>
@@ -196,6 +220,112 @@
           alert("Error removing friend.");
         }
       }
+      // ── Leaderboard ───────────────────────────────────────────
+      let lbMode = 'overall';
+      let lbActivityType = 'running';
+
+      function setLeaderboardMode(mode) {
+        lbMode = mode;
+        document.querySelectorAll('.lb-top-btn').forEach(b => b.classList.remove('active'));
+        event.target.classList.add('active');
+        document.getElementById('lbActivityTabs').style.display = mode === 'activity' ? 'flex' : 'none';
+        loadLeaderboard();
+      }
+
+      function setActivityType(type, btn) {
+        lbActivityType = type;
+        document.querySelectorAll('.lb-tab').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        loadLeaderboard();
+      }
+
+      async function loadLeaderboard() {
+        const type = lbMode === 'overall' ? 'overall' : lbActivityType;
+        const listEl = document.getElementById('leaderboardList');
+        listEl.innerHTML = '<div class="empty-state">Loading...</div>';
+
+        try {
+          const res = await fetch('/api/leaderboard?type=' + type);
+          const data = await res.json();
+          const board = data.leaderboard || [];
+
+          if (!board.length) {
+            listEl.innerHTML = '<div class="empty-state">No data yet this week.</div>';
+            return;
+          }
+
+          listEl.innerHTML = '';
+
+          // Get the week label
+          const weekLabel = document.createElement('div');
+          weekLabel.className = 'lb-week-label';
+          const now = new Date();
+          const monday = new Date(now);
+          monday.setDate(now.getDate() - ((now.getDay() + 6) % 7));
+          const sunday = new Date(monday);
+          sunday.setDate(monday.getDate() + 6);
+          const fmt = d => d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+          weekLabel.textContent = `Week of ${fmt(monday)} – ${fmt(sunday)}`;
+          listEl.appendChild(weekLabel);
+
+          // Pinned "You" row
+          const me = board.find(u => u.is_current_user);
+          if (me) {
+            const pinned = buildRow(me, true);
+            listEl.appendChild(pinned);
+          }
+
+          // Ranked list
+          board.forEach(user => {
+            listEl.appendChild(buildRow(user, false));
+          });
+
+        } catch (err) {
+          listEl.innerHTML = '<div class="empty-state">Failed to load leaderboard.</div>';
+          console.error('Leaderboard error:', err);
+        }
+      }
+
+      function buildRow(user, isPinned) {
+        const row = document.createElement('div');
+        row.className = 'lb-row' + (isPinned ? ' pinned' : '') + (user.is_current_user && !isPinned ? ' current-user' : '');
+
+        const rankEl = document.createElement('div');
+        rankEl.className = 'lb-rank';
+        if (isPinned) {
+          rankEl.textContent = '📍';
+        } else {
+          rankEl.textContent = '#' + user.rank;
+          if (user.rank === 1) rankEl.classList.add('gold');
+          else if (user.rank === 2) rankEl.classList.add('silver');
+          else if (user.rank === 3) rankEl.classList.add('bronze');
+        }
+
+        const nameEl = document.createElement('div');
+        nameEl.className = 'lb-name';
+        nameEl.textContent = user.display_name;
+
+        if (user.is_current_user) {
+          const badge = document.createElement('span');
+          badge.className = 'lb-you-badge';
+          badge.textContent = 'You';
+          nameEl.appendChild(badge);
+        }
+
+        const calsEl = document.createElement('div');
+        calsEl.className = 'lb-cals';
+        calsEl.textContent = user.calories.toLocaleString() + ' kcal';
+
+        row.appendChild(rankEl);
+        row.appendChild(nameEl);
+        row.appendChild(calsEl);
+        return row;
+      }
+
+      // Refresh on tab visibility change
+      document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible') loadLeaderboard();
+      });
 
       // ── Load pending requests ─────────────────────────────────
       async function loadRequests() {
@@ -278,7 +408,6 @@
       loadRequests();
       loadFriends();
     </script>
-    <script src="friends.js"></script>
     <script src="wave.js"></script>
     <script src="nav.js"></script>
 

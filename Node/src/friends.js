@@ -2,6 +2,7 @@ const express = require('express');
 const { Pool } = require('pg');
 
 const router = express.Router();
+const { verifyCsrf } = require('./Auth.js');
 
 const pool = new Pool({
     host: process.env.DB_HOST,
@@ -19,6 +20,8 @@ function requireAuth(req, res, next) {
     if (req.session && req.session.userId) return next();
     res.status(401).json({ error: 'Not logged in.' });
 }
+
+
 
 router.get('/api/friends', requireAuth, async (req, res) => {
     try {
@@ -85,7 +88,7 @@ router.get('/api/friends/search', requireAuth, async (req, res) => {
     }
 });
 
-router.post('/api/friends/request', requireAuth, async (req, res) => {
+router.post('/api/friends/request', requireAuth, verifyCsrf, async (req, res) => {
     const { userId } = req.body;
     if (!userId) return res.status(400).json({ error: 'userId is required.' });
     if (userId === req.session.userId) return res.status(400).json({ error: 'You cannot add yourself.' });
@@ -113,7 +116,7 @@ router.post('/api/friends/request', requireAuth, async (req, res) => {
     }
 });
 
-router.post('/api/friends/accept', requireAuth, async (req, res) => {
+router.post('/api/friends/accept', requireAuth, verifyCsrf, async (req, res) => {
     const { userId } = req.body;
     if (!userId) return res.status(400).json({ error: 'userId is required.' });
 
@@ -135,7 +138,7 @@ router.post('/api/friends/accept', requireAuth, async (req, res) => {
     }
 });
 
-router.post('/api/friends/reject', requireAuth, async (req, res) => {
+router.post('/api/friends/reject', requireAuth, verifyCsrf, async (req, res) => {
     const { userId } = req.body;
     if (!userId) return res.status(400).json({ error: 'userId is required.' });
 
@@ -154,3 +157,4 @@ router.post('/api/friends/reject', requireAuth, async (req, res) => {
 });
 
 module.exports = router;
+
