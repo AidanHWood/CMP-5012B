@@ -90,6 +90,9 @@ app.use('/', friendRoutes);
 // With the other router registrations (~line 88):
 const healthProfileRoutes = require('./healthProfile');
 app.use('/', healthProfileRoutes);
+
+const accountRoutes = require('./account');
+app.use('/', accountRoutes);
  
 // ——— Wire in Food routes ———
 const filePath = path.join(__dirname, 'data', 'food.json');

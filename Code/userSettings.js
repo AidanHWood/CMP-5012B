@@ -355,6 +355,46 @@ document.addEventListener('DOMContentLoaded', () => {
         btn.addEventListener('click', async(e) => { e.preventDefault(); try{await fetch('/logout',{method:'POST',credentials:'same-origin'});}catch{}window.location.href='/login'; });
     });
 
+    document.querySelector('.delete-account-btn')?.addEventListener('click', deleteAccount);
+
     loadProfile();
     loadGoals();
 });
+
+// ═══════════════════════════════════════════════
+//  DELETE ACCOUNT
+// ═══════════════════════════════════════════════
+async function deleteAccount() {
+    const confirmed = confirm(
+        'Are you sure you want to delete your account?\n\n' +
+        'This will permanently delete all your data including food logs, ' +
+        'exercise history, weight logs, and goals.\n\n' +
+        'This cannot be undone.'
+    );
+    if (!confirmed) return;
+
+    const doubleConfirmed = confirm('Last chance — are you absolutely sure?');
+    if (!doubleConfirmed) return;
+
+    try {
+        const csrfRes = await fetch('/api/csrf-token');
+        const { csrfToken } = await csrfRes.json();
+
+        const res = await fetch('/api/account', {
+            method: 'DELETE',
+            credentials: 'same-origin',
+            headers: { 'X-CSRF-Token': csrfToken },
+        });
+
+        const data = await res.json();
+
+        if (data.success) {
+            window.location.href = '/homepage.html';
+        } else {
+            alert(data.error || 'Failed to delete account. Please try again.');
+        }
+    } catch (err) {
+        console.error('Delete account error:', err);
+        alert('Network error. Please try again.');
+    }
+}
