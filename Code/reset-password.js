@@ -55,9 +55,6 @@
             successBox.textContent = "Password reset! Redirecting to login...";
             successBox.style.display = "block";
 
-            // Clean up
-            localStorage.removeItem("resetEmail");
-
             setTimeout(() => {
               window.location.href = "login.html";
             }, 2000);

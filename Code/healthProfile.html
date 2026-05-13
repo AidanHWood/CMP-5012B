@@ -252,10 +252,13 @@
       // ── Persist profile to server ──
       async function persistProfile() {
         try {
+          const csrfRes = await fetch('/api/csrf-token', { credentials: 'same-origin'});
+          const { csrfToken } = await csrfRes.json();
+
           const res = await fetch('/api/health-profile', {
             method: 'POST',
             credentials: 'same-origin',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': csrfToken },
             body: JSON.stringify({
               height_cm: profile.height,
               weight_kg: profile.weight,

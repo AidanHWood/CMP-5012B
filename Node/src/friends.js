@@ -59,7 +59,7 @@ router.get('/api/friends/requests', requireAuth, async (req, res) => {
 
 router.get('/api/friends/search', requireAuth, async (req, res) => {
     const { q } = req.query;
-    if (!q || q.trim().length < 2)
+    if (!q || q.trim().length < 2 || q.trim().length > 100)
         return res.status(400).json({ error: 'Search query must be at least 2 characters.' });
 
     try {
@@ -89,9 +89,9 @@ router.get('/api/friends/search', requireAuth, async (req, res) => {
 });
 
 router.post('/api/friends/request', requireAuth, verifyCsrf, async (req, res) => {
-    const { userId } = req.body;
-    if (!userId) return res.status(400).json({ error: 'userId is required.' });
-    if (userId === req.session.userId) return res.status(400).json({ error: 'You cannot add yourself.' });
+    const userId = parseInt(req.body.userId);
+    if (!userId || isNaN(userId) || userId <=0)
+        return res.status(400).json({ error: 'Invalid userId.'});
 
     try {
         const existing = await pool.query(
@@ -117,9 +117,9 @@ router.post('/api/friends/request', requireAuth, verifyCsrf, async (req, res) =>
 });
 
 router.post('/api/friends/accept', requireAuth, verifyCsrf, async (req, res) => {
-    const { userId } = req.body;
-    if (!userId) return res.status(400).json({ error: 'userId is required.' });
-
+    const userId = parseInt(req.body.userId);
+    if (!userId || isNaN(userId) || userId <=0)
+        return res.status(400).json({ error: 'Invalid userId.'});
     try {
         const result = await pool.query(
             `UPDATE friendships SET status = 'accepted', updated_at = NOW()
@@ -139,9 +139,9 @@ router.post('/api/friends/accept', requireAuth, verifyCsrf, async (req, res) => 
 });
 
 router.post('/api/friends/reject', requireAuth, verifyCsrf, async (req, res) => {
-    const { userId } = req.body;
-    if (!userId) return res.status(400).json({ error: 'userId is required.' });
-
+    const userId = parseInt(req.body.userId);
+    if (!userId || isNaN(userId) || userId <=0)
+        return res.status(400).json({ error: 'Invalid userId.'});
     try {
         await pool.query(
             `DELETE FROM friendships

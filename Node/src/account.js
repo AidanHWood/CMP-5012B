@@ -1,7 +1,7 @@
 const express = require('express');
 const router  = express.Router();
 const pool    = require('./db');
-
+const { verifyCsrf } = require('/Auth.js')
 function requireAuth(req, res, next) {
     if (req.session && req.session.userId) return next();
     res.status(401).json({ error: 'Not logged in.' });
@@ -12,7 +12,7 @@ function requireAuth(req, res, next) {
 // the user row itself. Each table is deleted explicitly so only
 // the session user's rows are affected — no cascading into other
 // users' data.
-router.delete('/api/account', requireAuth, async (req, res) => {
+router.delete('/api/account', requireAuth, verifyCsrf,  async (req, res) => {
     const userId = req.session.userId;
 
     try {

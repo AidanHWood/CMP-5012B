@@ -35,11 +35,11 @@ function getExerciseIcon(type) {
     return '🎯';
 }
 
-function getExerciseName(goalType) {
-    const parts = goalType.split('_');
-    return parts[0].charAt(0).toUpperCase() + parts[0].slice(1);
+function sanitise(str) {
+    const div = document.createElement('div');
+    div.textContent = str || '';
+    return div.innerHTML;
 }
-
 // ─────────────────────────────────────────────
 //  HELPERS
 // ─────────────────────────────────────────────
@@ -262,7 +262,7 @@ function populateGoals(goalsArr) {
             <div class="goal-top" style="cursor:pointer;" onclick="toggleGoalExpand('${cardId}')">
                 <span class="goal-icon">${icon}</span>
                 <div style="flex:1;">
-                    <h3>${name}</h3>
+                    <h3>${sanitise(name)}</h3>
                     <p>${primaryLabel || 'Weekly goals'}</p>
                 </div>
                 <span class="expand-arrow" id="arrow-${cardId}">▼</span>
@@ -301,7 +301,7 @@ function populateGoals(goalsArr) {
             html += `
                 <div style="padding:12px 0; border-top:1px solid rgba(0,0,0,0.06);">
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
-                        <span style="font-size:13px; font-weight:700; color:var(--dark);">${subName}</span>
+                        <span style="font-size:13px; font-weight:700; color:var(--dark);">${sanitise(subName)}</span>
                         <span style="font-size:12px; color:var(--muted);">${cfg.isTime ? 'Target time' : ''}</span>
                     </div>
                     <div class="goal-values" style="margin-bottom:8px;">
@@ -347,7 +347,7 @@ function populateGoals(goalsArr) {
             <div class="goal-top">
                 <span class="goal-icon">${cfg.icon}</span>
                 <div>
-                    <h3>${name}</h3>
+                    <h3>${sanitise(name)}</h3>
                     <p>${cfg.isTime ? 'Target time' : 'Target vs actual'}</p>
                 </div>
             </div>

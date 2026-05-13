@@ -71,28 +71,5 @@ async function handleLogin() {
         btn.textContent = 'Sign In';
     }
 }
-async function checkRecentLogout() {
-    try {
-        const res  = await fetch('/api/recent-logout');
-        const data = await res.json();
-
-        if (data.available && data.username) {
-            // Pre-fill the username field
-            document.getElementById('username').value = data.username;
-
-            // Show a friendly banner
-            const banner = document.getElementById('recentLogoutBanner');
-            if (banner) {
-                banner.textContent = `Welcome back, ${data.username}! Just enter your password to continue.`;
-                banner.style.display = 'block';
-            }
-
-            // Focus the password field so the user can just start typing
-            document.getElementById('password').focus();
-        }
-    } catch {
-        // Silently fail — not critical
-    }
-}
 
 document.addEventListener('keydown', (e)=> {if (e.key === 'Enter') handleLogin()});

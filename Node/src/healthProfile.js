@@ -1,6 +1,7 @@
 const express = require('express');
 const router  = express.Router();
 const pool    = require('./db');
+const { verifyCsrf } = require('./Auth.js')
 
 function requireAuth(req, res, next) {
     if (req.session && req.session.userId) return next();
@@ -27,7 +28,7 @@ router.get('/api/health-profile', requireAuth, async (req, res) => {
 });
 
 // ─── POST /api/health-profile ────────────────────────────────
-router.post('/api/health-profile', requireAuth, async (req, res) => {
+router.post('/api/health-profile', requireAuth, verifyCsrf , async (req, res) => {
     const { height_cm, weight_kg } = req.body;
 
     const height = height_cm ? parseFloat(height_cm) : null;

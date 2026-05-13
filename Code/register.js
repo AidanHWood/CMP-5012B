@@ -403,14 +403,10 @@ async function saveExerciseGoals() {
 }
 
 function parseTimeToSeconds(str) {
-    const parts = str.replace(':', '.').split('.');
-    if (parts.length === 3) {
-        return (parseInt(parts[0]) || 0) * 3600 + (parseInt(parts[1]) || 0) * 60 + (parseInt(parts[2]) || 0);
-    } else if (parts.length === 2) {
-        return (parseInt(parts[0]) || 0) * 60 + (parseInt(parts[1]) || 0);
-    } else {
-        return (parseInt(parts[0]) || 0) * 60;
-    }
+    const parts = str.split(':').map(Number);
+    if (parts.length === 3) return (parts[0]||0)*3600 + (parts[1]||0)*60 + (parts[2]||0);
+    if (parts.length === 2) return (parts[0]||0)*60 + (parts[1]||0);
+    return (parts[0]||0)*60;
 }
 
 function skipToFinish() {

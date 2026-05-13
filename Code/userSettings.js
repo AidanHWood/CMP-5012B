@@ -10,6 +10,12 @@ const GOAL_CONFIG = {
     gym_weight_moved_week: { label: 'Gym',            unit: 'kg',   isTime: false, higherIsBetter: true },
 };
 
+function sanitise(str) {
+    const div = document.createElement('div');
+    div.textContent = str || '';
+    return div.innerHTML;
+}
+
 function getGoalCfg(t) {
     if (GOAL_CONFIG[t]) return GOAL_CONFIG[t];
     if (t.includes('_sessions_week')) return { label: cap(t.replace('_sessions_week','')), unit:'sessions', isTime:false, higherIsBetter:true };
@@ -261,13 +267,17 @@ async function loadProfile() {
 }
 
 async function saveProfile() {
+    const csrfRes = await fetch('api/csrf-token');
+    const { csrfToken } = await csrfRes.json();
     const body = { real_name:document.getElementById('real_name').value.trim()||null, email:document.getElementById('email').value.trim()||null, age:document.getElementById('age').value||null, height_cm:document.getElementById('height_cm').value||null, weight_kg:document.getElementById('weight_kg').value||null, sex:document.querySelector('input[name="sex"]:checked')?.value||null };
-    try { const res=await fetch('/api/user-profile',{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)}); showMsg('profile-msg',res.ok?'✓ Saved!':'Failed.',!res.ok); if(res.ok)loadProfile(); } catch{showMsg('profile-msg','Network error.',true);}
+    try { const res=await fetch('/api/user-profile',{method:'PATCH',headers:{'Content-Type':'application/json', 'X-CSRF-Token': csrfToken},body:JSON.stringify(body)}); showMsg('profile-msg',res.ok?'✓ Saved!':'Failed.',!res.ok); if(res.ok)loadProfile(); } catch{showMsg('profile-msg','Network error.',true);}
 }
 
 async function savePreferences() {
+    const csrfRes = await fetch('api/csrf-token');
+    const { csrfToken } = await csrfRes.json();
     const body = { calorie_goal:document.getElementById('calorie_goal').value||null, weekly_exercise_goal:document.getElementById('weekly_exercise_goal').value||null, units:'metric'};
-    try { const res=await fetch('/api/user-profile',{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)}); showMsg('prefs-msg',res.ok?'✓ Saved!':'Failed.',!res.ok); } catch{showMsg('prefs-msg','Network error.',true);}
+    try { const res=await fetch('/api/user-profile',{method:'PATCH',headers:{'Content-Type':'application/json', 'X-CSRF-Token': csrfToken},body:JSON.stringify(body)}); showMsg('prefs-msg',res.ok?'✓ Saved!':'Failed.',!res.ok); } catch{showMsg('prefs-msg','Network error.',true);}
 }
 
 // ═══════════════════════════════════════════════
@@ -292,7 +302,7 @@ function renderGoals(goals) {
         const dl=fmtDate(g.deadline), nm=g.goal_name||c.label, ic=gIcon(g.goal_type), hint=c.isTime?'HH:MM:SS':(c.unit||'value');
         const auto=g.goal_type.includes('_sessions_week')||g.goal_type.includes('_distance_week')||g.goal_type==='gym_weight_moved_week'||g.goal_type==='calorie_intake';
         return `<div class="goal-entry" data-id="${g.goal_id}" data-type="${g.goal_type}"><div class="goal-entry-left">
-            <span class="goal-tag">${ic} ${c.label}</span><span class="goal-name">${nm}</span>
+            <span class="goal-tag">${ic} ${c.label}</span><span class="goal-name">${sanitise(nm)}</span>
             <div class="goal-progress-bar"><div class="goal-progress-fill" style="width:${prog}%;"></div></div>
             <span class="goal-meta">${as} of ${gs} · ${prog}%</span>
             ${auto?'<span class="goal-auto-badge">✓ Auto-tracked from your logs</span>'
@@ -350,10 +360,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         gl.addEventListener('keydown', e => { if(e.key==='Enter'&&e.target.classList.contains('progress-input'))updateGoalProgress(e.target.dataset.goalId,e.target.dataset.goalType); });
     }
-
-    document.querySelectorAll('.logoutBtn').forEach(btn => {
-        btn.addEventListener('click', async(e) => { e.preventDefault(); try{await fetch('/logout',{method:'POST',credentials:'same-origin'});}catch{}window.location.href='/login'; });
-    });
 
     document.querySelector('.delete-account-btn')?.addEventListener('click', deleteAccount);
 

@@ -71,7 +71,7 @@ const transporter = nodemailer.createTransport({
         pass: process.env.EMAIL_PASS
     },
     tls: {
-        rejectUnauthorized: false
+        rejectUnauthorized: process.env.NODE_ENV === 'production'
     }
 });
 
@@ -236,18 +236,23 @@ router.get('/register', (req, res) => {
     res.sendFile(path.join(__dirname, '../../Code/register.html'));
 });
 
-router.get('/login', (req, res) => {
+router.get('/login', async (req, res) => {
     const TEN_MINUTES = 10 * 60 * 1000;
     const logout = req.session.recentLogout;
 
     if (logout && (Date.now() - logout.at) < TEN_MINUTES && logout.userId) {
-        req.session.userId = logout.userId;
-        req.session.username = logout.username;
-        req.session.recentLogout = null;
-        generateCsrfToken(req);
-        return res.redirect('/dashboard');
+        const result = await pool.query(
+            'SELECT user_id, username FROM users WHERE user_id = $1',
+            [logout.userId]
+        );
+        if (result.rows.length > 0){
+            req.session.userId = logout.userId;
+            req.session.username = logout.username;
+            req.session.recentLogout = null;
+            generateCsrfToken(req);
+            return res.redirect('/dashboard');
+        }
     }
-
     res.sendFile(path.join(__dirname, '../../Code/login.html'));
 });
 
@@ -522,12 +527,13 @@ router.post('/api/forgot-password', resetLimiter, async (req, res) => {
 
         // Generate OTP and set expiry to 5 minutes from now
         const otpCode = generateOTP();
+        const otpHash = crypto.createHash('sha256').update(otpCode).digest('hex');
         const expiresAt = new Date(Date.now() + 5 * 60 * 1000);
 
         // Save OTP to database
         await pool.query(
             'INSERT INTO password_resets (user_id, otp_code, expires_at) VALUES ($1, $2, $3)',
-            [user.user_id, otpCode, expiresAt]
+            [user.user_id, otpHash, expiresAt]
         );
 
         // Send the email
@@ -583,11 +589,12 @@ router.post('/api/verify-otp', async (req, res) => {
         // - Has NOT been used already
         // - Has NOT expired (expires_at is in the future)
         // ORDER BY created_at DESC LIMIT 1 gets the most recent one
+        const otpHash = crypto.createHash('sha256').update(otp).digest('hex');
         const otpResult = await pool.query(
             `SELECT id FROM password_resets
              WHERE user_id = $1 AND otp_code = $2 AND used = FALSE AND expires_at > NOW()
              ORDER BY created_at DESC LIMIT 1`,
-            [userId, otp]
+            [userId, otpHash]
         );
 
         if (otpResult.rows.length === 0) {
@@ -678,18 +685,6 @@ router.post('/api/reset-password', async (req, res) => {
             errors: ['Server error. Please try again.']
         });
     }
-});
-
-// Auth.js — paste this before module.exports = router;
-router.get('/api/recent-logout', (req, res) => {
-    const TEN_MINUTES = 10 * 60 * 1000;
-    const logout = req.session.recentLogout;
-
-    if (logout && (Date.now() - logout.at) < TEN_MINUTES) {
-        return res.json({ available: true, username: logout.username });
-    }
-
-    res.json({ available: false });
 });
 
 module.exports = { router, verifyCsrf };

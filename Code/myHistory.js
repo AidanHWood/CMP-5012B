@@ -108,7 +108,7 @@ function selectExerciseType(type, btn) {
 async function loadWeightData(days) {
     try {
         const res = await fetch(`/api/weight-history?days=${days}`, { credentials: 'same-origin' });
-        if (res.status === 401) { window.location.href = 'login.html'; return; }
+        if (res.status === 401) { window.location.href = '/login'; return; }
         const data = await res.json();
         renderWeightChart(data.entries || []);
         updateWeightStats(data.entries || []);
@@ -118,7 +118,7 @@ async function loadWeightData(days) {
 async function loadWeightDataCustom(from, to) {
     try {
         const res = await fetch(`/api/weight-history?from=${from}&to=${to}`, { credentials: 'same-origin' });
-        if (res.status === 401) { window.location.href = 'login.html'; return; }
+        if (res.status === 401) { window.location.href = '/login'; return; }
         const data = await res.json();
         renderWeightChart(data.entries || []);
         updateWeightStats(data.entries || []);
@@ -194,7 +194,7 @@ function updateWeightStats(entries) {
 async function loadExerciseData(type, days) {
     try {
         const res = await fetch(`/api/exercise-history?type=${type}&days=${days}`, { credentials: 'same-origin' });
-        if (res.status === 401) { window.location.href = 'login.html'; return; }
+        if (res.status === 401) { window.location.href = '/login'; return; }
         const data = await res.json();
         renderExerciseChart(data.entries || [], type);
         updateExerciseStats(data.entries || [], type);
@@ -204,7 +204,7 @@ async function loadExerciseData(type, days) {
 async function loadExerciseDataCustom(type, from, to) {
     try {
         const res = await fetch(`/api/exercise-history?type=${type}&from=${from}&to=${to}`, { credentials: 'same-origin' });
-        if (res.status === 401) { window.location.href = 'login.html'; return; }
+        if (res.status === 401) { window.location.href = '/login'; return; }
         const data = await res.json();
         renderExerciseChart(data.entries || [], type);
         updateExerciseStats(data.entries || [], type);

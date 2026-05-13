@@ -21,6 +21,9 @@ const app = express();
 
 
 app.use(helmet({
+    referrerPolicy: {
+        policy: 'same-origin'
+    },
     contentSecurityPolicy: {
         directives: {
             ...helmet.contentSecurityPolicy.getDefaultDirectives(),
@@ -81,7 +84,7 @@ app.get('/healthProfile.html', (req, res) => {
 app.use(express.static(path.join(__dirname, '../../Code')));
  
 // ——— Wire in the Auth router ———
-const { router: authRouter } = require('./Auth');
+const { router: authRouter, verifyCsrf } = require('./Auth');
 app.use(authRouter);
 
 const friendRoutes = require('./friends');
@@ -167,7 +170,7 @@ app.get('/api/exercise', async (req, res) => {
         res.status(500).json({ error: 'Server error' });
     }
 });
-app.delete('/api/exercise/:id', async (req, res) => {
+app.delete('/api/exercise/:id',verifyCsrf, async (req, res) => {
     if (!req.session.userId) return res.status(401).json({ error: 'Not logged in' });
     try {
         await pool.query('DELETE FROM exercise_logs WHERE exercise_log_id = $1 AND user_id = $2', [req.params.id, req.session.userId]);
@@ -218,7 +221,7 @@ app.get('/api/weight-history', async (req, res) => {
 
 
 
-app.post('/api/exercise', async (req, res) => {
+app.post('/api/exercise', verifyCsrf, async (req, res) => {
     if (!req.session.userId) return res.status(401).json({ error: 'Not logged in' });
     const { exercise_type, duration_min, distance_km, calories_burned, weight_moved_kg } = req.body;
     if (!exercise_type || !duration_min) return res.status(400).json({ error: 'Exercise type and duration are required' });
@@ -454,7 +457,7 @@ app.get('/api/goals', async (req, res) => {
 // Accepts both formats:
 //   Phase 1/2 registration: { goal_type, target_val }
 //   Dashboard/Settings:     { goal_type, goal_name, goal_value, actual_value, deadline }
-app.post('/api/goals', async (req, res) => {
+app.post('/api/goals', verifyCsrf, async (req, res) => {
     if (!req.session.userId) return res.status(401).json({ error: 'Not logged in' });
 
     const { goal_type, goal_name, goal_value, target_val, actual_value, deadline } = req.body;
@@ -497,7 +500,7 @@ app.post('/api/goals', async (req, res) => {
 });
 
 // --- Save multiple goals at once (Phase 2 exercise goals) ---
-app.post('/api/goals/batch', async (req, res) => {
+app.post('/api/goals/batch', verifyCsrf , async (req, res) => {
     if (!req.session.userId) return res.status(401).json({ error: 'Not logged in' });
     const { goals } = req.body;
     if (!goals || !Array.isArray(goals) || goals.length === 0) {
@@ -533,7 +536,7 @@ app.post('/api/goals/batch', async (req, res) => {
 });
 
 // --- Update a goal (progress or target) ---
-app.patch('/api/goals/:id', async (req, res) => {
+app.patch('/api/goals/:id', verifyCsrf,  async (req, res) => {
     if (!req.session.userId) return res.status(401).json({ error: 'Not logged in' });
     const { actual_value, goal_value, target_val } = req.body;
     const newTarget = target_val || goal_value;
@@ -561,7 +564,7 @@ app.patch('/api/goals/:id', async (req, res) => {
 });
 
 // --- Delete a goal ---
-app.delete('/api/goals/:id', async (req, res) => {
+app.delete('/api/goals/:id', verifyCsrf , async (req, res) => {
     if (!req.session.userId) return res.status(401).json({ error: 'Not logged in' });
     try {
         const result = await pool.query(
@@ -690,7 +693,7 @@ app.get('/api/user-profile', async (req, res) => {
     }
 });
 
-app.patch('/api/user-profile', async (req, res) => {
+app.patch('/api/user-profile', verifyCsrf, async (req, res) => {
     if (!req.session.userId) return res.status(401).json({ error: 'Not logged in' });
     const { real_name, email, age, height_cm, weight_kg, calorie_goal } = req.body;
     try {
@@ -750,18 +753,25 @@ app.get('/api/leaderboard', async (req, res) => {
         const userIds = users.map(u => u.user_id);
 
         // Build exercise query based on type
-        const typeFilter = type === 'overall' ? '' : `AND exercise_type = '${type}'`;
+        // Replace the typeFilter + calResult query with this:
+        const calQuery = type === 'overall'
+            ? `SELECT user_id, COALESCE(SUM(calories_burned), 0) AS total_calories
+       FROM exercise_logs
+       WHERE user_id = ANY($1)
+         AND log_date >= DATE_TRUNC('week', CURRENT_DATE)
+         AND log_date < DATE_TRUNC('week', CURRENT_DATE) + INTERVAL '7 days'
+       GROUP BY user_id`
+            : `SELECT user_id, COALESCE(SUM(calories_burned), 0) AS total_calories
+       FROM exercise_logs
+       WHERE user_id = ANY($1)
+         AND log_date >= DATE_TRUNC('week', CURRENT_DATE)
+         AND log_date < DATE_TRUNC('week', CURRENT_DATE) + INTERVAL '7 days'
+         AND exercise_type = $2
+       GROUP BY user_id`;
 
-        const calResult = await pool.query(
-            `SELECT user_id, COALESCE(SUM(calories_burned), 0) AS total_calories
-             FROM exercise_logs
-             WHERE user_id = ANY($1)
-               AND log_date >= DATE_TRUNC('week', CURRENT_DATE)
-               AND log_date < DATE_TRUNC('week', CURRENT_DATE) + INTERVAL '7 days'
-               ${typeFilter}
-             GROUP BY user_id`,
-            [userIds]
-        );
+        const calResult = type === 'overall'
+            ? await pool.query(calQuery, [userIds])
+            : await pool.query(calQuery, [userIds, type]);
 
         // Map calories to users
         const calMap = {};

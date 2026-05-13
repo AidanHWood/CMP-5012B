@@ -116,7 +116,11 @@ async function addExercise() {
 
 async function deleteExercise(id) {
     try {
-        await fetch('/api/exercise/' + id, { method: 'DELETE' });
+        const csrfRes = await fetch('/api/csrf-token')
+        const { csrfToken } = await csrfRes.json();
+
+        await fetch('/api/exercise/' + id, { method: 'DELETE',
+        headers: {'X-CSRF-Token': csrfToken}});
         loadExerciseLogs();
     } catch (err) {
         alert('Error deleting exercise.');

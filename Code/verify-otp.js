@@ -1,12 +1,13 @@
 
-      // ——— Get the email from localStorage ———
-      const resetEmail = localStorage.getItem("resetEmail") || "";
-      if (resetEmail) {
-        document.getElementById("emailDisplay").textContent = resetEmail;
-      } else {
-        // No email stored — send them back
-        window.location.href = "forgot-password.html";
-      }
+async function checkSession() {
+  try {
+    const res = await fetch('/api/csrf-token', { credentials: 'same-origin' });
+    if (!res.ok) window.location.href = 'forgot-password.html';
+  } catch {
+    window.location.href = 'forgot-password.html';
+  }
+}
+checkSession()
 
       // ——— OTP input auto-focus behavior ———
       // When you type a digit, it automatically jumps to the next box.
@@ -92,7 +93,7 @@
             method: "POST",
             credentials: "same-origin",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ email: resetEmail, otp }),
+            body: JSON.stringify({ otp }),
           });
 
           const data = await res.json();
@@ -141,7 +142,7 @@
               "X-CSRF-Token": csrfData.csrfToken,
             },
             body: JSON.stringify({
-              email: resetEmail,
+              body: JSON.stringify({ _csrf: csrfData.csrfToken }),
               _csrf: csrfData.csrfToken,
             }),
           });

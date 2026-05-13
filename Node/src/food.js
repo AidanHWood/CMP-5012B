@@ -5,6 +5,7 @@
 
 const express = require('express');
 const { Pool } = require('pg');
+const { verifyCsrf } = require('/Auth.js')
 
 const pool = new Pool({
     host:     process.env.DB_HOST,
@@ -89,7 +90,7 @@ async function cacheFood(name, nutrients) {
 // ═══════════════════════════════════════════════════════════════
 router.get('/api/foods/search', requireAuth, async (req, res) => {
     const { q } = req.query;
-    if (!q || q.trim().length < 2)
+    if (!q || q.trim().length < 2 || q.trim().length > 100)
         return res.status(400).json({ error: 'Search query must be at least 2 characters.' });
 
     try {
@@ -138,7 +139,7 @@ router.get('/api/foods/search', requireAuth, async (req, res) => {
 //  Log a food entry for the logged-in user
 //  Body: { food_id, quantity_grams, meal_type }
 // ═══════════════════════════════════════════════════════════════
-router.post('/api/food-log', requireAuth, async (req, res) => {
+router.post('/api/food-log', requireAuth, verifyCsrf, async (req, res) => {
     const { food_id, quantity_grams, meal_type } = req.body;
 
     if (!food_id || !quantity_grams || !meal_type) {
@@ -209,7 +210,7 @@ router.get('/api/food-log/today', requireAuth, async (req, res) => {
 //  DELETE /api/food-log/:id
 //  Remove a food log entry (only if it belongs to the user)
 // ═══════════════════════════════════════════════════════════════
-router.delete('/api/food-log/:id', requireAuth, async (req, res) => {
+router.delete('/api/food-log/:id', requireAuth, verifyCsrf, async (req, res) => {
     try {
         const result = await pool.query(
             `DELETE FROM food_log WHERE f_log_id = $1 AND user_id = $2 RETURNING *`,
@@ -231,7 +232,7 @@ router.delete('/api/food-log/:id', requireAuth, async (req, res) => {
 //  POST /api/foods/manual
 //  Creates a new food in foods table then logs it
 // ═══════════════════════════════════════════════════════════════
-router.post('/api/foods/manual', requireAuth, async (req, res) => {
+router.post('/api/foods/manual', requireAuth, verifyCsrf, async (req, res) => {
     const { food_name, calories, energy, protein, fat, carbs, fibre, sugars, sodium, quantity_grams, meal_type } = req.body;
 
 

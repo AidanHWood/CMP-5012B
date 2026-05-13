@@ -182,7 +182,10 @@ async function addLookupLog() {
 // ── Delete entry ──────────────────────────────────────────
 async function deleteLog(id) {
     try {
-        await fetch('/api/food-log/' + id, { method: 'DELETE' });
+        const csrfRes = await fetch('/api/csrf-token');
+        const { csrfToken } = await csrfRes.json();
+        await fetch('/api/food-log/' + id, { method: 'DELETE',
+        headers: { 'X-CSRF-Token': csrfToken}});
         loadLogs();
     } catch (err) { alert('Error deleting entry.'); }
 }
