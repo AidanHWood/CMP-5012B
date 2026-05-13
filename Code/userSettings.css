@@ -146,6 +146,17 @@
     opacity: 0.85;
 }
 
+.delete-account-btn {
+    background: #c0392b;
+    color: #fff;
+    border: 1.5px solid #c0392b;
+}
+
+.delete-account-btn:hover {
+    background: #a93226;
+    border-color: #a93226;
+}
+
 .account-actions {
     display: flex;
     flex-direction: column;

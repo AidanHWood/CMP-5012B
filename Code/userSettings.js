@@ -266,7 +266,7 @@ async function saveProfile() {
 }
 
 async function savePreferences() {
-    const body = { calorie_goal:document.getElementById('calorie_goal').value||null, weekly_exercise_goal:document.getElementById('weekly_exercise_goal').value||null, units:document.querySelector('input[name="units"]:checked')?.value||null };
+    const body = { calorie_goal:document.getElementById('calorie_goal').value||null, weekly_exercise_goal:document.getElementById('weekly_exercise_goal').value||null, units:'metric'};
     try { const res=await fetch('/api/user-profile',{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)}); showMsg('prefs-msg',res.ok?'✓ Saved!':'Failed.',!res.ok); } catch{showMsg('prefs-msg','Network error.',true);}
 }
 
