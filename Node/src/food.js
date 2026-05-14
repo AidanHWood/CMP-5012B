@@ -1,11 +1,7 @@
-// ═══════════════════════════════════════════════════════════════
-//  routes/foods.js — Food search and logging routes
-//  Uses FDC API with PostgreSQL caching
-// ═══════════════════════════════════════════════════════════════
-
 const express = require('express');
 const { Pool } = require('pg');
-const { verifyCsrf } = require('/Auth.js')
+const { body, validationResult } = require('express-validator');
+const { verifyCsrf } = require('./Auth.js');
 
 const pool = new Pool({
     host:     process.env.DB_HOST,
@@ -18,10 +14,10 @@ const pool = new Pool({
 pool.on('connect', (client) => {
     client.query('SET search_path TO cmp5012b, public');
 });
+
 const router  = express.Router();
 const API_KEY = process.env.FDC_API_KEY;
 
-// ─── Nutrient IDs we care about ──────────────────────────────
 const NUTRIENT_MAP = {
     1008: 'calories',
     1062: 'energy',
@@ -38,7 +34,6 @@ function requireAuth(req, res, next) {
     res.status(401).json({ error: 'Not logged in.' });
 }
 
-// ─── Helper: extract nutrients from FDC food object ──────────
 function extractNutrients(foodNutrients = []) {
     const result = {};
     for (const n of foodNutrients) {
@@ -48,7 +43,6 @@ function extractNutrients(foodNutrients = []) {
     return result;
 }
 
-// ─── Helper: save a food to DB cache ─────────────────────────
 async function cacheFood(name, nutrients) {
     try {
         const result = await pool.query(
@@ -83,18 +77,12 @@ async function cacheFood(name, nutrients) {
     }
 }
 
-// ═══════════════════════════════════════════════════════════════
-//  GET /api/foods/search?q=banana
-//  1. Check DB cache first
-//  2. If no results, call FDC API and cache results
-// ═══════════════════════════════════════════════════════════════
 router.get('/api/foods/search', requireAuth, async (req, res) => {
     const { q } = req.query;
     if (!q || q.trim().length < 2 || q.trim().length > 100)
         return res.status(400).json({ error: 'Search query must be at least 2 characters.' });
 
     try {
-        // 1. Check DB cache
         const cached = await pool.query(
             `SELECT * FROM foods WHERE LOWER(food_name) LIKE LOWER($1) LIMIT 20`,
             [`%${q.trim()}%`]
@@ -104,7 +92,6 @@ router.get('/api/foods/search', requireAuth, async (req, res) => {
             return res.json({ source: 'cache', foods: cached.rows });
         }
 
-        // 2. Cache miss — call FDC API
         const apiUrl = `https://api.nal.usda.gov/fdc/v1/foods/search?query=${encodeURIComponent(q)}&api_key=${API_KEY}&pageSize=20&dataType=SR%20Legacy,Foundation`;
         const response = await fetch(apiUrl);
 
@@ -118,7 +105,6 @@ router.get('/api/foods/search', requireAuth, async (req, res) => {
             return res.json({ source: 'api', foods: [] });
         }
 
-        // 3. Cache each result in DB
         const saved = [];
         for (const food of data.foods) {
             const nutrients = extractNutrients(food.foodNutrients || []);
@@ -134,22 +120,19 @@ router.get('/api/foods/search', requireAuth, async (req, res) => {
     }
 });
 
-// ═══════════════════════════════════════════════════════════════
-//  POST /api/food-log
-//  Log a food entry for the logged-in user
-//  Body: { food_id, quantity_grams, meal_type }
-// ═══════════════════════════════════════════════════════════════
-router.post('/api/food-log', requireAuth, verifyCsrf, async (req, res) => {
+const foodLogValidation = [
+    body('food_id').isInt({ min: 1 }).withMessage('Invalid food_id.'),
+    body('quantity_grams').isFloat({ min: 1, max: 10000 }).withMessage('Quantity must be between 1 and 10000.'),
+    body('meal_type').isIn(['breakfast', 'lunch', 'dinner', 'snack']).withMessage('Invalid meal type.'),
+];
+
+router.post('/api/food-log', requireAuth, verifyCsrf, foodLogValidation, async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ error: errors.array()[0].msg });
+    }
+
     const { food_id, quantity_grams, meal_type } = req.body;
-
-    if (!food_id || !quantity_grams || !meal_type) {
-        return res.status(400).json({ error: 'food_id, quantity_grams and meal_type are required.' });
-    }
-
-    const validMeals = ['breakfast', 'lunch', 'dinner', 'snack'];
-    if (!validMeals.includes(meal_type.toLowerCase())) {
-        return res.status(400).json({ error: 'meal_type must be breakfast, lunch, dinner or snack.' });
-    }
 
     try {
         const result = await pool.query(
@@ -166,10 +149,6 @@ router.post('/api/food-log', requireAuth, verifyCsrf, async (req, res) => {
     }
 });
 
-// ═══════════════════════════════════════════════════════════════
-//  GET /api/food-log/today
-//  Get today's food log with scaled nutrients and total calories
-// ═══════════════════════════════════════════════════════════════
 router.get('/api/food-log/today', requireAuth, async (req, res) => {
     try {
         const result = await pool.query(
@@ -180,7 +159,6 @@ router.get('/api/food-log/today', requireAuth, async (req, res) => {
                 fl.log_date,
                 f.food_id,
                 f.food_name,
-                -- Scale nutrients by quantity (values are per 100g)
                 ROUND((f.calories * fl.quantity_grams / 100)::numeric, 1) AS calories,
                 ROUND((f.protein  * fl.quantity_grams / 100)::numeric, 1) AS protein,
                 ROUND((f.fat      * fl.quantity_grams / 100)::numeric, 1) AS fat,
@@ -197,7 +175,6 @@ router.get('/api/food-log/today', requireAuth, async (req, res) => {
         );
 
         const totalCalories = result.rows.reduce((sum, row) => sum + (parseFloat(row.calories) || 0), 0);
-
         res.json({ entries: result.rows, total_calories: Math.round(totalCalories) });
 
     } catch (err) {
@@ -206,10 +183,6 @@ router.get('/api/food-log/today', requireAuth, async (req, res) => {
     }
 });
 
-// ═══════════════════════════════════════════════════════════════
-//  DELETE /api/food-log/:id
-//  Remove a food log entry (only if it belongs to the user)
-// ═══════════════════════════════════════════════════════════════
 router.delete('/api/food-log/:id', requireAuth, verifyCsrf, async (req, res) => {
     try {
         const result = await pool.query(
@@ -228,40 +201,29 @@ router.delete('/api/food-log/:id', requireAuth, verifyCsrf, async (req, res) => 
     }
 });
 
-// ═══════════════════════════════════════════════════════════════
-//  POST /api/foods/manual
-//  Creates a new food in foods table then logs it
-// ═══════════════════════════════════════════════════════════════
-router.post('/api/foods/manual', requireAuth, verifyCsrf, async (req, res) => {
+const manualFoodValidation = [
+    body('food_name').trim().isLength({ min: 2, max: 150 }).withMessage('Food name must be between 2 and 150 characters.'),
+    body('calories').isFloat({ min: 0, max: 10000 }).withMessage('Calories must be between 0 and 10000.'),
+    body('quantity_grams').isFloat({ min: 1, max: 10000 }).withMessage('Quantity must be between 1 and 10000.'),
+    body('meal_type').isIn(['breakfast', 'lunch', 'dinner', 'snack']).withMessage('Invalid meal type.'),
+    body('energy').optional({ nullable: true, checkFalsy: true }).isFloat({ min: 0, max: 50000 }),
+    body('protein').optional({ nullable: true, checkFalsy: true }).isFloat({ min: 0, max: 1000 }),
+    body('fat').optional({ nullable: true, checkFalsy: true }).isFloat({ min: 0, max: 1000 }),
+    body('carbs').optional({ nullable: true, checkFalsy: true }).isFloat({ min: 0, max: 1000 }),
+    body('fibre').optional({ nullable: true, checkFalsy: true }).isFloat({ min: 0, max: 1000 }),
+    body('sugars').optional({ nullable: true, checkFalsy: true }).isFloat({ min: 0, max: 1000 }),
+    body('sodium').optional({ nullable: true, checkFalsy: true }).isFloat({ min: 0, max: 100000 }),
+];
+
+router.post('/api/foods/manual', requireAuth, verifyCsrf, manualFoodValidation, async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ error: errors.array()[0].msg });
+    }
+
     const { food_name, calories, energy, protein, fat, carbs, fibre, sugars, sodium, quantity_grams, meal_type } = req.body;
 
-
-    if (!food_name || !calories || !quantity_grams || !meal_type)
-        return res.status(400).json({ error: 'food_name, calories, quantity_grams and meal_type are required.' });
-
-    const validMeals = ['breakfast', 'lunch', 'dinner', 'snack'];
-    if (!validMeals.includes(meal_type.toLowerCase()))
-        return res.status(400).json({ error: 'Invalid meal type.' });
-
     try {
-        const numericFields = [
-            { name: 'Food Name', value: food_name.trim().length, min: 2, max: 150, required: true},
-            { name: 'Calories', value: calories, min: 0, max: 10000, required: true },
-            { name: 'Quantity', value: quantity_grams, min: 1, max: 10000, required: true},
-            { name: 'Protein', value: protein, min: 0, max: 1000, required: false},
-            { name: 'Fat', value: fat, min: 0, max: 1000, required: false},
-            { name: 'Carbs', value: carbs, min: 0, max: 1000, required: false},
-            { name: 'Fibre', value: fibre, min: 0, max: 1000, required: false},
-            { name: 'Sugars', value: sugars, min: 0, max: 1000, required: false},
-            { name: 'Sodium', value: sodium, min: 0, max: 100000, required: false}
-        ];
-
-        for (const field of numericFields) {
-            if (!field.required && !field.value) continue;
-            const num = Number(field.value);
-            if (isNaN(num) || num < field.min || num > field.max)
-                return res.status(400).json({error:`${field.name} must be between ${field.min} and ${field.max}`});
-        }
         const foodResult = await pool.query(
             `INSERT INTO foods (food_name, "Energy", calories, protein, fat, carbs, fibre, sugars, sodium)
              VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)

@@ -1,6 +1,4 @@
-// ─────────────────────────────────────────────
-//  GOAL CONFIG
-// ─────────────────────────────────────────────
+
 const GOAL_CONFIG = {
     water:       { label: 'Water',       unit: 'ml',    isTime: false, higherIsBetter: true,  targetHint: 'e.g. 2000 ml',  currentHint: 'e.g. 1500 ml' },
     steps:       { label: 'Steps',       unit: 'steps', isTime: false, higherIsBetter: true,  targetHint: 'e.g. 10000',    currentHint: 'e.g. 7500' },
@@ -25,7 +23,7 @@ function getGoalCfg(t) {
 }
 function cap(s) { return s.charAt(0).toUpperCase()+s.slice(1); }
 
-// ─── Helpers ─────────────────────────────────
+
 function timeToSec(s) { if(!s)return 0; const p=s.replace('.',':').split(':').map(Number); if(p.length===3)return(p[0]||0)*3600+(p[1]||0)*60+(p[2]||0); if(p.length===2)return(p[0]||0)*60+(p[1]||0); return parseFloat(s)||0; }
 function secToTime(s) { const t=Math.round(parseFloat(s)); const h=Math.floor(t/3600),m=Math.floor((t%3600)/60),sec=t%60; if(h>0)return`${h}:${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`; return`${m}:${String(sec).padStart(2,'0')}`; }
 function fmtVal(v,c) { if(v===null||v===undefined||v==='')return'—'; const n=parseFloat(v); if(isNaN(n))return'—'; if(c.isTime)return secToTime(n); if(c.isDistance)return`${(n/10).toFixed(1)} ${c.unit}`; return c.unit?`${n.toLocaleString()} ${c.unit}`:`${n.toLocaleString()}`; }
@@ -34,22 +32,20 @@ function showMsg(id,txt,err=false) { const el=document.getElementById(id); if(!e
 function fmtDate(d) { if(!d)return''; return new Date(d).toLocaleDateString('en-GB',{day:'numeric',month:'short'}); }
 function gIcon(t) { if(t.includes('running'))return'🏃'; if(t.includes('swimming'))return'🏊'; if(t.includes('cycling'))return'🚴'; if(t.includes('walking'))return'🚶'; if(t.includes('gym'))return'🏋️'; if(t.includes('calorie'))return'🔥'; if(t==='water')return'💧'; if(t==='steps')return'👟'; if(t==='weight_loss')return'⚖️'; return'🎯'; }
 
-// ─── BMR Calculation (Mifflin-St Jeor) ──────
+
 function calcBMR(w,h,age,gender) { if(gender==='female')return(10*w)+(6.25*h)-(5*age)-161; return(10*w)+(6.25*h)-(5*age)+5; }
 function calcCalGoals(bmr,factor) { const t=Math.round(bmr*factor); return { cut_extreme:Math.max(1200,t-1000), cut_moderate:Math.max(1200,t-500), maintain:t, bulk_moderate:t+250, bulk_extreme:t+500 }; }
 
 const EXERCISE_LABELS = { swimming:'Swimming', running:'Running', cycling:'Cycling', walking:'Walking', gym:'Gym' };
 const DIST_TYPES = ['swimming','running','cycling','walking'];
 
-// ─── State ───────────────────────────────────
+
 let selectedAddType = null;
 let settingsCalorieVal = null;
 let settingsSelectedExercises = new Set();
 let settingsExGoalConfigs = {};
 
-// ═══════════════════════════════════════════════
-//  GOAL TYPE SELECTOR
-// ═══════════════════════════════════════════════
+
 function selectGoalType(el, type) {
     document.querySelectorAll('.goal-type-card').forEach(c => c.classList.remove('selected'));
     el.classList.add('selected');
@@ -78,14 +74,12 @@ function selectGoalType(el, type) {
     }
 }
 
-// ═══════════════════════════════════════════════
-//  CALORIE SETUP (Settings version of Phase 1)
-// ═══════════════════════════════════════════════
+
 async function settingsSelectActivity(el, factor) {
     document.querySelectorAll('#settingsActivityOptions .activity-option').forEach(o => o.classList.remove('selected'));
     el.classList.add('selected');
 
-    // Get user's height/weight/age from the form fields
+
     const h = parseFloat(document.getElementById('height_cm').value) || 0;
     const w = parseFloat(document.getElementById('weight_kg').value) || 0;
     const age = parseInt(document.getElementById('age').value) || 25;
@@ -145,9 +139,6 @@ async function saveSettingsCalorieGoal() {
     btn.disabled = false; btn.textContent = 'Save Calorie Goal';
 }
 
-// ═══════════════════════════════════════════════
-//  EXERCISE SETUP (Settings version of Phase 2)
-// ═══════════════════════════════════════════════
 function settingsToggleExercise(el, type) {
     el.classList.toggle('selected');
     if (settingsSelectedExercises.has(type)) {
@@ -244,9 +235,7 @@ async function saveSettingsExerciseGoals() {
     btn.disabled = false; btn.textContent = 'Save Exercise Goals';
 }
 
-// ═══════════════════════════════════════════════
-//  PROFILE
-// ═══════════════════════════════════════════════
+
 async function loadProfile() {
     try {
         const res = await fetch('/api/user-profile');
@@ -280,9 +269,7 @@ async function savePreferences() {
     try { const res=await fetch('/api/user-profile',{method:'PATCH',headers:{'Content-Type':'application/json', 'X-CSRF-Token': csrfToken},body:JSON.stringify(body)}); showMsg('prefs-msg',res.ok?'✓ Saved!':'Failed.',!res.ok); } catch{showMsg('prefs-msg','Network error.',true);}
 }
 
-// ═══════════════════════════════════════════════
-//  GOALS — load and render
-// ═══════════════════════════════════════════════
+
 async function loadGoals() {
     try {
         let res = await fetch('/api/goals-with-progress');
@@ -311,9 +298,7 @@ function renderGoals(goals) {
     }).join('');
 }
 
-// ═══════════════════════════════════════════════
-//  GOALS — simple add, update, delete
-// ═══════════════════════════════════════════════
+
 async function addSimpleGoal() {
     if (!selectedAddType || selectedAddType==='calorie_setup'||selectedAddType==='exercise_setup') return showMsg('goal-add-msg','Please select a goal type.',true);
     const nm=document.getElementById('goal-name').value.trim(), tr=document.getElementById('goal-target').value.trim(), cr=document.getElementById('goal-current').value.trim(), dl=document.getElementById('goal-deadline').value;
@@ -343,9 +328,6 @@ async function deleteGoal(goalId) {
     try{const csrfRes=await fetch('/api/csrf-token');const{csrfToken}=await csrfRes.json();const res=await fetch(`/api/goals/${goalId}`,{method:'DELETE',headers:{'X-CSRF-Token':csrfToken}});if(res.ok)loadGoals();}catch(e){console.error('Delete:',e);}
 }
 
-// ═══════════════════════════════════════════════
-//  EVENT LISTENERS
-// ═══════════════════════════════════════════════
 document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('add-goal-btn')?.addEventListener('click', addSimpleGoal);
     document.getElementById('save-profile-btn')?.addEventListener('click', saveProfile);
@@ -367,9 +349,7 @@ document.addEventListener('DOMContentLoaded', () => {
     loadGoals();
 });
 
-// ═══════════════════════════════════════════════
-//  DELETE ACCOUNT
-// ═══════════════════════════════════════════════
+
 async function deleteAccount() {
     const confirmed = confirm(
         'Are you sure you want to delete your account?\n\n' +

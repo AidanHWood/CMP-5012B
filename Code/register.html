@@ -1,4 +1,4 @@
-<!--register page -->
+
 <!doctype html>
 <html lang="en">
   <head>
@@ -12,7 +12,6 @@
       rel="stylesheet"
     />
     <style>
-      /* ── Shared popup styles ── */
       .goal-overlay {
         display: none;
         position: fixed;
@@ -113,7 +112,6 @@
         color: var(--dark);
       }
 
-      /* ── Phase 1: Activity + Calorie cards ── */
       .activity-options {
         display: flex;
         flex-direction: column;
@@ -133,10 +131,6 @@
       }
       .activity-option:hover {
         border-color: rgba(0, 0, 0, 0.2);
-      }
-      .activity-option.selected {
-        border-color: var(--green);
-        background: rgba(26, 107, 60, 0.06);
       }
       .activity-option input[type="radio"] {
         display: none;
@@ -183,9 +177,7 @@
         gap: 8px;
         margin-bottom: 24px;
       }
-      .calorie-goals.visible {
-        display: flex;
-      }
+
       .calorie-card {
         display: flex;
         align-items: center;
@@ -200,10 +192,7 @@
       .calorie-card:hover {
         border-color: rgba(0, 0, 0, 0.2);
       }
-      .calorie-card.selected {
-        border-color: var(--green);
-        background: rgba(26, 107, 60, 0.06);
-      }
+
       .calorie-card-left {
         display: flex;
         flex-direction: column;
@@ -230,7 +219,7 @@
         color: var(--muted);
       }
 
-      /* ── Phase 2: Exercise goal styles ── */
+
       .exercise-toggle-list {
         display: flex;
         flex-wrap: wrap;
@@ -255,10 +244,7 @@
       .exercise-toggle:hover {
         border-color: rgba(0, 0, 0, 0.2);
       }
-      .exercise-toggle.selected {
-        border-color: var(--green);
-        background: rgba(26, 107, 60, 0.06);
-      }
+
       .exercise-toggle .toggle-icon {
         font-size: 20px;
       }
@@ -273,52 +259,13 @@
         color: var(--green);
       }
 
-      .exercise-goal-config {
-        border: 1px solid rgba(0, 0, 0, 0.06);
-        border-radius: 14px;
-        padding: 20px;
-        margin-bottom: 14px;
-        background: rgba(26, 107, 60, 0.02);
-      }
       .exercise-goal-config h4 {
         font-size: 15px;
         font-weight: 800;
         color: var(--dark);
         margin: 0 0 14px 0;
       }
-      .goal-type-tabs {
-        display: flex;
-        gap: 6px;
-        margin-bottom: 16px;
-        flex-wrap: wrap;
-      }
-      .goal-type-tab {
-        padding: 8px 14px;
-        border: 2px solid rgba(0, 0, 0, 0.08);
-        border-radius: 10px;
-        font-size: 12px;
-        font-weight: 700;
-        cursor: pointer;
-        background: #fff;
-        color: var(--dark);
-        transition: all 0.2s ease;
-        font-family: inherit;
-      }
-      .goal-type-tab:hover {
-        border-color: rgba(0, 0, 0, 0.2);
-      }
-      .goal-type-tab.active {
-        background: var(--green);
-        color: #fff;
-        border-color: var(--green);
-      }
 
-      .goal-input-row {
-        display: flex;
-        gap: 10px;
-        align-items: center;
-        margin-bottom: 10px;
-      }
       .goal-input-row label {
         font-size: 12px;
         font-weight: 700;
@@ -348,48 +295,10 @@
         width: 100px;
       }
 
-      .time-goal-group {
-        border-top: 1px solid rgba(0, 0, 0, 0.06);
-        padding-top: 12px;
-        margin-top: 8px;
-      }
-      .time-goal-entry {
-        display: flex;
-        gap: 10px;
-        align-items: center;
-        margin-bottom: 8px;
-        flex-wrap: wrap;
-      }
       .time-goal-entry label {
         font-size: 12px;
         font-weight: 700;
         color: var(--muted);
-      }
-      .add-distance-btn {
-        padding: 6px 14px;
-        border: 1.5px dashed rgba(0, 0, 0, 0.15);
-        border-radius: 8px;
-        background: transparent;
-        color: var(--muted);
-        font-size: 12px;
-        font-weight: 700;
-        cursor: pointer;
-        transition: all 0.2s;
-        font-family: inherit;
-      }
-      .add-distance-btn:hover {
-        border-color: var(--green);
-        color: var(--green);
-      }
-      .remove-distance-btn {
-        padding: 4px 8px;
-        border: none;
-        background: rgba(220, 38, 38, 0.08);
-        color: #c0392b;
-        border-radius: 6px;
-        font-size: 12px;
-        font-weight: 700;
-        cursor: pointer;
       }
 
       .no-exercises-selected {
@@ -477,9 +386,6 @@
       </form>
     </div>
 
-    <!-- ════════════════════════════════════════ -->
-    <!--  Phase 1: Calorie Goal Popup           -->
-    <!-- ════════════════════════════════════════ -->
     <div class="goal-overlay" id="goalOverlay">
       <div class="goal-popup">
         <h2>Set Your Goals</h2>
@@ -641,9 +547,7 @@
       </div>
     </div>
 
-    <!-- ════════════════════════════════════════ -->
-    <!--  Phase 2: Exercise Goals Popup         -->
-    <!-- ════════════════════════════════════════ -->
+
     <div class="goal-overlay" id="exerciseGoalOverlay">
       <div class="goal-popup">
         <h2>Exercise Goals</h2>
@@ -689,7 +593,6 @@
           </div>
         </div>
 
-        <!-- Dynamic goal configs appear here -->
         <div id="exerciseGoalConfigs">
           <p class="no-exercises-selected" id="noExercisesMsg">
             Select an exercise above to set a goal.

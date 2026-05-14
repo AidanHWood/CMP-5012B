@@ -8,7 +8,6 @@ function requireAuth(req, res, next) {
     res.status(401).json({ error: 'Not logged in.' });
 }
 
-// ─── GET /api/health-profile ─────────────────────────────────
 router.get('/api/health-profile', requireAuth, async (req, res) => {
     try {
         const result = await pool.query(
@@ -27,7 +26,6 @@ router.get('/api/health-profile', requireAuth, async (req, res) => {
     }
 });
 
-// ─── POST /api/health-profile ────────────────────────────────
 router.post('/api/health-profile', requireAuth, verifyCsrf , async (req, res) => {
     const { height_cm, weight_kg } = req.body;
 

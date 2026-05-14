@@ -1,29 +1,19 @@
-// --------------------------------------------------------------
-//  server.js — Main entry point
-//  This is the "brain" that starts Express, sets up middleware,
-//  and connects all the route files together.
-// --------------------------------------------------------------
-
 console.log('=== SERVER FILE LOADED ===');
 const express = require('express');
 const fs = require('fs');
 const path = require('path');
 const session = require('express-session');
+const rateLimit = require('express-rate-limit');
 const helmet = require('helmet');
+const https = require('https');
+const { body, validationResult } = require('express-validator');
 
- 
-// Load environment variables from .env file
 require('dotenv').config({ path: path.join(__dirname, '../.env') });
- 
-const app = express();
- 
-// ——— Middleware ———
 
+const app = express();
 
 app.use(helmet({
-    referrerPolicy: {
-        policy: 'same-origin'
-    },
+    referrerPolicy: { policy: 'same-origin' },
     contentSecurityPolicy: {
         directives: {
             ...helmet.contentSecurityPolicy.getDefaultDirectives(),
@@ -33,13 +23,11 @@ app.use(helmet({
         }
     }
 }));
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
- 
-// ——— Session Setup ———
-
-if (!process.env.SESSION_SECRET) throw new Error('Session Secret not set in .env')
+if (!process.env.SESSION_SECRET) throw new Error('Session Secret not set in .env');
 app.use(session({
     secret: process.env.SESSION_SECRET,
     resave: false,
@@ -52,7 +40,21 @@ app.use(session({
     }
 }));
 
-// ——— Protected page routes (must be before static middleware) ———
+
+function requireAuth(req, res, next) {
+    if (req.session && req.session.userId) return next();
+    res.status(401).json({ error: 'Not logged in.' });
+}
+
+const globalLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 500,
+    handler: (req, res) => {
+        res.status(429).json({ error: 'Too many requests. Please slow down.' });
+    }
+});
+app.use('/api', globalLimiter);
+
 const CODE_DIR = path.join(__dirname, '../../Code');
 
 app.get('/dashboard.html', (req, res) => {
@@ -75,34 +77,32 @@ app.get('/friends.html', (req, res) => {
     if (!req.session.userId) return res.redirect('/login.html');
     res.sendFile(path.join(CODE_DIR, 'friends.html'));
 });
-// With the other protected page routes (~line 74):
 app.get('/healthProfile.html', (req, res) => {
     if (!req.session.userId) return res.redirect('/login.html');
     res.sendFile(path.join(CODE_DIR, 'healthProfile.html'));
 });
-// Serve static files (HTML, CSS, JS) from the Code folder
+
 app.use(express.static(path.join(__dirname, '../../Code')));
- 
-// ——— Wire in the Auth router ———
+
+
 const { router: authRouter, verifyCsrf } = require('./Auth');
 app.use(authRouter);
+
 
 const friendRoutes = require('./friends');
 app.use('/', friendRoutes);
 
-// With the other router registrations (~line 88):
 const healthProfileRoutes = require('./healthProfile');
 app.use('/', healthProfileRoutes);
 
 const accountRoutes = require('./account');
 app.use('/', accountRoutes);
- 
-// ——— Wire in Food routes ———
-const filePath = path.join(__dirname, 'data', 'food.json');
+
 const foodRoutes = require('./food');
 app.use('/', foodRoutes);
- 
+
 app.post('/add-food', (req, res) => {
+    const filePath = path.join(__dirname, 'data', 'food.json');
     try {
         let data = [];
         if (fs.existsSync(filePath)) {
@@ -112,18 +112,17 @@ app.post('/add-food', (req, res) => {
         fs.writeFileSync(filePath, JSON.stringify(data, null, 2));
         res.json({ success: true });
     } catch (err) {
-        console.log(err);
+        console.error(err);
         res.status(500).json({ error: 'Server error' });
     }
 });
- 
-// ——— Calorie logging routes (in-memory for now) ———
+
 let calorieLog = [];
- 
+
 app.get('/api/calories', (req, res) => {
     res.json(calorieLog);
 });
- 
+
 app.post('/api/calories', (req, res) => {
     const { meal, calories, description } = req.body;
     const entry = {
@@ -136,19 +135,21 @@ app.post('/api/calories', (req, res) => {
     calorieLog.push(entry);
     res.status(201).json(entry);
 });
- 
+
 app.delete('/api/calories/:id', (req, res) => {
     calorieLog = calorieLog.filter(e => e.id !== Number(req.params.id));
     res.status(204).send();
 });
 
-
-// ——— Exercise Logging Routes (PostgreSQL) ———
 const pool = require('./db');
+
 app.get('/api/user-weight', async (req, res) => {
     if (!req.session.userId) return res.status(401).json({ error: 'Not logged in' });
     try {
-        const result = await pool.query('SELECT weight_kg FROM users WHERE user_id = $1', [req.session.userId]);
+        const result = await pool.query(
+            'SELECT weight_kg FROM users WHERE user_id = $1',
+            [req.session.userId]
+        );
         res.json({ weight_kg: result.rows[0]?.weight_kg || 70 });
     } catch (err) {
         console.error('Fetch weight error:', err);
@@ -170,30 +171,30 @@ app.get('/api/exercise', async (req, res) => {
         res.status(500).json({ error: 'Server error' });
     }
 });
-app.delete('/api/exercise/:id',verifyCsrf, async (req, res) => {
-    if (!req.session.userId) return res.status(401).json({ error: 'Not logged in' });
+
+app.delete('/api/exercise/:id', requireAuth, verifyCsrf, async (req, res) => {
     try {
-        await pool.query('DELETE FROM exercise_logs WHERE exercise_log_id = $1 AND user_id = $2', [req.params.id, req.session.userId]);
+        await pool.query(
+            'DELETE FROM exercise_logs WHERE exercise_log_id = $1 AND user_id = $2',
+            [req.params.id, req.session.userId]
+        );
         res.status(204).send();
     } catch (err) {
         console.error('Delete exercise error:', err);
         res.status(500).json({ error: 'Server error' });
     }
 });
+
 console.log('=== REGISTERING WEIGHT HISTORY ROUTE ===');
 
-// ——— Weight History Route ———
 app.get('/api/weight-history', async (req, res) => {
     if (!req.session.userId) return res.status(401).json({ error: 'Not logged in' });
-
     try {
-        let query;
-        let params;
-
+        let query, params;
         if (req.query.from && req.query.to) {
             const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
             if (!dateRegex.test(req.query.from) || !dateRegex.test(req.query.to))
-                return res.status(400).json({error: 'Invalid date format: Dates must be in the YYYY-MM-DD format'})
+                return res.status(400).json({ error: 'Invalid date format: Dates must be in the YYYY-MM-DD format' });
             query = `SELECT weight_log_id, weight_kg, log_date
                      FROM weight_logs
                      WHERE user_id = $1 AND log_date >= $2 AND log_date <= ($3::date + INTERVAL '1 day')
@@ -202,46 +203,35 @@ app.get('/api/weight-history', async (req, res) => {
         } else {
             const days = parseInt(req.query.days) || 7;
             if (days < 1 || days > 365)
-                return res.status(400).json({error: 'Days must be a valid range:(1-365)'})
+                return res.status(400).json({ error: 'Days must be a valid range:(1-365)' });
             query = `SELECT weight_log_id, weight_kg, log_date
                      FROM weight_logs
                      WHERE user_id = $1 AND log_date >= NOW() - ($2 * INTERVAL '1 day')
                      ORDER BY log_date ASC`;
             params = [req.session.userId, days];
         }
-
         const result = await pool.query(query, params);
         res.json({ entries: result.rows });
-
     } catch (err) {
         console.error('Weight history error:', err);
         res.status(500).json({ error: 'Server error' });
     }
 });
 
+const exerciseValidation = [
+    body('exercise_type').isIn(['running', 'cycling', 'walking', 'swimming', 'gym', 'sport']).withMessage('Invalid exercise type.'),
+    body('duration_min').isFloat({ min: 1, max: 1440 }).withMessage('Duration must be between 1 and 1440 minutes.'),
+    body('calories_burned').isFloat({ min: 0, max: 10000 }).withMessage('Calories burned must be between 0 and 10000.'),
+    body('distance_km').optional({ nullable: true, checkFalsy: true }).isFloat({ min: 0, max: 10000 }),
+    body('weight_moved_kg').optional({ nullable: true, checkFalsy: true }).isFloat({ min: 0, max: 10000 }),
+];
 
-
-app.post('/api/exercise', verifyCsrf, async (req, res) => {
-    if (!req.session.userId) return res.status(401).json({ error: 'Not logged in' });
-    const { exercise_type, duration_min, distance_km, calories_burned, weight_moved_kg } = req.body;
-    if (!exercise_type || !duration_min) return res.status(400).json({ error: 'Exercise type and duration are required' });
-
-    const validTypes =['running', 'cycling', 'walking', 'swimming', 'gym', 'sport']
-    if (!validTypes.includes(exercise_type))
-        return res.status(400).json({error: 'Invalid Exercise type'})
-
-    const numericFields = [
-        { name: 'Duration', value: duration_min, min: 1, max: 1440, required: true},
-        { name: 'Calories Burned', value: calories_burned, min: 0, max: 10000, required: true },
-        { name: 'Distance', value: distance_km, min: 0, max: 10000, required: false},
-        { name: 'Weight Moved', value: weight_moved_kg, min: 0, max: 10000, required: false}];
-
-    for (const field of numericFields) {
-        if (!field.required && !field.value) continue;
-        const num = Number(field.value);
-        if (isNaN(num) || num < field.min || num > field.max)
-            return res.status(400).json({error:`${field.name} must be between ${field.min} and ${field.max}`});
+app.post('/api/exercise', requireAuth, verifyCsrf, exerciseValidation, async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ error: errors.array()[0].msg });
     }
+    const { exercise_type, duration_min, distance_km, calories_burned, weight_moved_kg } = req.body;
     try {
         const result = await pool.query(
             `INSERT INTO exercise_logs (user_id, exercise_type, duration_min, distance_km, calories_burned, weight_moved_kg, log_date)
@@ -256,66 +246,54 @@ app.post('/api/exercise', verifyCsrf, async (req, res) => {
     }
 });
 
-
-
 app.get('/api/exercise-history', async (req, res) => {
     if (!req.session.userId) return res.status(401).json({ error: 'Not logged in' });
-
-
-
-    const validTypes =['running', 'cycling', 'walking', 'swimming', 'gym', 'sport']
+    const validTypes = ['running', 'cycling', 'walking', 'swimming', 'gym', 'sport'];
     const type = req.query.type || 'running';
-
     if (!validTypes.includes(type))
-        return res.status(400).json({error: 'Invalid Exercise type'})
-
+        return res.status(400).json({ error: 'Invalid Exercise type' });
     try {
         let query, params;
         if (req.query.from && req.query.to) {
             const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
             if (!dateRegex.test(req.query.from) || !dateRegex.test(req.query.to))
-                return res.status(400).json({error: 'Invalid date format: Dates must be in the YYYY-MM-DD format'})
-            query = `SELECT exercise_log_id, exercise_type, duration_min, distance_km, 
+                return res.status(400).json({ error: 'Invalid date format: Dates must be in the YYYY-MM-DD format' });
+            query = `SELECT exercise_log_id, exercise_type, duration_min, distance_km,
                             calories_burned, weight_moved_kg, log_date
                      FROM exercise_logs
-                     WHERE user_id = $1 AND exercise_type = $2 
+                     WHERE user_id = $1 AND exercise_type = $2
                        AND log_date >= $3 AND log_date <= ($4::date + INTERVAL '1 day')
                      ORDER BY log_date ASC`;
             params = [req.session.userId, type, req.query.from, req.query.to];
         } else {
             const days = parseInt(req.query.days) || 7;
             if (days < 1 || days > 365)
-                return res.status(400).json({error: 'Days must be a valid range:(1-365)'})
-            query = `SELECT exercise_log_id, exercise_type, duration_min, distance_km, 
+                return res.status(400).json({ error: 'Days must be a valid range:(1-365)' });
+            query = `SELECT exercise_log_id, exercise_type, duration_min, distance_km,
                             calories_burned, weight_moved_kg, log_date
                      FROM exercise_logs
-                     WHERE user_id = $1 AND exercise_type = $2 
+                     WHERE user_id = $1 AND exercise_type = $2
                        AND log_date >= NOW() - ($3 * INTERVAL '1 day')
                      ORDER BY log_date ASC`;
             params = [req.session.userId, type, days];
         }
-
         const result = await pool.query(query, params);
         res.json({ entries: result.rows });
-
     } catch (err) {
         console.error('Exercise history error:', err);
         res.status(500).json({ error: 'Server error' });
     }
 });
 
-// --- dashboard js ---
 app.get('/api/dashboard-stats', async (req, res) => {
     if (!req.session.userId) return res.status(401).json({ error: 'Not logged in' });
     try {
-        // calorie goal from user profile
         const userRes = await pool.query(
             'SELECT calorie_goal FROM users WHERE user_id = $1',
             [req.session.userId]
         );
         const calorieGoal = userRes.rows[0]?.calorie_goal || 2000;
 
-        // total calories eaten today from food_log
         const foodRes = await pool.query(
             `SELECT COALESCE(SUM(ROUND((f.calories * fl.quantity_grams / 100)::numeric, 1)), 0) AS total_calories,
                     COALESCE(SUM(ROUND((f.protein  * fl.quantity_grams / 100)::numeric, 1)), 0) AS total_protein,
@@ -388,7 +366,6 @@ app.get('/api/weekly-exercise', async (req, res) => {
             [req.session.userId]
         );
 
-        // fill in missing days with 0
         const days = [];
         for (let i = 6; i >= 0; i--) {
             const d = new Date();
@@ -428,13 +405,6 @@ app.get('/api/food-log/today-by-meal', async (req, res) => {
     }
 });
 
-// ═══════════════════════════════════════════════════════════════
-//  GOALS ROUTES — uses the 'goals' table
-//  Columns: goal_id, user_id, goal_type, target_val, target_date,
-//           status, goal_name, actual_value
-// ═══════════════════════════════════════════════════════════════
-
-// --- Get all goals for the logged-in user ---
 app.get('/api/goals', async (req, res) => {
     if (!req.session.userId) return res.status(401).json({ error: 'Not logged in' });
     try {
@@ -453,28 +423,17 @@ app.get('/api/goals', async (req, res) => {
     }
 });
 
-// --- Create a single goal ---
-// Accepts both formats:
-//   Phase 1/2 registration: { goal_type, target_val }
-//   Dashboard/Settings:     { goal_type, goal_name, goal_value, actual_value, deadline }
 app.post('/api/goals', verifyCsrf, async (req, res) => {
     if (!req.session.userId) return res.status(401).json({ error: 'Not logged in' });
-
     const { goal_type, goal_name, goal_value, target_val, actual_value, deadline } = req.body;
-
     if (!goal_type) return res.status(400).json({ error: 'goal_type is required.' });
-
-    // Accept target_val (from registration popup) or goal_value (from dashboard)
     const value = target_val || goal_value;
     if (!value && value !== 0) return res.status(400).json({ error: 'A target value is required.' });
-
     try {
-        // Upsert — if goal_type already exists for user, update it
         const existing = await pool.query(
             'SELECT goal_id FROM goals WHERE user_id = $1 AND goal_type = $2',
             [req.session.userId, goal_type]
         );
-
         let result;
         if (existing.rows.length > 0) {
             result = await pool.query(
@@ -491,7 +450,6 @@ app.post('/api/goals', verifyCsrf, async (req, res) => {
                 [req.session.userId, goal_type, goal_name || goal_type.replace(/_/g, ' '), value, actual_value || 0, deadline || null]
             );
         }
-
         res.json({ success: true, goal: result.rows[0] });
     } catch (err) {
         console.error('Add goal error:', err);
@@ -499,23 +457,18 @@ app.post('/api/goals', verifyCsrf, async (req, res) => {
     }
 });
 
-// --- Save multiple goals at once (Phase 2 exercise goals) ---
-app.post('/api/goals/batch', verifyCsrf , async (req, res) => {
+app.post('/api/goals/batch', verifyCsrf, async (req, res) => {
     if (!req.session.userId) return res.status(401).json({ error: 'Not logged in' });
     const { goals } = req.body;
-    if (!goals || !Array.isArray(goals) || goals.length === 0) {
+    if (!goals || !Array.isArray(goals) || goals.length === 0)
         return res.status(400).json({ error: 'No goals provided.' });
-    }
-
-     try {
+    try {
         for (const goal of goals) {
             if (!goal.goal_type || !goal.target_val) continue;
-
             const existing = await pool.query(
                 'SELECT goal_id FROM goals WHERE user_id = $1 AND goal_type = $2',
                 [req.session.userId, goal.goal_type]
             );
-
             if (existing.rows.length > 0) {
                 await pool.query(
                     'UPDATE goals SET target_val = $1, goal_name = COALESCE($2, goal_name), status = TRUE WHERE goal_id = $3',
@@ -535,12 +488,10 @@ app.post('/api/goals/batch', verifyCsrf , async (req, res) => {
     }
 });
 
-// --- Update a goal (progress or target) ---
-app.patch('/api/goals/:id', verifyCsrf,  async (req, res) => {
+app.patch('/api/goals/:id', verifyCsrf, async (req, res) => {
     if (!req.session.userId) return res.status(401).json({ error: 'Not logged in' });
     const { actual_value, goal_value, target_val } = req.body;
     const newTarget = target_val || goal_value;
-
     try {
         const result = await pool.query(
             `UPDATE goals SET
@@ -563,8 +514,7 @@ app.patch('/api/goals/:id', verifyCsrf,  async (req, res) => {
     }
 });
 
-// --- Delete a goal ---
-app.delete('/api/goals/:id', verifyCsrf , async (req, res) => {
+app.delete('/api/goals/:id', verifyCsrf, async (req, res) => {
     if (!req.session.userId) return res.status(401).json({ error: 'Not logged in' });
     try {
         const result = await pool.query(
@@ -579,23 +529,16 @@ app.delete('/api/goals/:id', verifyCsrf , async (req, res) => {
     }
 });
 
-// ——— Auto-compute goal progress from exercise_logs and food_log ———
-// This route returns goals with actual values computed from real data
-// instead of requiring manual updates for exercise-based goals
 app.get('/api/goals-with-progress', async (req, res) => {
     if (!req.session.userId) return res.status(401).json({ error: 'Not logged in' });
-
     try {
-        // Get all goals
         const goalsResult = await pool.query(
             `SELECT goal_id, goal_type, goal_name, target_val, actual_value, target_date, status
              FROM goals WHERE user_id = $1 ORDER BY goal_id DESC`,
             [req.session.userId]
         );
-
         const goals = goalsResult.rows;
 
-        // Get this week's exercise summary (Monday to now)
         const exerciseResult = await pool.query(
             `SELECT exercise_type,
                     COUNT(*) AS session_count,
@@ -609,7 +552,6 @@ app.get('/api/goals-with-progress', async (req, res) => {
             [req.session.userId]
         );
 
-        // Build a lookup: { running: { sessions: 3, distance: 15.5, weight: 0 }, ... }
         const exerciseData = {};
         for (const row of exerciseResult.rows) {
             exerciseData[row.exercise_type] = {
@@ -620,7 +562,6 @@ app.get('/api/goals-with-progress', async (req, res) => {
             };
         }
 
-        // Get today's calorie intake
         const foodResult = await pool.query(
             `SELECT COALESCE(SUM(f.calories * fl.quantity_grams / 100), 0) AS total_calories
              FROM food_log fl
@@ -630,35 +571,21 @@ app.get('/api/goals-with-progress', async (req, res) => {
         );
         const todayCalories = Math.round(parseFloat(foodResult.rows[0]?.total_calories) || 0);
 
-        // Auto-fill actual values based on goal_type
         const enrichedGoals = goals.map(g => {
             let autoActual = g.actual_value || 0;
             const type = g.goal_type;
-
-            // Calorie intake — today's food total
-            if (type === 'calorie_intake') {
-                autoActual = todayCalories;
-            }
-
-            // Sessions per week — count from exercise_logs this week
+            if (type === 'calorie_intake') autoActual = todayCalories;
             if (type.endsWith('_sessions_week')) {
                 const exerciseType = type.replace('_sessions_week', '');
                 autoActual = exerciseData[exerciseType]?.sessions || 0;
             }
-
-            // Distance per week — sum from exercise_logs this week
-            // Stored as value×10, so actual needs same scale
             if (type.endsWith('_distance_week')) {
                 const exerciseType = type.replace('_distance_week', '');
                 const distKm = exerciseData[exerciseType]?.distance || 0;
-                autoActual = Math.round(distKm * 10); // match storage scale
+                autoActual = Math.round(distKm * 10);
             }
-
-            // Gym weight moved per week
-            if (type === 'gym_weight_moved_week') {
+            if (type === 'gym_weight_moved_week')
                 autoActual = Math.round(exerciseData['gym']?.weight_moved || 0);
-            }
-
             return {
                 goal_id: g.goal_id,
                 goal_type: g.goal_type,
@@ -671,7 +598,6 @@ app.get('/api/goals-with-progress', async (req, res) => {
         });
 
         res.json({ goals: enrichedGoals });
-
     } catch (err) {
         console.error('Goals with progress error:', err);
         res.status(500).json({ error: 'Server error' });
@@ -722,17 +648,14 @@ app.patch('/api/user-profile', verifyCsrf, async (req, res) => {
         res.status(500).json({ error: 'Server error' });
     }
 });
-// ——— Leaderboard Route ———
+
 app.get('/api/leaderboard', async (req, res) => {
     if (!req.session.userId) return res.status(401).json({ error: 'Not logged in' });
-
     const type = req.query.type || 'overall';
     const validTypes = ['overall', 'running', 'cycling', 'walking', 'swimming', 'gym', 'sport'];
     if (!validTypes.includes(type))
         return res.status(400).json({ error: 'Invalid type' });
-
     try {
-        // Get friends + self
         const friendsResult = await pool.query(
             `SELECT u.user_id, u.username, u.real_name
              FROM users u
@@ -752,32 +675,28 @@ app.get('/api/leaderboard', async (req, res) => {
 
         const userIds = users.map(u => u.user_id);
 
-        // Build exercise query based on type
-        // Replace the typeFilter + calResult query with this:
         const calQuery = type === 'overall'
             ? `SELECT user_id, COALESCE(SUM(calories_burned), 0) AS total_calories
-       FROM exercise_logs
-       WHERE user_id = ANY($1)
-         AND log_date >= DATE_TRUNC('week', CURRENT_DATE)
-         AND log_date < DATE_TRUNC('week', CURRENT_DATE) + INTERVAL '7 days'
-       GROUP BY user_id`
+               FROM exercise_logs
+               WHERE user_id = ANY($1)
+                 AND log_date >= DATE_TRUNC('week', CURRENT_DATE)
+                 AND log_date < DATE_TRUNC('week', CURRENT_DATE) + INTERVAL '7 days'
+               GROUP BY user_id`
             : `SELECT user_id, COALESCE(SUM(calories_burned), 0) AS total_calories
-       FROM exercise_logs
-       WHERE user_id = ANY($1)
-         AND log_date >= DATE_TRUNC('week', CURRENT_DATE)
-         AND log_date < DATE_TRUNC('week', CURRENT_DATE) + INTERVAL '7 days'
-         AND exercise_type = $2
-       GROUP BY user_id`;
+               FROM exercise_logs
+               WHERE user_id = ANY($1)
+                 AND log_date >= DATE_TRUNC('week', CURRENT_DATE)
+                 AND log_date < DATE_TRUNC('week', CURRENT_DATE) + INTERVAL '7 days'
+                 AND exercise_type = $2
+               GROUP BY user_id`;
 
         const calResult = type === 'overall'
             ? await pool.query(calQuery, [userIds])
             : await pool.query(calQuery, [userIds, type]);
 
-        // Map calories to users
         const calMap = {};
         calResult.rows.forEach(r => { calMap[r.user_id] = Math.round(parseFloat(r.total_calories)); });
 
-        // Build leaderboard array
         const leaderboard = users.map(u => ({
             user_id: u.user_id,
             username: u.username,
@@ -786,13 +705,11 @@ app.get('/api/leaderboard', async (req, res) => {
             is_current_user: u.user_id === req.session.userId
         }));
 
-        // Sort by calories desc, then alphabetically for ties
         leaderboard.sort((a, b) => {
             if (b.calories !== a.calories) return b.calories - a.calories;
             return a.display_name.localeCompare(b.display_name);
         });
 
-        // Assign ranks (tied users share rank, next rank skips)
         let rank = 1;
         for (let i = 0; i < leaderboard.length; i++) {
             if (i > 0 && leaderboard[i].calories === leaderboard[i - 1].calories) {
@@ -804,7 +721,6 @@ app.get('/api/leaderboard', async (req, res) => {
         }
 
         res.json({ leaderboard, currentUserId: req.session.userId });
-
     } catch (err) {
         console.error('Leaderboard error:', err);
         res.status(500).json({ error: 'Server error' });
@@ -812,12 +728,20 @@ app.get('/api/leaderboard', async (req, res) => {
 });
 
 
-// ——— Homepage route ———
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, '../../Code/homepage.html'));
 });
- 
-// ——— Start Server ———
-app.listen(3000, () => {
-    console.log('Server running on http://localhost:3000');
-});
+
+try {
+    const sslOptions = {
+        key: fs.readFileSync(path.join(__dirname, 'key.pem')),
+        cert: fs.readFileSync(path.join(__dirname, 'cert.pem'))
+    };
+    https.createServer(sslOptions, app).listen(3000, () => {
+        console.log('Server running on https://localhost:3000');
+    });
+} catch {
+    app.listen(3000, () => {
+        console.log('Server running on http://localhost:3000 (no SSL certs found)');
+    });
+}

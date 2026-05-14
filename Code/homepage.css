@@ -20,7 +20,6 @@ body {
     overflow-x: hidden;
 }
 
-/* ───────────── NAVBAR ───────────── */
 
 .navbar {
     position: fixed;
@@ -42,12 +41,12 @@ body {
     z-index: 1000;
 }
 
-/* Ensure nav takes full width */
+
 .navbar nav {
     width: 100%;
 }
 
-/* Links container */
+
 .nav-links {
     list-style: none;
     display: flex;
@@ -58,12 +57,12 @@ body {
     padding: 0;
 }
 
-/* Push right section */
+
 .push-right {
     margin-left: auto;
 }
 
-/* Link styling */
+
 .nav-links a {
     text-decoration: none;
     color: var(--dark);
@@ -80,14 +79,14 @@ body {
     opacity: 1;
 }
 
-/* ───────────── MOBILE MENU ───────────── */
 
-/* Hide checkbox */
+
+
 #menu-toggle {
     display: none;
 }
 
-/* Burger icon */
+
 .menu-icon {
     display: none;
     font-size: 24px;
@@ -95,7 +94,6 @@ body {
     user-select: none;
 }
 
-/* ───────────── RESPONSIVE ───────────── */
 
 @media (max-width: 768px) {
 
@@ -129,7 +127,7 @@ body {
     }
 }
 
-/* ── Hero ── */
+
 .hero {
     min-height: 100vh;
     display: flex;
@@ -233,7 +231,7 @@ body {
 }
 .btn-secondary:hover { border-color: var(--dark); transform: translateY(-2px); }
 
-/* ── Feature strip ── */
+
 .features {
     padding: 0 24px 100px;
     max-width: 1000px;
@@ -292,7 +290,7 @@ body {
     line-height: 1.6;
 }
 
-/* ── CTA banner ── */
+
 .cta-banner {
     margin: 0 24px 100px;
     max-width: 952px;
@@ -334,13 +332,13 @@ body {
 }
 .btn-lime:hover { transform: translateY(-2px); opacity: 0.9; }
 
-/* ── Animation ── */
+
 @keyframes fadeUp {
     from { opacity: 0; transform: translateY(20px); }
     to   { opacity: 1; transform: translateY(0); }
 }
 
-/* ── Mobile ── */
+
 @media (max-width: 768px) {
     .menu-icon { display: block; position: absolute; right: 20px; top: 16px; font-size: 22px; cursor: pointer; }
     .nav-links { display: none; position: absolute; top: 60px; right: 16px; left: auto; width: auto; background: white; padding: 16px 20px; border-radius: 12px; flex-direction: column; gap: 16px; box-shadow: 0 8px 24px rgba(0,0,0,0.1); }

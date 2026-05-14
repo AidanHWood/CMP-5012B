@@ -1,7 +1,3 @@
-// ─────────────────────────────────────────────
-//  GOAL CONFIG — smart detection for any goal type
-// ─────────────────────────────────────────────
-
 function getGoalConfig(goalType) {
     const known = {
         calorie_intake:        { unit: 'kcal', isTime: false, icon: '🔥', isDistance: false },
@@ -40,9 +36,7 @@ function sanitise(str) {
     div.textContent = str || '';
     return div.innerHTML;
 }
-// ─────────────────────────────────────────────
-//  HELPERS
-// ─────────────────────────────────────────────
+
 function _pct(actual, goal) {
     if (!goal) return 0;
     return Math.min(100, Math.round((actual / goal) * 100));
@@ -69,14 +63,10 @@ function formatGoalName(goalType) {
     return goalType.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
 }
 
-// Convert distance stored as ×10 back to km
 function displayDistance(val) {
     return (val / 10).toFixed(1);
 }
 
-// ─────────────────────────────────────────────
-//  CHART INSTANCES
-// ─────────────────────────────────────────────
 let caloriesPieChart, macrosPieChart, caloriesLineChart, weeklyBarChart;
 
 function initCharts() {
@@ -135,9 +125,6 @@ function initCharts() {
     });
 }
 
-// ─────────────────────────────────────────────
-//  POPULATE FUNCTIONS
-// ─────────────────────────────────────────────
 function populateStats(stats) {
     const cards = document.querySelectorAll('.stat-card');
     if (!cards.length) return;
@@ -185,16 +172,11 @@ function populateWeeklyChart(days) {
     weeklyBarChart.update();
 }
 
-// ─────────────────────────────────────────────
-//  GROUP GOALS BY EXERCISE TYPE
-//  e.g. running_sessions_week, running_distance_week, running_time_5km
-//  all go under one "Running" card with expandable sub-goals
-// ─────────────────────────────────────────────
 
 function groupGoals(goalsArr) {
     const exerciseTypes = ['running', 'swimming', 'cycling', 'walking', 'gym'];
-    const groups = {};       // { running: [goal, goal, ...], swimming: [...] }
-    const standalone = [];   // goals that don't belong to an exercise group
+    const groups = {};
+    const standalone = [];
 
     for (const g of goalsArr) {
         let matched = false;
@@ -224,19 +206,15 @@ function populateGoals(goalsArr) {
     const { groups, standalone } = groupGoals(goalsArr);
     let html = '';
 
-    // Render grouped exercise goals (one card per exercise type with dropdown)
     for (const [exType, goals] of Object.entries(groups)) {
         const icon = getExerciseIcon(exType);
         const name = exType.charAt(0).toUpperCase() + exType.slice(1);
         const cardId = `exercise-group-${exType}`;
 
-        // Find sessions goal for the primary display
         const sessionsGoal = goals.find(g => g.goal_type.includes('_sessions_week'));
         const distanceGoal = goals.find(g => g.goal_type.includes('_distance_week'));
         const weightGoal = goals.find(g => g.goal_type.includes('_weight_moved'));
-        const timeGoals = goals.filter(g => g.goal_type.includes('_time_'));
 
-        // Pick the primary metric to show at the top
         let primaryLabel = '';
         let primaryProgress = 0;
 
@@ -274,7 +252,6 @@ function populateGoals(goalsArr) {
 
             <div class="goal-subgoals" id="${cardId}" style="display:none; margin-top:14px;">`;
 
-        // Render each sub-goal inside the dropdown
         for (const g of goals) {
             const cfg = getGoalConfig(g.goal_type);
             const goalVal = Number(g.goal_value) || 0;
@@ -321,8 +298,6 @@ function populateGoals(goalsArr) {
 
         html += `</div></div>`;
     }
-
-    // Render standalone goals (calorie_intake, water, steps, etc.)
     for (const g of standalone) {
         const cfg = getGoalConfig(g.goal_type);
         const goalVal = Number(g.goal_value) || 0;
@@ -368,7 +343,6 @@ function populateGoals(goalsArr) {
     grid.innerHTML = html;
 }
 
-// Toggle expand/collapse for grouped exercise goals
 function toggleGoalExpand(cardId) {
     const el = document.getElementById(cardId);
     const arrow = document.getElementById('arrow-' + cardId);
@@ -381,9 +355,7 @@ function toggleGoalExpand(cardId) {
     }
 }
 
-// ─────────────────────────────────────────────
-//  GOAL UPDATE
-// ─────────────────────────────────────────────
+
 async function updateDashGoal(btn, goalId, goalType) {
     const input = btn.previousElementSibling;
     const raw = input.value.trim();
@@ -412,16 +384,12 @@ async function updateDashGoal(btn, goalId, goalType) {
     }
 }
 
-// ─────────────────────────────────────────────
-//  MAIN LOAD
-// ─────────────────────────────────────────────
 async function loadDashboard() {
     try {
         const res = await fetch('/api/dashboard-stats');
         if (res.ok) populateStats(await res.json());
     } catch (err) { console.error('Stats fetch error:', err); }
 
-    // Use the auto-progress endpoint instead of plain /api/goals
     try {
         const res = await fetch('/api/goals-with-progress');
         if (res.ok) {
@@ -447,10 +415,6 @@ async function loadDashboard() {
     } catch (err) { console.error('Weekly exercise fetch error:', err); }
 }
 
-
-// ─────────────────────────────────────────────
-//  INIT
-// ─────────────────────────────────────────────
 initCharts();
 loadDashboard();
 

@@ -1,6 +1,4 @@
-
-      // Allow Enter key to submit
-      document
+ document
         .getElementById("confirm_password")
         .addEventListener("keydown", function (e) {
           if (e.key === "Enter") handleReset();

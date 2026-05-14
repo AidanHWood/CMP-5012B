@@ -79,7 +79,7 @@
 </div>
 
 <script>
-  // ── Sanitise helper ───────────────────────────────────────
+
   function sanitise(str) {
     const div = document.createElement('div');
     div.textContent = str || '';
@@ -88,7 +88,6 @@
 
   let searchTimeout;
 
-  // ── Search users ──────────────────────────────────────────
   async function searchUsers() {
     const q = document.getElementById("friendSearch").value.trim();
     const resultsEl = document.getElementById("searchResults");
@@ -135,7 +134,6 @@
     }, 400);
   }
 
-  // ── Send friend request ───────────────────────────────────
   async function sendRequest(userId, btn) {
     btn.disabled = true;
     btn.textContent = "Sending...";
@@ -190,7 +188,6 @@
     } catch (err) { alert("Error removing friend."); }
   }
 
-  // ── Load pending requests ─────────────────────────────────
   async function loadRequests() {
     try {
       const res = await fetch("/api/friends/requests");
@@ -221,7 +218,6 @@
     } catch (err) { console.error("Load requests error:", err); }
   }
 
-  // ── Load friends list ─────────────────────────────────────
   async function loadFriends() {
     try {
       const res = await fetch("/api/friends");
@@ -248,7 +244,6 @@
     } catch (err) { console.error("Load friends error:", err); }
   }
 
-  // ── Leaderboard ───────────────────────────────────────────
   let lbMode = 'overall';
   let lbActivityType = 'running';
 
@@ -295,11 +290,9 @@
       weekLabel.textContent = `Week of ${fmt(monday)} – ${fmt(sunday)}`;
       listEl.appendChild(weekLabel);
 
-      // Pinned "You" row
       const me = board.find(u => u.is_current_user);
       if (me) listEl.appendChild(buildRow(me, true));
 
-      // Ranked list
       board.forEach(user => listEl.appendChild(buildRow(user, false)));
 
     } catch (err) {
@@ -346,7 +339,6 @@
     return row;
   }
 
-  // Refresh on tab visibility change
   document.addEventListener('visibilitychange', () => {
     if (document.visibilityState === 'visible') loadLeaderboard();
   });

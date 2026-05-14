@@ -160,7 +160,6 @@
     <script>
       let profile = { height: null, weight: null };
 
-      // ── Load profile from server ──
       async function loadProfile() {
         try {
           const res = await fetch('/api/health-profile', { credentials: 'same-origin' });
@@ -176,7 +175,6 @@
         renderProfile();
       }
 
-      // ── Render all display values ──
       function renderProfile() {
         document.getElementById('heightVal').textContent  = profile.height ?? '—';
         document.getElementById('weightVal').textContent  = profile.weight ?? '—';
@@ -185,7 +183,6 @@
         updateBMI();
       }
 
-      // ── BMI calculation ──
       function updateBMI() {
         const bmiEl  = document.getElementById('bmiValue');
         const catEl  = document.getElementById('bmiCategory');
@@ -221,7 +218,6 @@
         markerEl.style.left = `${markerPercent}%`;
       }
 
-      // ── Inline edit ──
       function startEdit(metric) {
         document.getElementById(`${metric}Display`).style.display = 'none';
         document.getElementById(`${metric}EditBtn`).style.display = 'none';
@@ -249,7 +245,6 @@
         persistProfile();
       }
 
-      // ── Persist profile to server ──
       async function persistProfile() {
         try {
           const csrfRes = await fetch('/api/csrf-token', { credentials: 'same-origin'});
@@ -276,13 +271,12 @@
         }
       }
 
-      // ── Save All button ──
+
       async function saveAll() {
         await persistProfile();
         showToast('✓ Profile saved');
       }
 
-      // ── Toast notification ──
       function showToast(msg) {
         const toast = document.getElementById('toast');
         toast.textContent = msg;
@@ -290,7 +284,6 @@
         setTimeout(() => toast.classList.remove('show'), 2800);
       }
 
-      // Load on page open
       loadProfile();
     </script>
   </body>

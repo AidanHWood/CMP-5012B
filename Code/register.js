@@ -5,23 +5,15 @@ async function getCsrfToken() {
 }
 function val(id) { return document.getElementById(id).value.trim(); }
 
-// ═══════════════════════════════════════════════════════════════
-//  State
-// ═══════════════════════════════════════════════════════════════
+
 let userStats = { height_cm: 0, weight_kg: 0, age: 0, gender: '' };
 let selectedActivityFactor = null;
 let selectedGoalType = null;
 let selectedGoalValue = null;
-
-// Phase 2 state
 let selectedExercises = new Set();
-// Each config now stores separate values per goal type so switching tabs doesn't erase them
-// { running: { goalType: 'sessions', sessions: 3, distance: 30, weight_moved: null, timeGoals: [...] }, ... }
 let exerciseGoalConfigs = {};
 
-// ═══════════════════════════════════════════════════════════════
-//  Helpers
-// ═══════════════════════════════════════════════════════════════
+
 function calculateAge(dob) {
     const birth = new Date(dob);
     const today = new Date();
@@ -54,9 +46,6 @@ const EXERCISE_LABELS = {
 
 const DISTANCE_EXERCISES = ['swimming', 'running', 'cycling', 'walking'];
 
-// ═══════════════════════════════════════════════════════════════
-//  Registration
-// ═══════════════════════════════════════════════════════════════
 async function handleRegister() {
     const btn = document.getElementById('registerBtn');
     const errorBox = document.getElementById('errorBox');
@@ -108,9 +97,6 @@ async function handleRegister() {
     }
 }
 
-// ═══════════════════════════════════════════════════════════════
-//  Phase 1: Activity + Calorie
-// ═══════════════════════════════════════════════════════════════
 function selectActivity(el, factor) {
     document.querySelectorAll('.activity-option').forEach(o => o.classList.remove('selected'));
     el.classList.add('selected');
@@ -177,9 +163,6 @@ function goToPhase2() {
     document.getElementById('exerciseGoalOverlay').style.display = 'block';
 }
 
-// ═══════════════════════════════════════════════════════════════
-//  Phase 2: Exercise Goals
-// ═══════════════════════════════════════════════════════════════
 
 function toggleExercise(el, type) {
     el.classList.toggle('selected');
@@ -189,7 +172,6 @@ function toggleExercise(el, type) {
         delete exerciseGoalConfigs[type];
     } else {
         selectedExercises.add(type);
-        // Store separate values for each goal type so switching tabs doesn't erase input
         exerciseGoalConfigs[type] = {
             goalType: 'sessions',
             sessions: null,
@@ -237,9 +219,6 @@ function renderExerciseConfigs() {
         }
 
         html += `</div>`;
-
-        // Render the input for the currently selected goal type
-        // Each type reads/writes its own field so values persist
         if (config.goalType === 'sessions') {
             html += `<div class="goal-input-row">
                 <label>Sessions</label>
@@ -296,7 +275,6 @@ function renderExerciseConfigs() {
 }
 
 function setExGoalType(type, goalType) {
-    // Just switch the active tab — don't reset any values
     exerciseGoalConfigs[type].goalType = goalType;
     if (goalType === 'time' && exerciseGoalConfigs[type].timeGoals.length === 0) {
         exerciseGoalConfigs[type].timeGoals = [{ distance: 5, time: '' }];
@@ -329,9 +307,6 @@ function adjustDistance(type, index, delta) {
     renderExerciseConfigs();
 }
 
-// ═══════════════════════════════════════════════════════════════
-//  Save ALL exercise goals (every filled-in field, not just active tab)
-// ═══════════════════════════════════════════════════════════════
 
 async function saveExerciseGoals() {
     const btn = document.getElementById('saveExerciseGoalsBtn');
@@ -344,22 +319,18 @@ async function saveExerciseGoals() {
     for (const type of selectedExercises) {
         const config = exerciseGoalConfigs[type];
 
-        // Save sessions if filled
         if (config.sessions) {
             goals.push({ goal_type: `${type}_sessions_week`, target_val: Math.round(config.sessions) });
         }
 
-        // Save distance if filled (for distance exercises)
         if (config.distance && DISTANCE_EXERCISES.includes(type)) {
             goals.push({ goal_type: `${type}_distance_week`, target_val: Math.round(config.distance * 10) });
         }
 
-        // Save weight moved if filled (gym only)
         if (config.weight_moved && type === 'gym') {
             goals.push({ goal_type: 'gym_weight_moved_week', target_val: Math.round(config.weight_moved) });
         }
 
-        // Save all time goals if filled
         if (config.timeGoals && config.timeGoals.length > 0) {
             for (const tg of config.timeGoals) {
                 if (tg.distance && tg.time) {

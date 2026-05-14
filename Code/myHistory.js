@@ -1,13 +1,11 @@
-// ═══════════════════════════════════════════════════════════════
-//  myHistory.js — Weight + Exercise history charts
-// ═══════════════════════════════════════════════════════════════
+
 
 let weightChart = null;
 let exerciseChart = null;
 let currentExerciseType = 'running';
 let currentExerciseDays = 7;
 
-// ——— Initialize on page load ———
+
 document.addEventListener('DOMContentLoaded', () => {
     setupRangeButtons();
     setupCustomDateDefaults();
@@ -15,9 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
     loadExerciseData('running', 7);
 });
 
-// ═══════════════════════════════════════════════════════════════
-//  Range button click handlers (works for both sections)
-// ═══════════════════════════════════════════════════════════════
+
 
 function setupRangeButtons() {
     const buttons = document.querySelectorAll('.range-btn');
@@ -27,7 +23,6 @@ function setupRangeButtons() {
             const section = btn.dataset.section;
             const range = btn.dataset.range;
 
-            // Remove active from same section's buttons only
             document.querySelectorAll(`.range-btn[data-section="${section}"]`)
                 .forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
@@ -80,9 +75,6 @@ function applyExerciseCustomRange() {
     loadExerciseDataCustom(currentExerciseType, from, to);
 }
 
-// ═══════════════════════════════════════════════════════════════
-//  Exercise type selector
-// ═══════════════════════════════════════════════════════════════
 
 function selectExerciseType(type, btn) {
     document.querySelectorAll('.exercise-type-btn').forEach(b => b.classList.remove('active'));
@@ -101,9 +93,6 @@ function selectExerciseType(type, btn) {
     loadExerciseData(type, currentExerciseDays);
 }
 
-// ═══════════════════════════════════════════════════════════════
-//  Section 1: Weight data
-// ═══════════════════════════════════════════════════════════════
 
 async function loadWeightData(days) {
     try {
@@ -187,10 +176,6 @@ function updateWeightStats(entries) {
     else if (change > 0) changeEl.classList.add('positive');
 }
 
-// ═══════════════════════════════════════════════════════════════
-//  Section 2: Exercise data
-// ═══════════════════════════════════════════════════════════════
-
 async function loadExerciseData(type, days) {
     try {
         const res = await fetch(`/api/exercise-history?type=${type}&days=${days}`, { credentials: 'same-origin' });
@@ -273,9 +258,6 @@ function updateExerciseStats(entries, type) {
     document.getElementById('exStatDuration').textContent = totalDuration + ' min';
 }
 
-// ═══════════════════════════════════════════════════════════════
-//  Shared chart options builder
-// ═══════════════════════════════════════════════════════════════
 
 function buildChartOptions(values, unit) {
     return {
@@ -332,7 +314,6 @@ function buildChartOptions(values, unit) {
 }
 
 function getTimeUnit(count, values) {
-    // Simple heuristic based on number of data points
     if (count <= 14) return 'day';
     if (count <= 60) return 'week';
     return 'month';

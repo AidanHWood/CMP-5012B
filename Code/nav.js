@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', () => {
             try {
                 await fetch('/logout', { method: 'POST', redirect: 'manual' });
             } catch {
-                // ignore
+
             }
             window.location.href = '/';
         });

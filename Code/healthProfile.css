@@ -1,7 +1,4 @@
-/* healthProfile.css — page-specific styles only.
-   Depends on: homepage.css, auth.css              */
 
-/* ── Canvas (not in homepage.css despite canvas being used there) ── */
 #waveCanvas {
     position: fixed;
     top: 0; left: 0;
@@ -10,7 +7,7 @@
     pointer-events: none;
 }
 
-/* ── Layout ── */
+
 .content {
     position: relative;
     z-index: 1;
@@ -22,7 +19,7 @@
     margin: 0 auto;
 }
 
-/* ── Page heading ── */
+
 
 .page-subheading {
     text-align: center;
@@ -33,7 +30,6 @@
     animation: fadeUp 0.6s 0.2s forwards;
 }
 
-/* ── Stats banner ── */
 .stats-banner {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -78,8 +74,7 @@
     margin-top: 2px;
 }
 
-/* ── BMI banner ── */
-/* ── BMI Scale Card ── */
+
 .bmi-card {
     background: rgba(255, 255, 255, 0.75);
     backdrop-filter: blur(8px);
@@ -273,7 +268,6 @@
     background: #d9362b;
 }
 
-/* ── Form card overrides (auth.css has the base) ── */
 .form-card {
     background: rgba(255, 255, 255, 0.75);
     backdrop-filter: blur(8px);
@@ -302,7 +296,6 @@
     border-bottom: 1px solid rgba(0,0,0,0.06);
 }
 
-/* ── Metric rows ── */
 .metric-row {
     display: flex;
     align-items: center;
@@ -366,7 +359,6 @@
     margin-top: 1px;
 }
 
-/* ── Edit button ── */
 .edit-btn {
     width: 34px; height: 34px;
     background: rgba(0,0,0,0.05);
@@ -407,7 +399,7 @@
     background: white;
     text-align: right;
     outline: none;
-    margin-bottom: 0; /* override auth.css */
+    margin-bottom: 0;
 }
 
 .save-btn {
@@ -436,7 +428,6 @@
     cursor: pointer;
 }
 
-/* ── Sex selector ── */
 .sex-options {
     display: flex;
     gap: 8px;
@@ -464,7 +455,6 @@
     border-color: var(--green);
 }
 
-/* ── Save all button ── */
 .save-all-btn {
     width: 100%;
     padding: 15px;
@@ -485,7 +475,6 @@
 
 .save-all-btn:hover { transform: translateY(-2px); opacity: 0.85; }
 
-/* ── Toast ── */
 .toast {
     position: fixed;
     bottom: 30px;
@@ -504,7 +493,7 @@
 
 .toast.show { transform: translateX(-50%) translateY(0); }
 
-/* ── Log section title ── */
+
 .log-section-title {
     font-size: 11px;
     font-weight: 700;
@@ -520,12 +509,10 @@
 .save-note {
     font-size: 15px;
     line-height: 1.5;
-    color: var(--black);
     font-weight: 600;
     margin-bottom: 18px;
 }
 
-/* ── Mobile extras ── */
 @media (max-width: 600px) {
     .stat-tile .stat-value { font-size: 24px; }
     .metric-edit-wrap input { width: 72px; }

@@ -12,7 +12,7 @@
   margin: 0 auto;
 }
 
-/* ── Cards ── */
+
 .section-card {
   background: rgba(255, 255, 255, 0.72);
   border: 1px solid rgba(0, 0, 0, 0.06);
@@ -23,7 +23,7 @@
   margin-bottom: 28px;
 }
 
-/* ── Section header ── */
+
 .section-header {
   display: flex;
   justify-content: space-between;
@@ -49,7 +49,7 @@
   font-weight: 700;
 }
 
-/* ── Range buttons ── */
+
 .range-picker {
   display: flex;
   gap: 10px;
@@ -79,7 +79,7 @@
   color: #fff;
 }
 
-/* ── Custom range ── */
+
 .custom-range {
   margin-bottom: 20px;
 }
@@ -118,7 +118,7 @@
   border-color: var(--green);
 }
 
-/* Apply button */
+
 .apply-btn {
   padding: 12px 24px;
   background: var(--dark);
@@ -137,7 +137,7 @@
   opacity: 0.85;
 }
 
-/* ── Chart ── */
+
 .chart-wrapper {
   position: relative;
   width: 100%;
@@ -145,7 +145,7 @@
   margin-bottom: 20px;
 }
 
-/* ── Stats ── */
+
 .stats-row {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -179,7 +179,6 @@
   color: var(--green);
 }
 
-/* ── Exercise selector ── */
 .exercise-type-selector {
   display: flex;
   gap: 10px;
@@ -216,7 +215,7 @@
   color: #fff;
 }
 
-/* ── Empty ── */
+
 .empty-state {
   padding: 36px 20px;
   text-align: center;
@@ -225,7 +224,7 @@
   font-weight: 600;
 }
 
-/* ── Mobile ── */
+
 @media (max-width: 768px) {
   .content {
     padding-top: 110px;

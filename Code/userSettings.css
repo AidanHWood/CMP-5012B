@@ -428,7 +428,6 @@
     color: var(--dark);
 }
 
-/* ── Calorie goal cards ── */
 
 .calorie-goals {
     display: none;
@@ -492,7 +491,6 @@
     color: var(--muted);
 }
 
-/* ── Exercise toggle list ── */
 
 .exercise-toggle-list {
     display: flex;
@@ -548,8 +546,6 @@
     color: var(--muted);
     font-size: 14px;
 }
-
-/* ── Exercise goal config panel ── */
 
 .exercise-goal-config {
     border: 1px solid rgba(0, 0, 0, 0.06);
@@ -683,7 +679,6 @@
     cursor: pointer;
 }
 
-/* ── Active goal cards ── */
 
 .goal-list {
     display: flex;

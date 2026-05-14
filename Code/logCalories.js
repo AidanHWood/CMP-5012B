@@ -1,4 +1,4 @@
-// ── Mode toggle ───────────────────────────────────────────
+
 function showMode(mode) {
     document.getElementById('lookupSection').style.display = mode === 'lookup' ? 'block' : 'none';
     const buttons = document.querySelectorAll('.entry-mode-buttons button');
@@ -6,7 +6,7 @@ function showMode(mode) {
     buttons[1].classList.toggle('active', false);
 }
 
-// ── Manual popup ──────────────────────────────────────────
+
 function openManual() {
     const mealEl = document.querySelector('input[name="meal"]:checked');
     if (mealEl) {
@@ -77,7 +77,6 @@ async function submitManual() {
             return;
         }
 
-        // Success — close popup and reset
         closeManual();
         ['m_food_name','m_calories','m_energy','m_protein','m_fat',
             'm_carbs','m_fibre','m_sugars','m_sodium','m_quantity'].forEach(id => {
@@ -94,7 +93,6 @@ async function submitManual() {
     btn.textContent = '+ Save & Log Food';
 }
 
-// ── Food search ───────────────────────────────────────────
 let searchTimeout;
 async function searchFood() {
     const query     = document.getElementById('foodSearch').value.trim();
@@ -147,7 +145,6 @@ function selectFood(foodId, foodName, caloriesPer100g) {
     document.getElementById('foodSearch').value             = foodName;
 }
 
-// ── Lookup log entry ──────────────────────────────────────
 async function addLookupLog() {
     const mealEl       = document.querySelector('input[name="meal"]:checked');
     const foodId       = document.getElementById('selectedFoodId').value;
@@ -179,7 +176,7 @@ async function addLookupLog() {
     } catch (err) { alert('Error saving entry.'); }
 }
 
-// ── Delete entry ──────────────────────────────────────────
+
 async function deleteLog(id) {
     try {
         const csrfRes = await fetch('/api/csrf-token');
@@ -190,7 +187,6 @@ async function deleteLog(id) {
     } catch (err) { alert('Error deleting entry.'); }
 }
 
-// ── Load today's logs ─────────────────────────────────────
 async function loadLogs() {
     try {
         const res    = await fetch('/api/food-log/today');

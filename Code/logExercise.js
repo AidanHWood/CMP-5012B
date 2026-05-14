@@ -33,7 +33,6 @@ function onFormChange() {
     const intensityEl = document.querySelector('input[name="intensity"]:checked');
     const duration = Number(document.getElementById('duration').value) || 0;
 
-    // Show/hide distance field (running, cycling, walking, swimming)
     const distanceSection = document.getElementById('distanceSection');
     if (exerciseEl && DISTANCE_TYPES.includes(exerciseEl.value)) {
         distanceSection.style.display = 'block';
@@ -41,7 +40,6 @@ function onFormChange() {
         distanceSection.style.display = 'none';
     }
 
-    // Show/hide weight moved field (gym only)
     const weightMovedSection = document.getElementById('weightMovedSection');
     if (exerciseEl && exerciseEl.value === 'gym') {
         weightMovedSection.style.display = 'block';
@@ -49,7 +47,7 @@ function onFormChange() {
         weightMovedSection.style.display = 'none';
     }
 
-    // Calculate estimated burn
+
     let estimate = 0;
     if (exerciseEl && intensityEl && duration > 0) {
         estimate = calculateBurn(exerciseEl.value, intensityEl.value, duration);
@@ -97,7 +95,6 @@ async function addExercise() {
             return alert(data.error || 'Failed to save exercise.');
         }
 
-        // Reset form
         exerciseEl.checked = false;
         intensityEl.checked = false;
         document.getElementById('duration').value = '';
@@ -148,7 +145,8 @@ async function loadExerciseLogs() {
             listEl.innerHTML = '<div class="empty-state">No exercise logged yet.</div>';
             return;
         }
-        // Replace innerHTML template with:
+
+
         listEl.innerHTML = '';
         logs.forEach(log => {
             const typeName = log.exercise_type.charAt(0).toUpperCase() + log.exercise_type.slice(1);

@@ -1,17 +1,3 @@
-// ═══════════════════════════════════════════════════════════════
-//  Auth.js — Authentication & Password Reset Routes
-//
-//  This file handles:
-//  1. CSRF protection (prevents cross-site request forgery)
-//  2. Registration (with PostgreSQL)
-//  3. Login (with PostgreSQL)
-//  4. Logout
-//  5. Forgot Password → sends 6-digit OTP email
-//  6. Verify OTP
-//  7. Reset Password
-//  8. Dashboard access control
-// ═══════════════════════════════════════════════════════════════
-
 const express = require('express');
 const bcrypt = require('bcrypt');
 const crypto = require('crypto');
@@ -19,20 +5,10 @@ const rateLimit = require('express-rate-limit');
 const path = require('path');
 const nodemailer = require('nodemailer');
 const { Pool } = require('pg');
+const { body, validationResult } = require('express-validator');
 
 const router = express.Router();
 const SALT_ROUNDS = 12;
-
-// ═══════════════════════════════════════════════════════════════
-//  PostgreSQL Connection Pool
-// ═══════════════════════════════════════════════════════════════
-//
-//  A "pool" manages multiple database connections efficiently.
-//  Instead of opening/closing a connection for every query,
-//  the pool keeps a few connections alive and reuses them.
-//
-//  The credentials come from the .env file via process.env.
-// ═══════════════════════════════════════════════════════════════
 
 const pool = new Pool({
     host: process.env.DB_HOST,
@@ -42,27 +18,13 @@ const pool = new Pool({
     password: process.env.DB_PASSWORD
 });
 
-// Test DB connection when the server starts
 pool.query('SELECT NOW()')
     .then(() => console.log('✅ Connected to PostgreSQL'))
     .catch(err => console.error('❌ DB connection error:', err.message));
 
-// Tell PostgreSQL to look in the cmp5012b schema for tables
 pool.on('connect', (client) => {
     client.query('SET search_path TO cmp5012b, public');
 });
-
-// ═══════════════════════════════════════════════════════════════
-//  Email Transporter (Gmail via Nodemailer)
-// ═══════════════════════════════════════════════════════════════
-//
-//  nodemailer.createTransport() creates a reusable email sender.
-//  We use Gmail's SMTP server with an "App Password" — this is
-//  NOT your normal Gmail password. It's the 16-character code
-//  you generated from Google's App Passwords page.
-//
-//  The transporter is created once and reused for every email.
-// ═══════════════════════════════════════════════════════════════
 
 const transporter = nodemailer.createTransport({
     service: 'gmail',
@@ -75,34 +37,17 @@ const transporter = nodemailer.createTransport({
     }
 });
 
-// Verify email works on startup
+
 transporter.verify()
     .then(() => console.log('✅ Email transporter ready'))
     .catch(err => console.error('❌ Email setup error:', err.message));
 
-// ═══════════════════════════════════════════════════════════════
-//  Helper Functions
-// ═══════════════════════════════════════════════════════════════
 
-/**
- * Generate a random 6-digit OTP code.
- * crypto.randomInt is cryptographically secure — better than Math.random()
- * for security-sensitive things like reset codes.
- */
 function generateOTP() {
     return crypto.randomInt(100000, 999999).toString();
 }
 
-function validatePassword(password) {
-    const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/;
-    return regex.test(password);
-}
 
-/**
- * Send the OTP code to the user's email.
- * The HTML template creates a nice-looking email with the code
- * displayed in large text so it's easy to read.
- */
 async function sendOTPEmail(toEmail, otpCode) {
     const mailOptions = {
         from: `"Health Tracker" <${process.env.EMAIL_USER}>`,
@@ -127,29 +72,12 @@ async function sendOTPEmail(toEmail, otpCode) {
     await transporter.sendMail(mailOptions);
 }
 
-// ═══════════════════════════════════════════════════════════════
-//  CSRF Protection (kept from your original Auth.js)
-// ═══════════════════════════════════════════════════════════════
-//
-//  CSRF (Cross-Site Request Forgery) protection stops attackers
-//  from tricking a user's browser into making requests to your
-//  server. How it works:
-//  
-//  1. Server generates a random token, stores it in the session
-//  2. Frontend fetches that token via GET /api/csrf-token
-//  3. Frontend includes the token in every POST request
-//  4. Server checks the token matches — if not, reject the request
-//
-//  This means a malicious site can't forge requests because they
-//  can't access the token stored in the user's session.
-// ═══════════════════════════════════════════════════════════════
-
 function generateCsrfToken(req) {
     const token = crypto.randomBytes(32).toString('hex');
     req.session.csrfToken = token;
     return token;
 }
-//this is the function to verify the token
+
 function verifyCsrf(req, res, next) {
     const submitted = req.body._csrf || req.headers['x-csrf-token'];
     const sessionToken = req.session.csrfToken;
@@ -171,17 +99,9 @@ function verifyCsrf(req, res, next) {
     next();
 }
 
-function isValidEmail(email) {
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-}
-
-// ═══════════════════════════════════════════════════════════════
-//  Rate Limiters (kept from your original Auth.js)
-// ═══════════════════════════════════════════════════════════════
-
 const loginLimiter = rateLimit({
-    windowMs: 15 * 60 * 1000,   // 15 minutes
-    max: 10,                     // 10 attempts per window
+    windowMs: 15 * 60 * 1000,
+    max: 10,
     skipSuccessfulRequests: true,
     handler: (req, res) => {
         res.status(429).json({
@@ -192,8 +112,8 @@ const loginLimiter = rateLimit({
 });
 
 const registerLimiter = rateLimit({
-    windowMs: 60 * 60 * 1000,   // 1 hour
-    max: 5,                      // 5 registrations per hour
+    windowMs: 60 * 60 * 1000,
+    max: 5,
     handler: (req, res) => {
         res.status(429).json({
             success: false,
@@ -202,11 +122,10 @@ const registerLimiter = rateLimit({
     },
 });
 
-// Rate limiter specifically for password reset requests
-// Prevents someone spamming reset emails
+
 const resetLimiter = rateLimit({
-    windowMs: 15 * 60 * 1000,   // 15 minutes
-    max: 5,                      // 5 reset requests per 15 min
+    windowMs: 15 * 60 * 1000,
+    max: 5,
     handler: (req, res) => {
         res.status(429).json({
             success: false,
@@ -215,10 +134,7 @@ const resetLimiter = rateLimit({
     },
 });
 
-// ═══════════════════════════════════════════════════════════════
-//  ROUTE: GET /api/csrf-token
-//  Frontend calls this before any POST to get a CSRF token
-// ═══════════════════════════════════════════════════════════════
+
 
 router.get('/api/csrf-token', (req, res) => {
     if (!req.session.csrfToken) {
@@ -227,10 +143,6 @@ router.get('/api/csrf-token', (req, res) => {
     res.json({ csrfToken: req.session.csrfToken });
 });
 
-// ═══════════════════════════════════════════════════════════════
-//  ROUTE: GET /register & GET /login
-//  Serve the HTML pages
-// ═══════════════════════════════════════════════════════════════
 
 router.get('/register', (req, res) => {
     res.sendFile(path.join(__dirname, '../../Code/register.html'));
@@ -256,50 +168,26 @@ router.get('/login', async (req, res) => {
     res.sendFile(path.join(__dirname, '../../Code/login.html'));
 });
 
-// ═══════════════════════════════════════════════════════════════
-//  ROUTE: POST /register
-//  Creates a new user account in PostgreSQL
-// ═══════════════════════════════════════════════════════════════
-//
-//  WHAT CHANGED FROM YOUR ORIGINAL:
-//  - Instead of users.push(user), we INSERT INTO the users table
-//  - Instead of findByUsername(), we SELECT FROM users
-//  - bcrypt.hash() is the same — it hashes the password before storing
-//  - All your validation and CSRF checks are kept as-is
-// ═══════════════════════════════════════════════════════════════
-
-router.post('/register', registerLimiter, verifyCsrf, async (req, res) => {
-    const {
-        username, real_name, email, password, confirm_password,
-        height_cm, weight_kg, DoB, gender, target_weight_kg
-    } = req.body;
-
-    const errors = [];
-
-    if (!username || username.trim().length < 3) {
-        errors.push('Username must be at least 3 characters.');
+const registerValidation = [
+    body('username').trim().isLength({ min: 3 }).withMessage('Username must be at least 3 characters.'),
+    body('real_name').trim().isLength({ min: 2 }).withMessage('Please enter your real name.'),
+    body('email').trim().isEmail().normalizeEmail().withMessage('Please enter a valid email address.'),
+    body('password')
+        .isLength({ min: 8 }).withMessage('Password must be at least 8 characters.')
+        .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9])/)
+        .withMessage('Password must contain uppercase, lowercase, number and special character.'),
+    body('confirm_password').custom((value, { req }) => {
+        if (value !== req.body.password) throw new Error('Passwords do not match.');
+        return true;
+    }),
+];
+router.post('/register', registerLimiter, verifyCsrf, registerValidation, async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ success: false, errors: errors.array().map(e => e.msg) });
     }
-    if (!real_name || real_name.trim().length < 2) {
-        errors.push('Please enter your real name.');
-    }
-    if (!email || !isValidEmail(email.trim())) {
-        errors.push('Please enter a valid email address.');
-    }
-    if (!password || !validatePassword(password)) {
-        errors.push('Password must be at least 8 characters and contain an uppercase letter, lowercase letter, number, and special character.');
-    }
-    if (password !== confirm_password) {
-        errors.push('Passwords do not match.');
-    }
-
-    if (errors.length > 0) {
-        return res.status(400).json({ success: false, errors });
-    }
-
     try {
-        // ——— Check if username or email already exists ———
-        // $1 and $2 are parameterized queries — they prevent SQL injection.
-        // Never build SQL strings with string concatenation!
+
         const existing = await pool.query(
             'SELECT user_id FROM users WHERE LOWER(username) = LOWER($1) OR LOWER(email) = LOWER($2)',
             [username.trim(), email.trim()]
@@ -312,14 +200,8 @@ router.post('/register', registerLimiter, verifyCsrf, async (req, res) => {
             });
         }
 
-        // ——— Hash the password ———
-        // bcrypt.hash() adds a random "salt" and hashes the password.
-        // SALT_ROUNDS (12) controls how slow the hash is — higher = more secure but slower.
-        // The result looks like: $2b$12$K3xG... (60 chars)
         const hashedPassword = await bcrypt.hash(password, SALT_ROUNDS);
 
-        // ——— Insert into PostgreSQL ———
-        // RETURNING gives us back the new user's data without a second query
         const result = await pool.query(
             `INSERT INTO users (username, real_name, email, password_hash, height_cm, weight_kg, DoB, gender, target_weight_kg)
              VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
@@ -339,7 +221,6 @@ router.post('/register', registerLimiter, verifyCsrf, async (req, res) => {
 
         const newUser = result.rows[0];
 
-        // ——— Log them in automatically ———
         req.session.userId = newUser.user_id;
         req.session.username = newUser.username;
         generateCsrfToken(req);
@@ -355,40 +236,26 @@ router.post('/register', registerLimiter, verifyCsrf, async (req, res) => {
     }
 });
 
-// ═══════════════════════════════════════════════════════════════
-//  ROUTE: POST /login
-//  Authenticates a user against the PostgreSQL database
-// ═══════════════════════════════════════════════════════════════
-//
-//  WHAT CHANGED:
-//  - Instead of findByUsernameOrEmail(), we SELECT from the DB
-//  - bcrypt.compare() is the same — it checks the password
-//  - The "dummy hash" trick is kept: if no user is found, we still
-//    run bcrypt.compare against a fake hash. This prevents timing
-//    attacks (attacker can't tell if a username exists based on
-//    how fast the response comes back).
-// ═══════════════════════════════════════════════════════════════
+const loginValidation = [
+    body('username').trim().notEmpty().withMessage('Please enter your username.'),
+    body('password').notEmpty().withMessage('Please enter your password.'),
+];
 
-router.post('/login', loginLimiter, verifyCsrf, async (req, res) => {
-    const { username, password } = req.body;
-
-    if (!username || !password) {
-        return res.status(400).json({
-            success: false,
-            errors: ['Please enter your username and password.'],
-        });
+router.post('/login', loginLimiter, verifyCsrf, loginValidation, async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ success: false, errors: errors.array().map(e => e.msg) });
     }
 
+    const { username, password } = req.body;
     try {
-        // Look up user by username OR email
+
         const result = await pool.query(
             'SELECT user_id, username, email, password_hash FROM users WHERE LOWER(username) = LOWER($1) OR LOWER(email) = LOWER($1)',
             [username.trim()]
         );
 
         const user = result.rows[0] || null;
-
-        // Dummy hash — used if no user found, to prevent timing attacks
         const dummyHash = '$2b$12$KbQiHKvZpDffGhX7yL6t2eN8G6wmIqQFj8IDHdB9vjJE0iEOfO4aK';
         const hash = user ? user.password_hash : dummyHash;
 
@@ -400,8 +267,6 @@ router.post('/login', loginLimiter, verifyCsrf, async (req, res) => {
                 errors: ['Invalid username or password.'],
             });
         }
-
-        // ——— Set session (log them in) ———
         req.session.userId = user.user_id;
         req.session.username = user.username;
         generateCsrfToken(req);
@@ -417,10 +282,6 @@ router.post('/login', loginLimiter, verifyCsrf, async (req, res) => {
     }
 });
 
-// ═══════════════════════════════════════════════════════════════
-//  ROUTE: POST /logout
-// ═══════════════════════════════════════════════════════════════
-
 router.post('/logout', (req, res) => {
     const username = req.session.username || null;
     const userId = req.session.userId || null;
@@ -435,13 +296,9 @@ router.post('/logout', (req, res) => {
         at: Date.now()
     };
 
-    res.redirect('/');  // ← send them to homepage, not /login
+    res.redirect('/');
 });
 
-// ═══════════════════════════════════════════════════════════════
-//  ROUTE: GET /dashboard
-//  Only accessible if logged in
-// ═══════════════════════════════════════════════════════════════
 
 router.get('/dashboard', (req, res) => {
     if (!req.session.userId) {
@@ -449,11 +306,6 @@ router.get('/dashboard', (req, res) => {
     }
     res.sendFile(path.join(__dirname, '../../Code/dashboard.html'));
 });
-
-// ═══════════════════════════════════════════════════════════════
-//  ROUTE: GET /api/me
-//  Returns current logged-in user info (useful for frontend)
-// ═══════════════════════════════════════════════════════════════
 
 router.get('/api/me', (req, res) => {
     if (req.session && req.session.userId) {
@@ -467,28 +319,6 @@ router.get('/api/me', (req, res) => {
     }
 });
 
-// ═══════════════════════════════════════════════════════════════
-//  PASSWORD RESET FLOW — 3 steps
-// ═══════════════════════════════════════════════════════════════
-//
-//  Step 1: POST /api/forgot-password
-//     → User enters their email
-//     → Server generates a 6-digit OTP, saves it to password_resets table
-//     → Server emails the OTP to the user
-//     → OTP expires after 5 minutes
-//
-//  Step 2: POST /api/verify-otp
-//     → User enters the 6-digit code from their email
-//     → Server checks it against the database (correct? not expired? not used?)
-//     → If valid, marks OTP as "used" and sets a session flag
-//
-//  Step 3: POST /api/reset-password
-//     → User enters a new password
-//     → Server checks the session flag (must have verified OTP first)
-//     → Hashes the new password and updates the users table
-// ═══════════════════════════════════════════════════════════════
-
-// ——— Step 1: Request OTP ———
 router.post('/api/forgot-password', resetLimiter, async (req, res) => {
     try {
         const { email } = req.body;
@@ -500,15 +330,11 @@ router.post('/api/forgot-password', resetLimiter, async (req, res) => {
             });
         }
 
-        // Find the user by email
         const result = await pool.query(
             'SELECT user_id, email FROM users WHERE LOWER(email) = LOWER($1)',
             [email.trim()]
         );
 
-        // SECURITY: Always respond with the same message whether the email
-        // exists or not. This prevents attackers from discovering which
-        // emails have accounts (called "user enumeration").
         if (result.rows.length === 0) {
             return res.json({
                 success: true,
@@ -518,28 +344,22 @@ router.post('/api/forgot-password', resetLimiter, async (req, res) => {
 
         const user = result.rows[0];
 
-        // Invalidate any previous unused OTPs for this user
-        // This prevents old codes from working after a new one is requested
         await pool.query(
             'UPDATE password_resets SET used = TRUE WHERE user_id = $1 AND used = FALSE',
             [user.user_id]
         );
 
-        // Generate OTP and set expiry to 5 minutes from now
         const otpCode = generateOTP();
         const otpHash = crypto.createHash('sha256').update(otpCode).digest('hex');
         const expiresAt = new Date(Date.now() + 5 * 60 * 1000);
 
-        // Save OTP to database
         await pool.query(
             'INSERT INTO password_resets (user_id, otp_code, expires_at) VALUES ($1, $2, $3)',
             [user.user_id, otpHash, expiresAt]
         );
 
-        // Send the email
         await sendOTPEmail(user.email, otpCode);
 
-        // Store email in session so the verify step knows which user
         req.session.resetEmail = email.trim().toLowerCase();
 
         res.json({
@@ -556,7 +376,7 @@ router.post('/api/forgot-password', resetLimiter, async (req, res) => {
     }
 });
 
-// ——— Step 2: Verify OTP ———
+
 router.post('/api/verify-otp', async (req, res) => {
     try {
         const { email, otp } = req.body;
@@ -568,7 +388,6 @@ router.post('/api/verify-otp', async (req, res) => {
             });
         }
 
-        // Find the user
         const userResult = await pool.query(
             'SELECT user_id FROM users WHERE LOWER(email) = LOWER($1)',
             [email.trim()]
@@ -583,12 +402,6 @@ router.post('/api/verify-otp', async (req, res) => {
 
         const userId = userResult.rows[0].user_id;
 
-        // Look for a valid OTP:
-        // - Matches the user
-        // - Matches the code they entered
-        // - Has NOT been used already
-        // - Has NOT expired (expires_at is in the future)
-        // ORDER BY created_at DESC LIMIT 1 gets the most recent one
         const otpHash = crypto.createHash('sha256').update(otp).digest('hex');
         const otpResult = await pool.query(
             `SELECT id FROM password_resets
@@ -604,14 +417,11 @@ router.post('/api/verify-otp', async (req, res) => {
             });
         }
 
-        // Mark the OTP as used so it can't be reused
         await pool.query(
             'UPDATE password_resets SET used = TRUE WHERE id = $1',
             [otpResult.rows[0].id]
         );
 
-        // Store in session that this user has verified their OTP
-        // The reset-password route checks for this
         req.session.resetUserId = userId;
         req.session.resetVerified = true;
 
@@ -629,46 +439,30 @@ router.post('/api/verify-otp', async (req, res) => {
     }
 });
 
-// ——— Step 3: Reset Password ———
-router.post('/api/reset-password', async (req, res) => {
-    try {
-        const { password, confirm_password } = req.body;
+const resetPasswordValidation = [
+    body('password')
+        .isLength({ min: 8 }).withMessage('Password must be at least 8 characters.')
+        .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9])/)
+        .withMessage('Password must contain uppercase, lowercase, number and special character.'),
+    body('confirm_password').custom((value, { req }) => {
+        if (value !== req.body.password) throw new Error('Passwords do not match.');
+        return true;
+    }),
+];
 
-        // Check that the user actually verified an OTP first
-        // Without this, someone could skip straight to this endpoint
-        if (!req.session.resetVerified || !req.session.resetUserId) {
-            return res.status(403).json({
-                success: false,
-                errors: ['Please verify your reset code first.']
-            });
-        }
-
-
-
-        if (!password || !validatePassword(password)){
-            return res.status(400).json({
-                success:false,
-                errors: ['Invalid Password format :Password must be at least 8 characters and contain an uppercase letter, lowercase letter, number, and special character.']
-            })
-        }
-
-        if (password !== confirm_password) {
-            return res.status(400).json({
-                success: false,
-                errors: ['Passwords do not match.']
-            });
-        }
-
-        // Hash the new password
+router.post('/api/reset-password', resetPasswordValidation, async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ success: false, errors: errors.array().map(e => e.msg) });
+    }
+    try{
         const newHash = await bcrypt.hash(password, SALT_ROUNDS);
 
-        // Update it in the database
         await pool.query(
             'UPDATE users SET password_hash = $1 WHERE user_id = $2',
             [newHash, req.session.resetUserId]
         );
 
-        // Clean up the reset session data
         delete req.session.resetUserId;
         delete req.session.resetVerified;
         delete req.session.resetEmail;

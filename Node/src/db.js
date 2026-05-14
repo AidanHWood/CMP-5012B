@@ -13,7 +13,6 @@ const pool = new Pool({
     max: 3
 });
 
-// Tell PostgreSQL to look in cmp5012b schema for all tables
 pool.on('connect', (client) => {
     client.query('SET search_path TO cmp5012b, public');
 });

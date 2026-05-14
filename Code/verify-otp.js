@@ -9,10 +9,6 @@ async function checkSession() {
 }
 checkSession()
 
-      // ——— OTP input auto-focus behavior ———
-      // When you type a digit, it automatically jumps to the next box.
-      // Backspace goes back to the previous box.
-      // Pasting a full 6-digit code fills all boxes at once.
       const otpInputs = document.querySelectorAll(".otp-inputs input");
 
       otpInputs.forEach((input, index) => {
@@ -24,7 +20,6 @@ checkSession()
           }
         });
 
-        // Backspace moves to previous box
         input.addEventListener("keydown", function (e) {
           if (e.key === "Backspace" && !this.value && index > 0) {
             otpInputs[index - 1].focus();
@@ -34,7 +29,7 @@ checkSession()
           }
         });
 
-        // Handle paste — fills all 6 boxes from clipboard
+
         input.addEventListener("paste", function (e) {
           e.preventDefault();
           const pasted = e.clipboardData.getData("text").replace(/[^0-9]/g, "");
@@ -46,10 +41,7 @@ checkSession()
         });
       });
 
-      // ——— Countdown timer ———
-      // Shows how much time is left before the code expires.
-      // When it hits 0, the message changes to tell them to request a new code.
-      let timeLeft = 5 * 60; // 5 minutes in seconds
+      let timeLeft = 5 * 60;
 
       const timerInterval = setInterval(() => {
         timeLeft--;
@@ -66,7 +58,7 @@ checkSession()
         }
       }, 1000);
 
-      // ——— Verify the OTP ———
+
       async function handleVerify() {
         // Collect all 6 digits into one string
         const otp = Array.from(otpInputs)
@@ -120,7 +112,6 @@ checkSession()
         btn.textContent = "Verify Code";
       }
 
-      // ——— Resend the code ———
       async function handleResend() {
         const errorBox = document.getElementById("errorBox");
         const successBox = document.getElementById("successBox");
@@ -151,11 +142,11 @@ checkSession()
             successBox.textContent = "New code sent! Check your email.";
             successBox.style.display = "block";
 
-            // Reset timer
+
             timeLeft = 5 * 60;
             document.getElementById("timer").style.color = "#999";
 
-            // Clear old input
+
             otpInputs.forEach((i) => (i.value = ""));
             otpInputs[0].focus();
           } else {

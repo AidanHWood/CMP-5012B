@@ -1,4 +1,4 @@
-// wave.js - Dynamic wave background for the forms / homepage.
+
 
 const canvas = document.getElementById("waveCanvas");
     const ctx = canvas.getContext("2d");
