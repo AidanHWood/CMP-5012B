@@ -15,6 +15,8 @@ pool.on('connect', (client) => {
     client.query('SET search_path TO cmp5012b, public');
 });
 
+
+//Defines the api key as being in the .env file, we need this for the api caching
 const router  = express.Router();
 const API_KEY = process.env.FDC_API_KEY;
 
@@ -29,11 +31,14 @@ const NUTRIENT_MAP = {
     1093: 'sodium',
 };
 
+//require auth function which checks to see if the user has a valid session, if not it will throw an error
 function requireAuth(req, res, next) {
     if (req.session && req.session.userId) return next();
     res.status(401).json({ error: 'Not logged in.' });
 }
 
+//This is the function to extract the nutrient values from the api dataset, it makes use of the predefined nutrient_map
+//This is so that the users have the ability to track their macronutrient values.
 function extractNutrients(foodNutrients = []) {
     const result = {};
     for (const n of foodNutrients) {
@@ -42,6 +47,9 @@ function extractNutrients(foodNutrients = []) {
     }
     return result;
 }
+
+//This is one of the main funtions of this js file, when there is a new food entered by a user into the search box, and it is present in the API dataset, it then stores the value from the api in the database
+//This was a planned way to improve the efficiency of our program, as we are storing new values within our dataset, we are then requiring less and less api calls, saving us time, and if this were a real system, money
 
 async function cacheFood(name, nutrients) {
     try {
@@ -77,6 +85,9 @@ async function cacheFood(name, nutrients) {
     }
 }
 
+
+//this get request searches for a food item, first checking our local database cache before falling back to the FDC API,
+//any new results from the API are then cached in our database to reduce future API calls
 router.get('/api/foods/search', requireAuth, async (req, res) => {
     const { q } = req.query;
     if (!q || q.trim().length < 2 || q.trim().length > 100)
@@ -120,12 +131,16 @@ router.get('/api/foods/search', requireAuth, async (req, res) => {
     }
 });
 
+//validation function for the food_id, type and grams, to ensure boundaries are maintained
 const foodLogValidation = [
     body('food_id').isInt({ min: 1 }).withMessage('Invalid food_id.'),
     body('quantity_grams').isFloat({ min: 1, max: 10000 }).withMessage('Quantity must be between 1 and 10000.'),
     body('meal_type').isIn(['breakfast', 'lunch', 'dinner', 'snack']).withMessage('Invalid meal type.'),
 ];
 
+
+//this is the post method that will log a food log to the actual users account, it will insert the food log into the database based on the user ID,
+// this data is then used later on by the dashboard page in order to display the actual data.
 router.post('/api/food-log', requireAuth, verifyCsrf, foodLogValidation, async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -149,6 +164,9 @@ router.post('/api/food-log', requireAuth, verifyCsrf, foodLogValidation, async (
     }
 });
 
+
+//this get request fetches all of todays food log entries for the logged in user,
+//it scales the nutrient values based on the quantity in grams logged and returns a total calorie count
 router.get('/api/food-log/today', requireAuth, async (req, res) => {
     try {
         const result = await pool.query(
@@ -183,6 +201,8 @@ router.get('/api/food-log/today', requireAuth, async (req, res) => {
     }
 });
 
+//this is the delete method for the food-log, and is what runs if the user wants to delete a food log that they have made,
+// it searches for the entry, and also ensures that the user has a valid CSRF token, it will then delete the food log from the database
 router.delete('/api/food-log/:id', requireAuth, verifyCsrf, async (req, res) => {
     try {
         const result = await pool.query(
@@ -201,6 +221,8 @@ router.delete('/api/food-log/:id', requireAuth, verifyCsrf, async (req, res) => 
     }
 });
 
+
+//manual food entry constraints, using express-validator
 const manualFoodValidation = [
     body('food_name').trim().isLength({ min: 2, max: 150 }).withMessage('Food name must be between 2 and 150 characters.'),
     body('calories').isFloat({ min: 0, max: 10000 }).withMessage('Calories must be between 0 and 10000.'),
@@ -215,6 +237,8 @@ const manualFoodValidation = [
     body('sodium').optional({ nullable: true, checkFalsy: true }).isFloat({ min: 0, max: 100000 }),
 ];
 
+//post request for the manual food entry., this is where the users can add their own foods into the database, say if one of the foods that a user is logging isnt in the database, nor the api dataset
+// there has to be a way for a user to enter their own food. , this checks the manual food validation constaints, then adds the user logged food into the database
 router.post('/api/foods/manual', requireAuth, verifyCsrf, manualFoodValidation, async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
