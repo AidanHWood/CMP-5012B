@@ -79,7 +79,7 @@ function generateCsrfToken(req) {
 }
 
 function verifyCsrf(req, res, next) {
-    const submitted = req.body._csrf || req.headers['x-csrf-token'];
+    const submitted = (req.body && req.body._csrf) || req.headers['x-csrf-token'];
     const sessionToken = req.session.csrfToken;
 
     if (!submitted || !sessionToken) {
@@ -186,6 +186,9 @@ router.post('/register', registerLimiter, verifyCsrf, registerValidation, async 
     if (!errors.isEmpty()) {
         return res.status(400).json({ success: false, errors: errors.array().map(e => e.msg) });
     }
+
+    const { username, real_name, email, password, height_cm, weight_kg, DoB, gender, target_weight_kg } = req.body; // ADD THIS
+
     try {
 
         const existing = await pool.query(
@@ -455,7 +458,14 @@ router.post('/api/reset-password', resetPasswordValidation, async (req, res) => 
     if (!errors.isEmpty()) {
         return res.status(400).json({ success: false, errors: errors.array().map(e => e.msg) });
     }
-    try{
+
+    // ADD THESE TWO:
+    if (!req.session.resetVerified || !req.session.resetUserId) {
+        return res.status(403).json({ success: false, errors: ['Please verify your reset code first.'] });
+    }
+    const { password } = req.body;
+
+    try {
         const newHash = await bcrypt.hash(password, SALT_ROUNDS);
 
         await pool.query(
