@@ -22,7 +22,8 @@ function requireAuth(req, res, next) {
 }
 
 
-
+//this get request fetches all accepted friends for the logged in user,
+//it joins the friendships and users tables to return the friend details
 router.get('/api/friends', requireAuth, async (req, res) => {
     try {
         const result = await pool.query(
@@ -41,6 +42,9 @@ router.get('/api/friends', requireAuth, async (req, res) => {
     }
 });
 
+
+//this get request fetches all pending friend requests sent to the logged in user,
+//it is used to populate the friend requests section on the friends page
 router.get('/api/friends/requests', requireAuth, async (req, res) => {
     try {
         const result = await pool.query(
@@ -57,6 +61,8 @@ router.get('/api/friends/requests', requireAuth, async (req, res) => {
     }
 });
 
+//this get request searches for users by username or real name,
+//it also returns the friendship status and direction so the frontend knows whether to show add, sent or accept buttons
 router.get('/api/friends/search', requireAuth, async (req, res) => {
     const { q } = req.query;
     if (!q || q.trim().length < 2 || q.trim().length > 100)
@@ -88,6 +94,8 @@ router.get('/api/friends/search', requireAuth, async (req, res) => {
     }
 });
 
+//This is the post request for when a user requests fo be friends with another user, first it checks the valid CSRF and auth functions,
+//Then it will select both of the users and insert both the values into the friendships table, describing the relationship between the 2 users
 router.post('/api/friends/request', requireAuth, verifyCsrf, async (req, res) => {
     const userId = parseInt(req.body.userId);
     if (!userId || isNaN(userId) || userId <=0)
@@ -116,6 +124,9 @@ router.post('/api/friends/request', requireAuth, verifyCsrf, async (req, res) =>
     }
 });
 
+//this is a post request for then the requested friends accepts the invitation
+// all this function changes is the status of the friendship from pending to accepted.
+//then the friend will be able to be viewed on both thefriends and leaderboards page
 router.post('/api/friends/accept', requireAuth, verifyCsrf, async (req, res) => {
     const userId = parseInt(req.body.userId);
     if (!userId || isNaN(userId) || userId <=0)
@@ -138,6 +149,8 @@ router.post('/api/friends/accept', requireAuth, verifyCsrf, async (req, res) => 
     }
 });
 
+//this is the post request for when the requested friend rejects the request, this will just delete both of the users information from the friendship table,
+// we do this because if there has been a rejection, then there is no relationship between the 2 users anymore, so we must delete them both from the table
 router.post('/api/friends/reject', requireAuth, verifyCsrf, async (req, res) => {
     const userId = parseInt(req.body.userId);
     if (!userId || isNaN(userId) || userId <=0)
