@@ -1,3 +1,10 @@
+/*
+========================================================
+File: auth.css
+Description: design and layout styling script for authentication features
+========================================================
+*/
+
 .form-page {
     min-height: 100vh;
     display: flex;
