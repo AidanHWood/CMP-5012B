@@ -1,3 +1,5 @@
+
+//Dependencies,install express, bcrypt, ratelimit, nodemailer, crypto, etc
 const express = require('express');
 const bcrypt = require('bcrypt');
 const crypto = require('crypto');
@@ -10,6 +12,7 @@ const { body, validationResult } = require('express-validator');
 const router = express.Router();
 const SALT_ROUNDS = 12;
 
+//pool for all of the routes to the postgres database server
 const pool = new Pool({
     host: process.env.DB_HOST,
     port: process.env.DB_PORT || 5432,
@@ -26,6 +29,7 @@ pool.on('connect', (client) => {
     client.query('SET search_path TO cmp5012b, public');
 });
 
+//Nodemailer transporter setting up gmail password implementation
 const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
@@ -37,17 +41,19 @@ const transporter = nodemailer.createTransport({
     }
 });
 
-
+//Debugging code to ensure that when the server starts, is the transporter ready
 transporter.verify()
-    .then(() => console.log('✅ Email transporter ready'))
-    .catch(err => console.error('❌ Email setup error:', err.message));
+    .then(() => console.log('Email transporter ready'))
+    .catch(err => console.error('Email setup error:', err.message));
 
 
+//this function is used to generate the one time password that the users will use to reset their password
 function generateOTP() {
     return crypto.randomInt(100000, 999999).toString();
 }
 
 
+//function to make use of nodemailer, the users email, and the one time password in order to sent the one time password to the users email
 async function sendOTPEmail(toEmail, otpCode) {
     const mailOptions = {
         from: `"Health Tracker" <${process.env.EMAIL_USER}>`,
@@ -72,12 +78,20 @@ async function sendOTPEmail(toEmail, otpCode) {
     await transporter.sendMail(mailOptions);
 }
 
+
+//function to generate a CSRF token, this is a 32 byte hex string that is used to secure user requests and ensure that they can't be emulated
+// With this token, when users make a request, the csrf token is required to process this request
+//this way, an attacker cant emulate a users actions
 function generateCsrfToken(req) {
     const token = crypto.randomBytes(32).toString('hex');
     req.session.csrfToken = token;
     return token;
 }
 
+
+//This function is used to verify the csrf token that is generated from the system.
+//it computes a check to ensure that there is actually a csrf token that exists within the request.
+// furthermore it also computes if the submitted csrf token is correct, otherwise it errors
 function verifyCsrf(req, res, next) {
     const submitted = (req.body && req.body._csrf) || req.headers['x-csrf-token'];
     const sessionToken = req.session.csrfToken;
@@ -99,6 +113,8 @@ function verifyCsrf(req, res, next) {
     next();
 }
 
+
+//Rate limit for login attempt: 10 requests per hour per user, preventing DoS attacks
 const loginLimiter = rateLimit({
     windowMs: 15 * 60 * 1000,
     max: 10,
@@ -111,6 +127,8 @@ const loginLimiter = rateLimit({
     },
 });
 
+
+//Rate limit for register page: 5 requests per hour per users, preventing Dos attacks
 const registerLimiter = rateLimit({
     windowMs: 60 * 60 * 1000,
     max: 5,
@@ -122,7 +140,7 @@ const registerLimiter = rateLimit({
     },
 });
 
-
+//Rate limit for resetting password page: 5 requests per hour per user, preventing Dos attacks
 const resetLimiter = rateLimit({
     windowMs: 15 * 60 * 1000,
     max: 5,
@@ -136,6 +154,8 @@ const resetLimiter = rateLimit({
 
 
 
+//this get request serves the csrf token to the frontend, it generates a new one if one doesn't already exist in the session,
+//the frontend fetches this before every POST request to include it in the request headers
 router.get('/api/csrf-token', (req, res) => {
     if (!req.session.csrfToken) {
         req.session.csrfToken = crypto.randomBytes(32).toString('hex');
@@ -143,11 +163,13 @@ router.get('/api/csrf-token', (req, res) => {
     res.json({ csrfToken: req.session.csrfToken });
 });
 
-
+//this get request serves the register page to the user
 router.get('/register', (req, res) => {
     res.sendFile(path.join(__dirname, '../../Code/register.html'));
 });
 
+//this get request serves the login page, but first checks if the user has logged out within the last 10 minutes,
+//if they have and their account still exists, they are automatically logged back in and redirected to the dashboard
 router.get('/login', async (req, res) => {
     const TEN_MINUTES = 10 * 60 * 1000;
     const logout = req.session.recentLogout;
@@ -168,6 +190,9 @@ router.get('/login', async (req, res) => {
     res.sendFile(path.join(__dirname, '../../Code/login.html'));
 });
 
+
+
+//Register page validation that makes use of express - validator to ensure that all of the fields are filled in with the correct data
 const registerValidation = [
     body('username').trim().isLength({ min: 3 }).withMessage('Username must be at least 3 characters.'),
     body('real_name').trim().isLength({ min: 2 }).withMessage('Please enter your real name.'),
@@ -181,6 +206,11 @@ const registerValidation = [
         return true;
     }),
 ];
+
+//this is the post request for the register page, it first checks the rate limiter, csrf token and validation,
+//if all of these pass then it checks if the username or email already exists in the database,
+//if they dont then it hashes the password using bcrypt and inserts the new user into the database,
+//it then logs the user in automatically by setting the session variables and generating a new csrf token
 router.post('/register', registerLimiter, verifyCsrf, registerValidation, async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -239,11 +269,18 @@ router.post('/register', registerLimiter, verifyCsrf, registerValidation, async 
     }
 });
 
+//login validation also making use of the express - validator dependency
 const loginValidation = [
     body('username').trim().notEmpty().withMessage('Please enter your username.'),
     body('password').notEmpty().withMessage('Please enter your password.'),
 ];
 
+
+//This is the login post function, it takes in quite a few parameters including the login limiter to limit rates, veryifyCSRF, and login validation
+//This also will select the users data based on their username entered into the input, it will then use bycrypt to encyrpt the password entered by the user
+//Then it will compare this password with the already hashed password stored inside the database.
+//if they match, success, adn the user is allowed to login
+//if they dont, then an error is thrown
 router.post('/login', loginLimiter, verifyCsrf, loginValidation, async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -285,6 +322,9 @@ router.post('/login', loginLimiter, verifyCsrf, loginValidation, async (req, res
     }
 });
 
+
+//the post function for when a user logs out of the applciation, it sets the session variables to null, it then sends the user back to the home page
+// it also records the date and time of the logout, this is so that we can begin to implement the session relogging
 router.post('/logout', (req, res) => {
     const username = req.session.username || null;
     const userId = req.session.userId || null;
@@ -302,14 +342,16 @@ router.post('/logout', (req, res) => {
     res.redirect('/');
 });
 
-
+//this get request serves the dashboard page, it first checks if the user is logged in,
+//if they are not then they are redirected to the login page
 router.get('/dashboard', (req, res) => {
     if (!req.session.userId) {
         return res.redirect('/login');
     }
     res.sendFile(path.join(__dirname, '../../Code/dashboard.html'));
 });
-
+//this get request returns the currently logged in users basic info,
+//it is used by the frontend to check if the user is logged in and get their username
 router.get('/api/me', (req, res) => {
     if (req.session && req.session.userId) {
         res.json({
@@ -322,6 +364,12 @@ router.get('/api/me', (req, res) => {
     }
 });
 
+
+
+//this is the post code for the forgotten password page, obviously it has a reset limiter to ensure DoS attacks are mitigated.
+//this then computes checks to ensure that the user has entered an email and if it exists inside the database
+//If the email exists then a one time code is then generated and sent to the users email address using nodemailer.
+//This will also encrypt the one time password. Only uses sha256, as bcrypt is slow, and OTPs are only in use briefly, there is no real need to implemet a very secure method
 router.post('/api/forgot-password', resetLimiter, async (req, res) => {
     try {
         const { email } = req.body;
@@ -380,6 +428,10 @@ router.post('/api/forgot-password', resetLimiter, async (req, res) => {
 });
 
 
+
+//this is anotehr codeblock, this one is for handling the check of the user entering the one time password that has been sent to their account.
+//it retrieves the one time code hash from the database, and then compares this has with the hashed version of the one time code that the user enters into the application.
+//if they match then the user is allowed to proceed onto the next page, if not an error is thrown
 router.post('/api/verify-otp', async (req, res) => {
     try {
         const { email, otp } = req.body;
@@ -442,6 +494,10 @@ router.post('/api/verify-otp', async (req, res) => {
     }
 });
 
+
+//another validation check, this time to ensure that when a user enters a new password, that it conforms
+// to the already in place password validation of the register page, we make use of express-validation
+// as well as a regex, in order to ensure that the password entered is valid
 const resetPasswordValidation = [
     body('password')
         .isLength({ min: 8 }).withMessage('Password must be at least 8 characters.')
@@ -453,12 +509,15 @@ const resetPasswordValidation = [
     }),
 ];
 
+
+//This is the post method for the reset-password. it takes in the resetPassword Validation function
+// it checks to ensure that the user has entered a new password, if they have then bcrypt with hash and salt the password, and store it in the database
+
 router.post('/api/reset-password', resetPasswordValidation, async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         return res.status(400).json({ success: false, errors: errors.array().map(e => e.msg) });
     }
-
     if (!req.session.resetVerified || !req.session.resetUserId) {
         return res.status(403).json({ success: false, errors: ['Please verify your reset code first.'] });
     }
