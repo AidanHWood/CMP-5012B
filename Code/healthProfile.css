@@ -144,7 +144,7 @@
 .bmi-bar {
     position: relative;
     display: grid;
-    grid-template-columns: 18.5fr 6.5fr 5fr 10fr;
+    grid-template-columns: 8.5fr 6.5fr 5fr 10fr;
     height: 30px;
     border-radius: 999px;
     overflow: visible;
@@ -219,15 +219,15 @@
 }
 
 .bmi-ticks span:nth-child(1) {
-    left: 46.25%;
+    left: 28.33%;
 }
 
 .bmi-ticks span:nth-child(2) {
-    left: 62.5%;
+    left: 50%;
 }
 
 .bmi-ticks span:nth-child(3) {
-    left: 75%;
+    left: 66.66%;
 }
 
 .bmi-legend {

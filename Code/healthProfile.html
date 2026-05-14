@@ -210,11 +210,11 @@
         catEl.textContent = cat;
         msgEl.textContent = `Your BMI is in the ${cat.toLowerCase()} category.`;
 
-        const minBMI = 10;
-        const maxBMI = 40;
-        const clampedBMI = Math.min(Math.max(bmi, minBMI), maxBMI);
-        const markerPercent = ((clampedBMI - minBMI) / (maxBMI - minBMI)) * 100;
+        const bmiMin = 10;
+        const bmiMax = 40;
 
+        let markerPercent = ((bmi - bmiMin) / (bmiMax - bmiMin)) * 100;
+        markerPercent = Math.max(0, Math.min(markerPercent, 100));
         markerEl.style.left = `${markerPercent}%`;
       }
 
