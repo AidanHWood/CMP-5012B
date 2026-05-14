@@ -8,6 +8,8 @@ function requireAuth(req, res, next) {
     res.status(401).json({ error: 'Not logged in.' });
 }
 
+//this get request fetches the logged in users height and weight from the database,
+//it is used to populate the health profile page and calculate the users BMI
 router.get('/api/health-profile', requireAuth, async (req, res) => {
     try {
         const result = await pool.query(
@@ -26,6 +28,9 @@ router.get('/api/health-profile', requireAuth, async (req, res) => {
     }
 });
 
+
+//This is the post request for the health proile, it checks if they have the valid auth checks,
+// then it checks to see if the user has made any changes to their height or weight values
 router.post('/api/health-profile', requireAuth, verifyCsrf , async (req, res) => {
     const { height_cm, weight_kg } = req.body;
 
