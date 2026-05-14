@@ -1,3 +1,8 @@
+//this javascript file is used as a setup for the postgres database connection.
+//setting up the connection pool for the database to be accessed.
+//then it connects to the database, and gives a success or error message, dependent on the outcome of the connection
+
+
 const { Pool } = require('pg');
 
 const pool = new Pool({
@@ -18,7 +23,7 @@ pool.on('connect', (client) => {
 });
 
 pool.connect()
-    .then(() => console.log('✅ Connected to PostgreSQL'))
-    .catch(err => console.error('❌ DB connection error:', err.message));
+    .then(() => console.log('Connected to PostgreSQL'))
+    .catch(err => console.error('DB connection error:', err.message));
 
 module.exports = pool;
