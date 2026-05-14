@@ -1,3 +1,10 @@
+/*
+========================================================
+File: homepage.css
+Description: design and layout styling script for the homepage, many pages will use this aswell as other css as it contains alot of the standard layout css
+========================================================
+*/
+
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
