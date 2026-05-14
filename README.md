@@ -1,28 +1,6 @@
 # CMP-5012B – Software Engineering Project Starter
 
-This repository is a starter template for team projects in **CMP-5012B – Software Engineering**.
-
-It provides a consistent structure for all the documentation and design artefacts required for
-Coursework Part 1, and a place to put your implementation for Part 2.
-
-### New to GitHub?  
-Read [Getting Started (Web Browser Only)](web-only-setup.md) for information on working directly with the web interface.
-
-For local workflow, we recommend using GitHub desktop. See the [GitHub Desktop Quick Start](github-desktop-quick-start.md) guide.
-
-
-
----
-
-## Structure
-
-- `/docs` – Text-based documentation (vision, user stories, acceptance criteria, etc.)
-- `/design` – Diagrams and design artefacts (C4, wireframes, sequence diagrams, data model)
-- `/planning` – Sprints, tasks, roadmap, risk register
-- `/src` (you can create later) – Source code for implementation
-- `/tests` (optional) – Tests for your system
-
----
+FOR MARKERS, THE SOURCE CODE IS LOCATED IN BOTH NODE/SRC and CODE directories, please read them! :)
 
 ## Getting Started
 
