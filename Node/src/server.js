@@ -12,6 +12,8 @@ require('dotenv').config({ path: path.join(__dirname, '../.env') });
 
 const app = express();
 
+
+//helmet.js implementeation, cant use HTTPS due to the lack of an SSL certificate, but I know how to implement it in the future
 app.use(helmet({
     referrerPolicy: { policy: 'same-origin' },
     contentSecurityPolicy: {
@@ -57,6 +59,7 @@ app.use('/api', globalLimiter);
 
 const CODE_DIR = path.join(__dirname, '../../Code');
 
+//getters for the paths to different pages
 app.get('/dashboard.html', (req, res) => {
     if (!req.session.userId) return res.redirect('/login.html');
     res.sendFile(path.join(CODE_DIR, 'dashboard.html'));
@@ -101,28 +104,9 @@ app.use('/', accountRoutes);
 const foodRoutes = require('./food');
 app.use('/', foodRoutes);
 
-app.post('/add-food', (req, res) => {
-    const filePath = path.join(__dirname, 'data', 'food.json');
-    try {
-        let data = [];
-        if (fs.existsSync(filePath)) {
-            data = JSON.parse(fs.readFileSync(filePath));
-        }
-        data.push(req.body);
-        fs.writeFileSync(filePath, JSON.stringify(data, null, 2));
-        res.json({ success: true });
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({ error: 'Server error' });
-    }
-});
-
 let calorieLog = [];
 
-app.get('/api/calories', (req, res) => {
-    res.json(calorieLog);
-});
-
+//this post requests adds the users caloric intake for a meal.
 app.post('/api/calories', (req, res) => {
     const { meal, calories, description } = req.body;
     const entry = {
@@ -136,6 +120,7 @@ app.post('/api/calories', (req, res) => {
     res.status(201).json(entry);
 });
 
+//delete request for a caloric food entry
 app.delete('/api/calories/:id', (req, res) => {
     calorieLog = calorieLog.filter(e => e.id !== Number(req.params.id));
     res.status(204).send();
@@ -143,6 +128,10 @@ app.delete('/api/calories/:id', (req, res) => {
 
 const pool = require('./db');
 
+
+
+//this get request fetches the users current weight from the database,
+//it is used by the exercise logging page to calculate estimated calories burned
 app.get('/api/user-weight', async (req, res) => {
     if (!req.session.userId) return res.status(401).json({ error: 'Not logged in' });
     try {
@@ -157,6 +146,8 @@ app.get('/api/user-weight', async (req, res) => {
     }
 });
 
+//this get request fetches all exercise logs for the current user for today,
+//it is used to populate the exercise log list on the log exercise page
 app.get('/api/exercise', async (req, res) => {
     if (!req.session.userId) return res.status(401).json({ error: 'Not logged in' });
     try {
@@ -172,6 +163,7 @@ app.get('/api/exercise', async (req, res) => {
     }
 });
 
+//delete request for when a user wants to remove the exercise.
 app.delete('/api/exercise/:id', requireAuth, verifyCsrf, async (req, res) => {
     try {
         await pool.query(
@@ -185,8 +177,8 @@ app.delete('/api/exercise/:id', requireAuth, verifyCsrf, async (req, res) => {
     }
 });
 
-console.log('=== REGISTERING WEIGHT HISTORY ROUTE ===');
-
+//this get request fetches the users weight history from the database,
+//it supports both a date range query and a days query, and validates the input before querying
 app.get('/api/weight-history', async (req, res) => {
     if (!req.session.userId) return res.status(401).json({ error: 'Not logged in' });
     try {
@@ -226,6 +218,7 @@ const exerciseValidation = [
     body('weight_moved_kg').optional({ nullable: true, checkFalsy: true }).isFloat({ min: 0, max: 10000 }),
 ];
 
+//post request for when a user is entering a new exersise into th database,
 app.post('/api/exercise', requireAuth, verifyCsrf, exerciseValidation, async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -246,6 +239,8 @@ app.post('/api/exercise', requireAuth, verifyCsrf, exerciseValidation, async (re
     }
 });
 
+//this get request fetches the users exercise history for a specific exercise type,
+//it supports both a date range query and a days query, validating the input before querying the databas
 app.get('/api/exercise-history', async (req, res) => {
     if (!req.session.userId) return res.status(401).json({ error: 'Not logged in' });
     const validTypes = ['running', 'cycling', 'walking', 'swimming', 'gym', 'sport'];
@@ -285,6 +280,8 @@ app.get('/api/exercise-history', async (req, res) => {
     }
 });
 
+//this get request fetches all the stats needed for the dashboard page,
+//it queries calories eaten, calories burned, macros and the users logging streak for today
 app.get('/api/dashboard-stats', async (req, res) => {
     if (!req.session.userId) return res.status(401).json({ error: 'Not logged in' });
     try {
@@ -352,6 +349,10 @@ app.get('/api/dashboard-stats', async (req, res) => {
     }
 });
 
+
+
+//this get request fetches the users exercise calories burned for the last 7 days,
+//it fills in any missing days with 0 so the chart always shows a full week
 app.get('/api/weekly-exercise', async (req, res) => {
     if (!req.session.userId) return res.status(401).json({ error: 'Not logged in' });
     try {
@@ -383,6 +384,10 @@ app.get('/api/weekly-exercise', async (req, res) => {
     }
 });
 
+
+
+//this get request fetches todays food log grouped by meal type,
+//it is used by the dashboard to populate the calories throughout the day chart
 app.get('/api/food-log/today-by-meal', async (req, res) => {
     if (!req.session.userId) return res.status(401).json({ error: 'Not logged in' });
     try {
@@ -405,6 +410,8 @@ app.get('/api/food-log/today-by-meal', async (req, res) => {
     }
 });
 
+//this get request fetches all goals for the logged in user from the database,
+//ordered by most recently created first
 app.get('/api/goals', async (req, res) => {
     if (!req.session.userId) return res.status(401).json({ error: 'Not logged in' });
     try {
@@ -423,6 +430,8 @@ app.get('/api/goals', async (req, res) => {
     }
 });
 
+//this post request will submit a newly created goal for the user, it first performs chccks to ensure that the data has actually been entered,
+// then it will update or insert a new goal into the goals table of the database, linking it thrugh the use of a foreign key, userId
 app.post('/api/goals', verifyCsrf, async (req, res) => {
     if (!req.session.userId) return res.status(401).json({ error: 'Not logged in' });
     const { goal_type, goal_name, goal_value, target_val, actual_value, deadline } = req.body;
@@ -457,6 +466,8 @@ app.post('/api/goals', verifyCsrf, async (req, res) => {
     }
 });
 
+//this post request saves multiple exercise goals at once, it is used during the registration phase 2 popup
+//and the user settings page, it loops through each goal and either updates or inserts depending on whether it already exists
 app.post('/api/goals/batch', verifyCsrf, async (req, res) => {
     if (!req.session.userId) return res.status(401).json({ error: 'Not logged in' });
     const { goals } = req.body;
@@ -488,6 +499,8 @@ app.post('/api/goals/batch', verifyCsrf, async (req, res) => {
     }
 });
 
+//this patch request is used when a user wants to make changes to a goal but not delete it,
+//it will get the goal_id of the goal that is being requested to change, and it will update the values for the usre in the database.
 app.patch('/api/goals/:id', verifyCsrf, async (req, res) => {
     if (!req.session.userId) return res.status(401).json({ error: 'Not logged in' });
     const { actual_value, goal_value, target_val } = req.body;
@@ -514,6 +527,7 @@ app.patch('/api/goals/:id', verifyCsrf, async (req, res) => {
     }
 });
 
+//function to delete a user goal, this will check the users auth and delete the goal from the database
 app.delete('/api/goals/:id', verifyCsrf, async (req, res) => {
     if (!req.session.userId) return res.status(401).json({ error: 'Not logged in' });
     try {
@@ -529,6 +543,9 @@ app.delete('/api/goals/:id', verifyCsrf, async (req, res) => {
     }
 });
 
+
+//this get request fetches all goals with their actual progress automatically calculated from the database,
+//exercise based goals pull their values from exercise_logs and calorie goals pull from food_log for today
 app.get('/api/goals-with-progress', async (req, res) => {
     if (!req.session.userId) return res.status(401).json({ error: 'Not logged in' });
     try {
@@ -604,6 +621,10 @@ app.get('/api/goals-with-progress', async (req, res) => {
     }
 });
 
+
+
+//this get request fetches the logged in users profile information from the database,
+//it is used to populate the user settings page with the current values
 app.get('/api/user-profile', async (req, res) => {
     if (!req.session.userId) return res.status(401).json({ error: 'Not logged in' });
     try {
@@ -619,6 +640,8 @@ app.get('/api/user-profile', async (req, res) => {
     }
 });
 
+//this patch request waits to see if a user changes any of the values within their user settings profile,
+//if they do then the system will then update the values inside the database, coaessing the values to other tables.
 app.patch('/api/user-profile', verifyCsrf, async (req, res) => {
     if (!req.session.userId) return res.status(401).json({ error: 'Not logged in' });
     const { real_name, email, age, height_cm, weight_kg, calorie_goal } = req.body;
@@ -649,6 +672,10 @@ app.patch('/api/user-profile', verifyCsrf, async (req, res) => {
     }
 });
 
+
+
+//this get request fetches the leaderboard for the current user and their accepted friends,
+//it ranks users by calories burned this week, with tied users sharing the same rank
 app.get('/api/leaderboard', async (req, res) => {
     if (!req.session.userId) return res.status(401).json({ error: 'Not logged in' });
     const type = req.query.type || 'overall';
@@ -728,6 +755,7 @@ app.get('/api/leaderboard', async (req, res) => {
 });
 
 
+//serves the homepage to unauthenticated users
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, '../../Code/homepage.html'));
 });
