@@ -1,3 +1,39 @@
+//  Handles:
+//  - Goal configuration and smart goal-type detection
+//  - Formatting utilities for values, dates, progress, and time conversion
+//  - Dynamic goal setup for:
+//      - Water, steps, weight loss
+//      - Calorie intake targets
+//      - Exercise-based goals (sessions, distance, time, gym volume)
+//  - BMR and calorie goal calculations based on user metrics/activity
+//  - Rendering and updating active goals with progress tracking
+//  - Auto-tracked exercise and calorie goals from logged activity
+//  - Manual goal creation, editing, updating, and deletion
+//  - User profile loading and preference saving
+//  - Account deletion workflow with confirmation handling
+//
+//  Supports:
+//  - Dynamic exercise goal patterns:
+//      - running_sessions_week
+//      - swimming_distance_week
+//      - cycling_time_10km
+//      - gym_weight_moved_week
+//  - Time-based goals with HH:MM:SS conversion
+//  - Batch goal creation for multiple exercise goals
+//  - Auto-calculated progress percentages and visual progress bars
+//
+//  Uses:
+//  - /api/goals
+//  - /api/goals/batch
+//  - /api/goals-with-progress
+//  - /api/user-profile
+//  - /api/account
+//  - /api/csrf-token
+//
+//  Dependencies:
+//  - Fetch API
+//  - DOM manipulation
+//  - Browser local event handling
 
 const GOAL_CONFIG = {
     water:       { label: 'Water',       unit: 'ml',    isTime: false, higherIsBetter: true,  targetHint: 'e.g. 2000 ml',  currentHint: 'e.g. 1500 ml' },

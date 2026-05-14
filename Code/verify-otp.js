@@ -1,3 +1,15 @@
+//  Part of the password reset flow:
+//  forgot-password.html → verify-otp.html → reset-password.html
+//
+//  Features:
+//  - 6-digit OTP input with auto-focus to next box on typing
+//  - Backspace moves to previous box
+//  - Paste support: fills all 6 boxes from clipboard
+//  - 5-minute countdown timer with expiry warning
+//  - Resend code button that triggers a new OTP email
+//  - Session check: redirects to forgot-password if no active session
+//
+//  Dependencies: /api/csrf-token, /api/verify-otp, /api/forgot-password
 
 async function checkSession() {
   try {

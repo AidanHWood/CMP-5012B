@@ -1,3 +1,12 @@
+//  Handles:
+//  - User login form validation and submission
+//  - CSRF token retrieval for secure authentication requests
+//  - Password visibility toggle
+//  - Enter key login shortcut
+//  - Login loading states and error handling
+//  - Redirecting authenticated users to dashboard
+//
+//  Dependencies: /api/csrf-token, /login   
 
 //Generating the likkle CSRF token
 async function getCsrfToken() {
@@ -19,7 +28,7 @@ async  function togglePassword(){
     }
 }
 
-//func that handles the login tingy
+//func that handles the login 
 async function handleLogin() {
     const btn = document.getElementById('loginBtn');
     const errorBox = document.getElementById('errorBox');

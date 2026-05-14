@@ -1,4 +1,15 @@
-
+//  Section 1: Weight Over Time
+//  - Fetches weight_logs from /api/weight-history
+//  - Displays a Chart.js line chart with date range picker
+//  - Shows stats: starting weight, current, change, entry count
+//
+//  Section 2: Exercise & Physical Activity
+//  - Exercise type selector (Running, Swimming, Cycling, Walking, Gym)
+//  - Fetches exercise_logs from /api/exercise-history?type=X
+//  - Charts distance (km) for cardio or weight moved (kg) for gym
+//  - Separate date range picker per section
+//
+//  Dependencies: Chart.js, chartjs-adapter-date-fns, /api/weight-history, /api/exercise-history
 
 let weightChart = null;
 let exerciseChart = null;

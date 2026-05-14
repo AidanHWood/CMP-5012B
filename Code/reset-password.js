@@ -1,9 +1,24 @@
+ //  Final step of the password reset flow:
+//  forgot-password.html → verify-otp.html → reset-password.html
+//
+//  Validates the new password meets complexity requirements:
+//  - At least 8 characters
+//  - Contains uppercase, lowercase, number, and special character
+//  - Both password fields match
+//
+//  Sends the new password to POST /api/reset-password
+//  and redirects to login on success.
+//
+//  Dependencies: /api/reset-password
+ 
  document
         .getElementById("confirm_password")
         .addEventListener("keydown", function (e) {
           if (e.key === "Enter") handleReset();
         });
 
+        // ── Password complexity validation ──
+       // Requires: 8+ chars, 1 uppercase, 1 lowercase, 1 digit, 1 special char
       function validatePassword(password) {
         const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/;
         return regex.test(password);

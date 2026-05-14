@@ -1,3 +1,25 @@
+//  Handles:
+//  - Food search and calorie lookup logging
+//  - Manual food entry creation and submission
+//  - Daily food log display and deletion
+//  - Meal type selection and tracking
+//  - Live food search with debounce
+//  - Total calorie tracking for the current day
+//  - Modal/overlay controls for manual food entry
+//
+//  Supports two logging modes:
+//      - Food database lookup
+//      - Manual nutrition entry
+//
+//  Dependencies: /api/foods/search,
+//                /api/foods/manual,
+//                /api/food-log,
+//                /api/food-log/today,
+//                /api/csrf-token
+// ─────────────────────────────────────────────
+//  Food search uses delayed querying (debounce)
+//  to reduce unnecessary API requests
+// ─────────────────────────────────────────────
 
 function showMode(mode) {
     document.getElementById('lookupSection').style.display = mode === 'lookup' ? 'block' : 'none';

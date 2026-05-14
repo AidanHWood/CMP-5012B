@@ -1,3 +1,18 @@
+//  Handles the user registration flow:
+//  1. User fills in form → account created via POST /register
+//  2. Phase 1 popup: Activity level selection → BMR calculation
+//     → 5 calorie goal options (Cut/Maintain/Bulk) → saved to goals table
+//  3. Phase 2 popup: Exercise type selection → sessions/distance/time
+//     goals per exercise → batch saved to goals table
+//
+//  Calorie calculation uses the Mifflin-St Jeor formula:
+//    Men:   BMR = (10 × weight) + (6.25 × height) - (5 × age) + 5
+//    Women: BMR = (10 × weight) + (6.25 × height) - (5 × age) - 161
+//    Then: TDEE = BMR × activity factor (1.2 to 1.9)
+//
+//  Dependencies: /api/csrf-token, /register, /api/goals, /api/goals/batch
+
+// ── Fetch CSRF token for secure form submissions
 async function getCsrfToken() {
     const res = await fetch('/api/csrf-token');
     const data = await res.json();

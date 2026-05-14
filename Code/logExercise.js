@@ -1,3 +1,21 @@
+//  Handles:
+//  - Logging and deleting exercise entries
+//  - Live calorie burn estimation using MET values
+//  - Auto-fetching user body weight for calorie calculations
+//  - Dynamic exercise form behaviour:
+//  -   - Distance tracking for cardio exercises
+//  -   - Weight moved tracking for gym sessions
+//  - Displaying exercise history and total calories burned
+//  - Manual calorie override support
+//
+//  Uses MET-based calorie estimation formula:calories = MET × body weight × hours exercised
+//
+//  Dependencies: /api/user-weight, /api/exercise,/api/csrf-token
+// ─────────────────────────────────────────────
+//  MET values configuration for exercise intensity
+//  Used to estimate calories burned dynamically
+// ─────────────────────────────────────────────
+
 const MET_VALUES = {
     running:  { low: 6.0, medium: 8.0, high: 11.5 },
     cycling:  { low: 4.0, medium: 6.8, high: 10.0 },

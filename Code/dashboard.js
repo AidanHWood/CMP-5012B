@@ -1,3 +1,22 @@
+//  Handles:
+//  - Loading and displaying stat cards (calories eaten, burned, net, streak)
+//  - Pie charts: calories remaining, macronutrients
+//  - Line chart: cumulative calories throughout the day by meal
+//  - Bar chart: weekly exercise calories burned
+//  - Goals section: groups exercise goals by type with expandable dropdowns,
+//    standalone goals (calorie intake, water, steps) with manual update,
+//    auto-tracked progress from exercise_logs and food_log
+//
+//  Uses /api/goals-with-progress for auto-computed actual values
+//  (sessions counted, distance summed, calories from food log)
+
+//  Dependencies: Chart.js, /api/dashboard-stats, /api/goals-with-progress,
+//                /api/food-log/today-by-meal, /api/weekly-exercise, /api/csrf-token
+// ─────────────────────────────────────────────
+//  Goal config — smart detection for any goal type
+//  Pattern-matches dynamic types from registration (e.g. running_sessions_week)
+// ─────────────────────────────────────────────
+
 function getGoalConfig(goalType) {
     const known = {
         calorie_intake:        { unit: 'kcal', isTime: false, icon: '🔥', isDistance: false },
