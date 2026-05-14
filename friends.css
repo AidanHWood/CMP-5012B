@@ -1,0 +1,321 @@
+/*
+========================================================
+File: friends.css
+Description: design and layout styling script for the friends page
+========================================================
+*/
+
+@import url("https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&display=swap");
+
+.content {
+  position: relative;
+  z-index: 1;
+  min-height: 100vh;
+  padding: 130px 24px 80px;
+}
+
+.leaderboard-container {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.section-card,
+.user-row {
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  border-radius: 24px;
+  backdrop-filter: blur(12px);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.06);
+}
+
+.section-card {
+  padding: 28px;
+  margin-bottom: 28px;
+}
+
+.section-title {
+  margin-bottom: 18px;
+  color: var(--green);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 24px;
+  height: 24px;
+  margin-left: 8px;
+  padding: 0 8px;
+  background: var(--green);
+  color: #fff;
+  border-radius: 100px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.search-input {
+  width: 100%;
+  padding: 14px 16px;
+  margin-bottom: 14px;
+  border: 1.5px solid rgba(0, 0, 0, 0.1);
+  border-radius: 14px;
+  background: #fff;
+  color: var(--dark);
+  font-family: "DM Sans", sans-serif;
+  font-size: 15px;
+  outline: none;
+}
+
+.search-input:focus {
+  border-color: var(--green);
+}
+
+.user-row {
+  padding: 18px 22px;
+  margin-bottom: 10px;
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: center;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  background: rgba(26, 107, 60, 0.1);
+  color: var(--green);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  font-weight: 800;
+  flex-shrink: 0;
+}
+
+.user-name {
+  color: var(--dark);
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.user-handle {
+  margin-top: 3px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.btn-add,
+.btn-accept,
+.btn-reject,
+.btn-sent,
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 42px;
+  padding: 0 20px;
+  border-radius: 100px;
+  font-family: "DM Sans", sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.btn-add,
+.btn-accept {
+  background: var(--dark);
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.2s, opacity 0.2s;
+}
+
+.btn-add:hover,
+.btn-accept:hover {
+  transform: translateY(-2px);
+  opacity: 0.85;
+}
+
+.btn-sent,
+.status-badge.accepted,
+.status-badge.pending {
+  background: rgba(26, 107, 60, 0.1);
+  color: var(--green);
+  border: 1px solid rgba(26, 107, 60, 0.2);
+}
+
+.btn-reject {
+  background: transparent;
+  color: #c0392b;
+  border: 1.5px solid rgba(192, 57, 43, 0.22);
+  cursor: pointer;
+  transition: transform 0.2s, background 0.2s, border-color 0.2s;
+}
+
+.btn-reject:hover {
+  transform: translateY(-2px);
+  background: rgba(192, 57, 43, 0.08);
+  border-color: #c0392b;
+}
+
+.empty-state {
+  padding: 36px 20px;
+  text-align: center;
+  color: var(--muted);
+  font-size: 15px;
+  font-weight: 600;
+}
+
+@media (max-width: 768px) {
+  .content {
+    padding-top: 110px;
+  }
+
+  .section-card {
+    padding: 22px;
+  }
+
+  .user-row {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .user-row > div:last-child {
+    width: 100%;
+  }
+
+  .btn-add,
+  .btn-accept,
+  .btn-reject,
+  .btn-sent,
+  .status-badge {
+    width: 100%;
+  }
+}
+/* ── Leaderboard ─────────────────────────────────────────── */
+.lb-top-toggles {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.lb-top-btn {
+  padding: 10px 20px;
+  border-radius: 100px;
+  border: 1.5px solid rgba(0,0,0,0.1);
+  background: #fff;
+  font-family: "DM Sans", sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+  color: var(--dark);
+}
+
+.lb-top-btn.active {
+  background: var(--green);
+  color: #fff;
+  border-color: var(--green);
+}
+
+.lb-activity-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.lb-tab {
+  padding: 8px 16px;
+  border-radius: 100px;
+  border: 1.5px solid rgba(0,0,0,0.1);
+  background: #fff;
+  font-family: "DM Sans", sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+  color: var(--dark);
+}
+
+.lb-tab.active {
+  background: var(--green);
+  color: #fff;
+  border-color: var(--green);
+}
+
+.lb-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 18px;
+  border-radius: 16px;
+  margin-bottom: 8px;
+  background: rgba(255,255,255,0.6);
+  border: 1px solid rgba(0,0,0,0.05);
+}
+
+.lb-row.pinned {
+  background: rgba(26,107,60,0.08);
+  border: 1.5px solid rgba(26,107,60,0.25);
+  margin-bottom: 16px;
+}
+
+.lb-row.current-user {
+  background: rgba(26,107,60,0.05);
+  border: 1.5px solid rgba(26,107,60,0.15);
+}
+
+.lb-rank {
+  font-size: 16px;
+  font-weight: 900;
+  color: var(--muted);
+  min-width: 28px;
+  text-align: center;
+}
+
+.lb-rank.gold   { color: #f5a623; }
+.lb-rank.silver { color: #9b9b9b; }
+.lb-rank.bronze { color: #c47a3a; }
+
+.lb-name {
+  flex: 1;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--dark);
+}
+
+.lb-you-badge {
+  font-size: 11px;
+  font-weight: 700;
+  background: var(--green);
+  color: #fff;
+  padding: 2px 8px;
+  border-radius: 100px;
+  margin-left: 8px;
+}
+
+.lb-cals {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--green);
+}
+
+.lb-week-label {
+  font-size: 12px;
+  color: var(--muted);
+  font-weight: 600;
+  margin-bottom: 14px;
+}

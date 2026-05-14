@@ -1,0 +1,242 @@
+/*
+========================================================
+File: logCalories.css
+Description: design and layout styling script for the logCalories page, this also contains styling for all the buttons and form cards for the logging
+========================================================
+*/
+
+@import url("https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&display=swap");
+
+.content {
+  position: relative;
+  z-index: 1;
+  min-height: 100vh;
+  padding: 130px 24px 80px;
+}
+
+.log-container {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.total-banner,
+.form-card,
+.log-entry {
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  border-radius: 24px;
+  backdrop-filter: blur(12px);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.06);
+}
+
+.total-banner {
+  padding: 28px;
+  margin-bottom: 20px;
+  text-align: center;
+  color: var(--green);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.cal-number {
+  display: block;
+  margin-top: 8px;
+  font-family: "Instrument Serif", serif;
+  font-size: 52px;
+  line-height: 1;
+  color: var(--dark);
+  letter-spacing: -1px;
+}
+
+.form-card {
+  padding: 28px;
+  margin-bottom: 28px;
+}
+
+.form-card label,
+.popup-label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--dark);
+}
+
+.meal-options,
+.entry-mode-buttons {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+
+.meal-option {
+  flex: 1;
+  min-width: 120px;
+}
+
+.meal-option input[type="radio"] {
+  display: none;
+}
+
+.meal-option span,
+.entry-mode-buttons button {
+  display: block;
+  width: 100%;
+  text-align: center;
+  padding: 14px 16px;
+  background: rgba(26, 107, 60, 0.1);
+  border: 1px solid rgba(26, 107, 60, 0.2);
+  border-radius: 18px;
+  color: var(--green);
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.2s, background 0.2s, color 0.2s;
+}
+
+.meal-option span:hover,
+.entry-mode-buttons button:hover {
+  transform: translateY(-2px);
+  background: rgba(26, 107, 60, 0.16);
+}
+
+.meal-option input[type="radio"]:checked + span,
+.entry-mode-buttons button.active {
+  background: var(--green);
+  color: #fff;
+}
+
+.form-card input[type="text"],
+.form-card input[type="number"],
+.popup-input,
+#m_meal_type {
+  width: 100%;
+  padding: 14px 16px;
+  margin-bottom: 14px;
+  border: 1.5px solid rgba(0, 0, 0, 0.1);
+  border-radius: 14px;
+  background: #fff;
+  color: var(--dark);
+  font-family: "DM Sans", sans-serif;
+  font-size: 15px;
+  outline: none;
+}
+
+.form-card input:focus,
+.popup-input:focus,
+#m_meal_type:focus {
+  border-color: var(--green);
+}
+
+.submit-btn {
+  width: 100%;
+  padding: 14px 28px;
+  background: var(--dark);
+  color: #fff;
+  border: none;
+  border-radius: 100px;
+  font-size: 15px;
+  font-weight: 700;
+  font-family: "DM Sans", sans-serif;
+  cursor: pointer;
+  transition: transform 0.2s, opacity 0.2s;
+}
+
+.submit-btn:hover {
+  transform: translateY(-2px);
+  opacity: 0.85;
+}
+
+.log-section-title {
+  margin-bottom: 12px;
+  color: var(--green);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.log-entry {
+  padding: 18px 22px;
+  margin-bottom: 10px;
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: center;
+}
+
+.entry-left {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.meal-tag {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.entry-desc {
+  color: var(--dark);
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.entry-right {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.entry-cals {
+  color: var(--green);
+  font-size: 18px;
+  font-weight: 800;
+}
+
+.entry-cals small {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.delete-btn {
+  background: transparent;
+  border: none;
+  color: rgba(107, 124, 110, 0.55);
+  font-size: 18px;
+  cursor: pointer;
+}
+
+.delete-btn:hover {
+  color: #c0392b;
+}
+
+.empty-state {
+  padding: 36px 20px;
+  text-align: center;
+  color: var(--muted);
+  font-size: 15px;
+  font-weight: 600;
+}
+
+@media (max-width: 768px) {
+  .content {
+    padding-top: 110px;
+  }
+
+  .form-card,
+  .total-banner {
+    padding: 22px;
+  }
+
+  .log-entry {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
