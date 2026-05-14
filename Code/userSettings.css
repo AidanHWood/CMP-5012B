@@ -1,3 +1,10 @@
+/*
+========================================================
+File: userSettings.css
+Description: design and layout styling script for the userSettings.html page, this page had to display alot such as a large amount of entry fields for the users settings and the goals they can set aswell as the use of modular sections to allow for the displayment of the users goals
+========================================================
+*/
+
 @import url("https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&display=swap");
 
 .content {
