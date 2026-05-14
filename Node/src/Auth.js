@@ -459,7 +459,6 @@ router.post('/api/reset-password', resetPasswordValidation, async (req, res) => 
         return res.status(400).json({ success: false, errors: errors.array().map(e => e.msg) });
     }
 
-    // ADD THESE TWO:
     if (!req.session.resetVerified || !req.session.resetUserId) {
         return res.status(403).json({ success: false, errors: ['Please verify your reset code first.'] });
     }
