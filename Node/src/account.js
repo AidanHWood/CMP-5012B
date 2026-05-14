@@ -8,6 +8,8 @@ function requireAuth(req, res, next) {
 }
 
 
+// this is a delete method that is used on the user settings page, it is used when a user wants to fully delete their account from the application
+// this method also deletes on cascade, meaning that all of the data that is stored about the user will also be deleted cleanly.
 router.delete('/api/account', requireAuth, verifyCsrf,  async (req, res) => {
     const userId = req.session.userId;
 
